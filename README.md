@@ -1,5 +1,5 @@
-# docker
+# docker-ubuntu-base
 
-The obligatory Dockerfile collection
+Builds an Ubuntu base image from https://phusion.github.io/baseimage-docker/ 
 
-See: https://hub.docker.com/u/funkygibbon/ for various automated builds of these docker images
+Modified to use mirror://mirrors.ubuntu.com/mirrors.txt
