@@ -1,0 +1,5 @@
+app:
+  build: .
+  env_file:
+   - env.default
+   - env.user

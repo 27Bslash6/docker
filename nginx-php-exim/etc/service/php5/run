@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+if [[ "${ENVIRONMENT}" == "development" ]] ; then
+	php5enmod xdebug
+else
+	php5dismod xdebug
+fi
+
+exec php5-fpm -c /etc/php5/fpm >>/var/log/php-fpm.log 2>&1
