@@ -6,6 +6,9 @@
 
 set -e
 
+source /root/env.default
+source /root/env.user
+
 # =============================================================================
 # Application is launched as $APP_USER:$APP_GROUP with specified UID and GID, 
 # This simplifies editing on the host via volumes, or securing volumes from host

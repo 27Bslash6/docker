@@ -38,6 +38,8 @@ EXPOSE 80
 
 COPY etc /etc
 COPY index.php /app/index.php
+COPY env.* /root/
+
 COPY init.sh /init.sh
 COPY boot.sh /boot.sh
 
