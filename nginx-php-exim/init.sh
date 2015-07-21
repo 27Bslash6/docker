@@ -27,6 +27,3 @@ echo "daemon off;" >> /etc/nginx/nginx.conf
 # EXIM
 
 echo "MAIN_TLS_ENABLE = 1" >> /etc/exim4/exim4.conf.localmacros
-
-source /root/env.default
-source /root/env.user

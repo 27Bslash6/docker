@@ -6,8 +6,11 @@
 
 set -e
 
+
 source /root/env.default
 source /root/env.user
+
+/tests.pre
 
 # =============================================================================
 # Application is launched as $APP_USER:$APP_GROUP with specified UID and GID, 
@@ -25,10 +28,14 @@ echo "  group: ${APP_GROUP:-$DEFAULT_APP_GROUP} ${APP_GID:-$DEFAULT_APP_GID}"
 # - Group sanity checks
 EXISTING_GROUP_GID=$( getent group ${APP_GROUP:-$DEFAULT_APP_GROUP} | sed -r "s/${APP_GROUP:-$DEFAULT_APP_GROUP}\:x\:([[:digit:]]*):/\1/g" )
 
-if [[ -z $EXISTING_GROUP_GID ]] ; then 
+if [[ $EXISTING_GROUP_GID =~ $R_NUMBER ]] ; then 
 	# Create new group
-	echo "  groupadd ${APP_GROUP:-$DEFAULT_APP_GROUP}"
+	echo "\n  * groupadd ${APP_GROUP:-$DEFAULT_APP_GROUP}"
 	groupadd -r -g ${APP_GID:-$DEFAULT_APP_GID} ${APP_GROUP:-$DEFAULT_APP_GROUP}
+fi
+
+if [[ $EXISTING_GROUP_GID != APP_GID ]] ; 
+	
 else
 	# Group exists
 	# @todo test existing user logic!
@@ -49,14 +56,15 @@ fi
 # =============================================================================
 # 	USER
 # =============================================================================
+R_NUMBER='^[0-9]+$'
 
 # - User sanity checks
 EXISTING_USER_UID=$( getent passwd ${APP_USER:-$DEFAULT_APP_USER} | sed -r "s/${APP_USER:-$DEFAULT_APP_USER}\:x\:([[:digit:]]*):.*/\1/g" )
 echo $EXISTING_USER_UID
 
-if [[ -z $EXISTING_USER_UID ]] ; then 
+if [[ $EXISTING_USER_UID =~ $R_NUMBER ]] ; then 
 	# Create new user
- 	echo "  useradd ${APP_USER:-$DEFAULT_APP_USER}"
+ 	echo "\n  * useradd ${APP_USER:-$DEFAULT_APP_USER}"
 	useradd -M -r -G nginx -s /usr/sbin/nologin -u ${APP_UID:-$DEFAULT_APP_UID} -g ${APP_GROUP:-$DEFAULT_APP_GROUP} ${APP_USER:-$DEFAULT_APP_USER}
 else
 	# User exists
@@ -84,7 +92,7 @@ fi
 
 # Set log dir writable by APP_USER
 # unnecessary due to group permissions?
-# chown -Rf ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /var/log/nginx
+chown -Rf ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /var/log/nginx
 
 # =============================================================================
 # 	NGINX
@@ -190,6 +198,8 @@ fi
 
 service exim4 restart
 
+/tests.post 
+
 # -----------------------------------------------------------------------------
 
 
@@ -197,6 +207,4 @@ service exim4 restart
 # 	BOOT
 # =============================================================================
 
-# Hand over to runit
-
-exec /sbin/my_init
+[ $1 -eq "/sbin/my_init" ] && exec /sbin/my_init || date

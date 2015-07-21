@@ -33,21 +33,45 @@ RUN apt-get update && \
 
 VOLUME ["/app"]
 
-EXPOSE 443
-EXPOSE 80
-
 COPY etc /etc
 COPY index.php /app/index.php
 COPY env.* /root/
+
+ENV ENVIRONMENT production \
+	VIRTUAL_HOST example.com \
+    TIMEZONE Australia/Sydney \
+    APP_USER nginx_php \
+    APP_GROUP nginx_php \
+    APP_UID 1000 \
+    APP_GID 1000 \
+    UPLOAD_MAX_SIZE 30M \
+    PHP_MEMORY_LIMIT 128M \
+    PHP_PROCESS_MANAGER dynamic \
+    PHP_MAX_CHILDREN 6 \
+    PHP_START_SERVERS 3 \
+    PHP_MIN_SPARE_SERVERS 2 \
+    PHP_MAX_SPARE_SERVERS 3 \
+    PHP_MAX_REQUESTS 500 \
+    EXIM_DELIVERY_MODE local \
+    EXIM_SMARTHOST_MAIL_SMARTHOST smtp.example.org::587 \
+    EXIM_SMARTHOST_MAIL_FROM example.com \
+    EXIM_SMARTHOST_MAIL_USERNAME postmaster@example.com \
+    EXIM_SMARTHOST_MAIL_PASSWORD password_123
+
+EXPOSE 443
+EXPOSE 80
 
 COPY init.sh /init.sh
 COPY boot.sh /boot.sh
 
 RUN chmod 750 /init.sh && \
 	chmod 750 /boot.sh && \
+	chmod 750 /tests.*
 	chmod 750 /etc/service/nginx/run && \
 	chmod 750 /etc/service/php5/run
 
 RUN /init.sh
 
-CMD ["/boot.sh"]
+ENTRYPOINT /boot.sh
+
+CMD ["/sbin/my_init"]
