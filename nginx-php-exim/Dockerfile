@@ -28,20 +28,15 @@ RUN apt-get update && \
 		php5-recode && \
 	php5enmod mcrypt imap && \
 	apt-get -y remove wget && \
-	apt-get clean && \
-	mkdir /app
+	apt-get clean
 
 VOLUME ["/app"]
 
-COPY etc /etc
-COPY index.php /app/index.php
-COPY env.* /root/
-
-ENV ENVIRONMENT production \
+ENV APP_ENV production \
 	VIRTUAL_HOST example.com \
     TIMEZONE Australia/Sydney \
-    APP_USER nginx_php \
-    APP_GROUP nginx_php \
+    APP_USER nginx-php \
+    APP_GROUP nginx-php \
     APP_UID 1000 \
     APP_GID 1000 \
     UPLOAD_MAX_SIZE 30M \
@@ -61,17 +56,20 @@ ENV ENVIRONMENT production \
 EXPOSE 443
 EXPOSE 80
 
+COPY etc /etc
+COPY index.php /app/index.php
+COPY env.* /root/
+
 COPY init.sh /init.sh
 COPY boot.sh /boot.sh
 
 RUN chmod 750 /init.sh && \
 	chmod 750 /boot.sh && \
-	chmod 750 /tests.*
 	chmod 750 /etc/service/nginx/run && \
 	chmod 750 /etc/service/php5/run
 
 RUN /init.sh
 
-ENTRYPOINT /boot.sh
+RUN /boot.sh
 
 CMD ["/sbin/my_init"]

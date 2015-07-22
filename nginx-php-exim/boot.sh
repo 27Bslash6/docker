@@ -6,42 +6,45 @@
 
 set -e
 
-
 source /root/env.default
 source /root/env.user
 
-/tests.pre
+
+# Overwrite 'example.com' default host with something appropriate
+DEFAULT_VIRTUAL_HOST=${VIRTUAL_HOST:-`hostname -f`}
+
+echo "  virtual-host:  ${VIRTUAL_HOST:-$DEFAULT_VIRTUAL_HOST}"
 
 # =============================================================================
 # Application is launched as $APP_USER:$APP_GROUP with specified UID and GID, 
 # This simplifies editing on the host via volumes, or securing volumes from host
 
-echo "Starting config in ${ENVIRONMENT} mode ...\n"
+echo "Starting config in ${APP_ENV} mode ..."
 
 echo "  user:  ${APP_USER:-$DEFAULT_APP_USER} ${APP_UID:-$DEFAULT_APP_UID}"
 echo "  group: ${APP_GROUP:-$DEFAULT_APP_GROUP} ${APP_GID:-$DEFAULT_APP_GID}"
+
+# Regex to detect an integer
+R_NUMBER='^[0-9]+$'
 
 # =============================================================================
 # 	GROUP
 # =============================================================================
 
 # - Group sanity checks
+
+
 EXISTING_GROUP_GID=$( getent group ${APP_GROUP:-$DEFAULT_APP_GROUP} | sed -r "s/${APP_GROUP:-$DEFAULT_APP_GROUP}\:x\:([[:digit:]]*):/\1/g" )
 
 if [[ $EXISTING_GROUP_GID =~ $R_NUMBER ]] ; then 
-	# Create new group
-	echo "\n  * groupadd ${APP_GROUP:-$DEFAULT_APP_GROUP}"
-	groupadd -r -g ${APP_GID:-$DEFAULT_APP_GID} ${APP_GROUP:-$DEFAULT_APP_GROUP}
-fi
+	# Is number, is good.
 
-if [[ $EXISTING_GROUP_GID != APP_GID ]] ; 
-	
-else
 	# Group exists
 	# @todo test existing user logic!
+
 	echo "  group found with gid $EXISTING_GROUP_GID"
 
-	if [[ $EXISTING_GROUP_GID -ne ${APP_GID:-$DEFAULT_APP_GID} ]]; then
+	if ! [[ $EXISTING_GROUP_GID = ${APP_GID:-$DEFAULT_APP_GID} ]]; then
 		# Existing group does not have matching GID
 		APP_GID = $EXISTING_GROUP_GID
 		export APP_GID
@@ -51,28 +54,34 @@ else
 		echo "\t         new \$APP_GID is $EXISTING_GROUP_GID (was ${APP_GID:-$EXISTING_GROUP_GID})\n\n"	
 		echo "================================================================================"	
 	fi
+	
+else
+
+	# Create new group
+	echo "  * groupadd ${APP_GROUP:-$DEFAULT_APP_GROUP}"
+	groupadd -r -g ${APP_GID:-$DEFAULT_APP_GID} ${APP_GROUP:-$DEFAULT_APP_GROUP}
+
 fi
 
 # =============================================================================
 # 	USER
 # =============================================================================
-R_NUMBER='^[0-9]+$'
+
 
 # - User sanity checks
 EXISTING_USER_UID=$( getent passwd ${APP_USER:-$DEFAULT_APP_USER} | sed -r "s/${APP_USER:-$DEFAULT_APP_USER}\:x\:([[:digit:]]*):.*/\1/g" )
-echo $EXISTING_USER_UID
+if ! [[ -z "$EXISTING_USER_UID" ]] ; then
+	echo "**  debug: user search result"
+	echo $EXISTING_USER_UID
+fi
 
 if [[ $EXISTING_USER_UID =~ $R_NUMBER ]] ; then 
-	# Create new user
- 	echo "\n  * useradd ${APP_USER:-$DEFAULT_APP_USER}"
-	useradd -M -r -G nginx -s /usr/sbin/nologin -u ${APP_UID:-$DEFAULT_APP_UID} -g ${APP_GROUP:-$DEFAULT_APP_GROUP} ${APP_USER:-$DEFAULT_APP_USER}
-else
 	# User exists
 	# @todo test existing user logic!
 
 	echo "  user found with uid $EXISTING_USER_UID"
 
-	if [[ $EXISTING_USER_UID -ne ${APP_UID:-$DEFAULT_APP_UID} ]]; then
+	if ! [[ $EXISTING_USER_UID = ${APP_UID:-$DEFAULT_APP_UID} ]]; then
 		# Existing user does not have matching UID
 		APP_UID = $EXISTING_USER_UID
 		export APP_UID
@@ -83,9 +92,15 @@ else
 		echo "================================================================================"
 
 	fi
+
+else
+	# Create new user
+ 	echo "  * useradd ${APP_USER:-$DEFAULT_APP_USER}"
+	useradd -M -r -G nginx -s /usr/sbin/nologin -u ${APP_UID:-$DEFAULT_APP_UID} -g ${APP_GROUP:-$DEFAULT_APP_GROUP} ${APP_USER:-$DEFAULT_APP_USER}
+
 fi
 
-if [[ ${CHOWN_APP_DIR} -eq "true" ]] ; then
+if [[ "${CHOWN_APP_DIR}" -eq "true" ]] ; then
 	echo "  chown ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app /var/log/nginx"
 	chown -Rf ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app /var/log/nginx
 fi 
@@ -104,6 +119,10 @@ echo "  nginx:  user ${APP_USER:-$DEFAULT_APP_USER}"
 
 # worker_processes = num cpu cores
 procs=$(cat /proc/cpuinfo |grep processor | wc -l)
+if [ $procs > ${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_NGINX_MAX_WORKER_PROCESSES}]; then
+	echo "  nginx:  use maximum ${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_NGINX_MAX_WORKER_PROCESSES} of $procs available cores"
+	procs=${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_NGINX_MAX_WORKER_PROCESSES}
+fi
 sed -i -r "s/worker_processes\s+[0-9]+/worker_processes $procs/" /etc/nginx/nginx.conf
 echo "  nginx:  worker_processes = $procs"
 
@@ -146,9 +165,19 @@ echo "  php:    pm.min_spare_servers = ${PHP_MIN_SPARE_SERVERS:-$DEFAULT_PHP_MIN
 echo "  php:    pm.max_spare_servers = ${PHP_MAX_SPARE_SERVERS:-$DEFAULT_PHP_MAX_SPARE_SERVERS}"
 echo "  php:    pm.max_requests = ${PHP_MAX_REQUESTS:-$DEFAULT_PHP_MAX_REQUESTS}"
 
+if [[ ${EXIM_EXIM_SMARTHOST_MAIL_FROM:-$DEFAULT_EXIM_SMARTHOST_MAIL_FROM} = "example.com" ]] ; then
+	echo "  tests: default domain detected, using ${VIRTUAL_HOST:-$APP_HOST_DOMAIN}"
+	EXIM_SMARTHOST_MAIL_FROM=${VIRTUAL_HOST:-$APP_HOST_DOMAIN}
+fi
+
+# Update PHP sendmail_path 
+sed -i -r "s/sendmail_path =.*$/sendmail_path = \/usr\/bin\/sendmail -t -f no-reply@${EXIM_SMARTHOST_MAIL_FROM:-$DEFAULT_EXIM_SMARTHOST_MAIL_FROM}/g" /etc/php5/fpm/php.ini
+echo "  php:    sendmail_path = /usr/bin/sendmail -t -f no-reply@${EXIM_SMARTHOST_MAIL_FROM:-$DEFAULT_EXIM_SMARTHOST_MAIL_FROM}"
+
 # =============================================================================
 # 	EXIM4
 # =============================================================================
+
 
 if [[ "${EXIM_DELIVERY_MODE:-$DEFAULT_EXIM_DELIVERY_MODE}" = "smarthost" ]] ; then	
 
@@ -156,19 +185,15 @@ if [[ "${EXIM_DELIVERY_MODE:-$DEFAULT_EXIM_DELIVERY_MODE}" = "smarthost" ]] ; th
 	# 	SMARTHOST
 	# -------------------------------------------------------------------------
 	
-	# Update PHP sendmail_path 
-	sed -i -r "s/sendmail_path =.*$/sendmail_path = \/usr\/bin\/sendmail -t -f no-reply@${EXIM_SMARTHOST_MAIL_FROM:-$DEFAULT_EXIM_SMARTHOST_MAIL_FROM}/g" /etc/php5/fpm/php.ini
-	echo "php:    sendmail_path = /usr/bin/sendmail -t -f no-reply@${EXIM_SMARTHOST_MAIL_FROM:-$DEFAULT_EXIM_SMARTHOST_MAIL_FROM}"
-
 	echo "  exim4:  smarthost"
 
 	# Configure exim4 mta smarthost to use sendgrid or mailgun
 	sed -i -r "s/dc_eximconfig_configtype='[a-z]*'/dc_eximconfig_configtype='smarthost'/" /etc/exim4/update-exim4.conf.conf
 	
-	echo "exim4:  from:  ${EXIM_SMARTHOST_MAIL_FROM:-$DEFAULT_EXIM_SMARTHOST_MAIL_FROM}"
+	echo "  exim4:  from:  ${EXIM_SMARTHOST_MAIL_FROM:-$DEFAULT_EXIM_SMARTHOST_MAIL_FROM}"
 	sed -i -r "s/dc_readhost='.*'/dc_readhost='${EXIM_SMARTHOST_MAIL_FROM:-$DEFAULT_EXIM_SMARTHOST_MAIL_FROM}'/" /etc/exim4/update-exim4.conf.conf
 	
-	echo "exim4:  relay: ${EXIM_SMARTHOST:-$DEFAULT_EXIM_SMARTHOST}"
+	echo "  exim4:  relay: ${EXIM_SMARTHOST:-$DEFAULT_EXIM_SMARTHOST}"
 	sed -i -r "s/dc_smarthost='.*'/dc_smarthost='${EXIM_SMARTHOST:-$DEFAULT_EXIM_SMARTHOST}'/" /etc/exim4/update-exim4.conf.conf
 	sed -i -r "s/dc_hide_mailname=''/dc_hide_mailname='true'/" /etc/exim4/update-exim4.conf.conf
 
@@ -183,8 +208,8 @@ else
 	# -------------------------------------------------------------------------
 
 	# Update PHP sendmail_path 
-	sed -i -r "s/sendmail_path =.*$/sendmail_path = \/usr\/bin\/sendmail -t -f no-reply@${VIRTUAL_HOST:-$HOSTNAME}/g" /etc/php5/fpm/php.ini
-	echo "  php:    sendmail_path = /usr/bin/sendmail -t -f no-reply@${VIRTUAL_HOST:-$HOSTNAME}"
+	sed -i -r "s/sendmail_path =.*$/sendmail_path = \/usr\/bin\/sendmail -t -f no-reply@${VIRTUAL_HOST}/g" /etc/php5/fpm/php.ini
+	echo "  php:    sendmail_path = /usr/bin/sendmail -t -f no-reply@${VIRTUAL_HOST}"
 	
 	echo "exim4:  local delivery"
 
@@ -198,8 +223,6 @@ fi
 
 service exim4 restart
 
-/tests.post 
-
 # -----------------------------------------------------------------------------
 
 
@@ -207,4 +230,8 @@ service exim4 restart
 # 	BOOT
 # =============================================================================
 
-[ $1 -eq "/sbin/my_init" ] && exec /sbin/my_init || date
+date
+
+echo "Starting Runit ..."
+
+exec /sbin/my_init 
