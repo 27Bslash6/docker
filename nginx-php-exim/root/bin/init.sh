@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
 
+# make terminal programs happy, eg. vim, less
 echo "export TERM=xterm-256color" >> /root/.bashrc
+
 
 # PHP-FPM
 
@@ -10,20 +12,28 @@ cp /etc/php5/fpm/pool.d/www.conf /etc/php5/fpm/pool.d/www.conf.dist
 
 echo "display_errors=On\nhtml_errors=On\n" >> /etc/php5/mods-available/xdebug.ini
 
+# Still necessary in case of misconfiguration in sites-enabled/
 sed -i -r "s/;cgi.fix_pathinfo\s*=\s*1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
-sed -i -r "s/;daemonize\s*=\s*yes/daemonize = no/g" /etc/php5/fpm/php-fpm.conf
-sed -i -r "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /etc/php5/fpm/pool.d/www.conf
+# Don't fork
+sed -i -r "s/;daemonize = yes/daemonize = no/g" /etc/php5/fpm/php-fpm.conf
+# Catch PHP output
+sed -i -r "s/;catch_workers_output =/catch_workers_output =/g" /etc/php5/fpm/pool.d/www.conf
+# Fix socket permissions
 sed -i -r "s/;listen.mode = 0660/listen.mode = 0750/g" /etc/php5/fpm/pool.d/www.conf
+# Enable sendmail additional parameters
 sed -i -r "s/;sendmail_path =/sendmail_path =/g" /etc/php5/fpm/php.ini
+
 
 # NGINX
 
+# Backup distribution conf, in case
 cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.dist
-
+# Include sites-enabled/*
 sed -i "s/.*conf\.d\/\*\.conf;.*/&\n    include \/etc\/nginx\/sites-enabled\/\*;/" /etc/nginx/nginx.conf
-
+# Don't fork nginx, stay in foreground
 echo "daemon off;" >> /etc/nginx/nginx.conf
 
 # EXIM
 
+# enable TLS
 echo "MAIN_TLS_ENABLE = 1" >> /etc/exim4/exim4.conf.localmacros

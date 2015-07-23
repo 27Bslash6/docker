@@ -30,46 +30,51 @@ RUN apt-get update && \
 	apt-get -y remove wget && \
 	apt-get clean
 
-VOLUME ["/app"]
+RUN mkdir -p /app/www && \
+	mkdir /root/bin/ && \
+	echo "export PATH=/root/bin:$PATH" > /root/.bashrc
 
-ENV APP_ENV production \
-	VIRTUAL_HOST example.com \
-    TIMEZONE Australia/Sydney \
-    APP_USER nginx-php \
-    APP_GROUP nginx-php \
-    APP_UID 1000 \
-    APP_GID 1000 \
-    UPLOAD_MAX_SIZE 30M \
-    PHP_MEMORY_LIMIT 128M \
-    PHP_PROCESS_MANAGER dynamic \
-    PHP_MAX_CHILDREN 6 \
-    PHP_START_SERVERS 3 \
-    PHP_MIN_SPARE_SERVERS 2 \
-    PHP_MAX_SPARE_SERVERS 3 \
-    PHP_MAX_REQUESTS 500 \
-    EXIM_DELIVERY_MODE local \
-    EXIM_SMARTHOST_MAIL_SMARTHOST smtp.example.org::587 \
-    EXIM_SMARTHOST_MAIL_FROM example.com \
-    EXIM_SMARTHOST_MAIL_USERNAME postmaster@example.com \
-    EXIM_SMARTHOST_MAIL_PASSWORD password_123
+VOLUME ["/app/www"]
 
 EXPOSE 443
 EXPOSE 80
 
+ENV DEFAULT_APP_ENV=production
+ENV DEFAULT_CHOWN_APP_DIR=true
+ENV DEFAULT_APP_ENV production
+ENV DEFAULT_VIRTUAL_HOST example.com
+ENV DEFAULT_TIMEZONE Australia/Sydney
+ENV DEFAULT_APP_USER nginx-php
+ENV DEFAULT_APP_GROUP nginx-php
+ENV DEFAULT_APP_UID 1000
+ENV DEFAULT_APP_GID 1000
+ENV DEFAULT_UPLOAD_MAX_SIZE 30M
+ENV DEFAULT_NGINX_MAX_WORKER_PROCESSES 8
+ENV DEFAULT_NGINX_KEEPALIVE_TIMEOUT 30 
+ENV DEFAULT_PHP_MEMORY_LIMIT 128M
+ENV DEFAULT_PHP_PROCESS_MANAGER dynamic
+ENV DEFAULT_PHP_MAX_CHILDREN 6
+ENV DEFAULT_PHP_START_SERVERS 3
+ENV DEFAULT_PHP_MIN_SPARE_SERVERS 2
+ENV DEFAULT_PHP_MAX_SPARE_SERVERS 3
+ENV DEFAULT_PHP_MAX_REQUESTS 500
+ENV DEFAULT_EXIM_DELIVERY_MODE local
+ENV DEFAULT_EXIM_MAIL_FROM example.com
+ENV DEFAULT_EXIM_SMARTHOST_MAIL_SMARTHOST smtp.example.org::587
+ENV DEFAULT_EXIM_SMARTHOST_MAIL_USERNAME postmaster@example.com
+ENV DEFAULT_EXIM_SMARTHOST_MAIL_PASSWORD password_123
+
 COPY etc /etc
-COPY index.php /app/index.php
-COPY env.* /root/
+COPY root /root
+COPY env.user /root/.env.user
+COPY index.php /app/www/index.php
 
-COPY init.sh /init.sh
-COPY boot.sh /boot.sh
-
-RUN chmod 750 /init.sh && \
-	chmod 750 /boot.sh && \
+RUN chmod 750 /root/bin/* && \
 	chmod 750 /etc/service/nginx/run && \
 	chmod 750 /etc/service/php5/run
 
-RUN /init.sh
+RUN /root/bin/init.sh
 
-RUN /boot.sh
+ENTRYPOINT ["/root/bin/boot.sh"]
 
 CMD ["/sbin/my_init"]
