@@ -8,7 +8,7 @@ ENV DEBIAN_FRONTEND noninteractive
 COPY sources.list /etc/apt/sources.list
 
 # Update to latest packages and tidy up
-RUN apt-get update -q \
+RUN apt-get update \
   && apt-get -y upgrade \
   && apt-get -y autoremove \
   && apt-get -y clean \
