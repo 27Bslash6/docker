@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# exit on error
-set -e
-
-# Start nginx
-exec nginx

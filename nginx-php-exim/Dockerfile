@@ -1,17 +1,10 @@
-FROM funkygibbon/docker-ubuntu-base
+FROM funkygibbon/nginx
 
 MAINTAINER Ray Walker <hello@raywalker.it>
 
-# APT
 RUN apt-get update && \
-	apt-get install -y wget && \
-	wget -q http://nginx.org/keys/nginx_signing.key -O- | sudo apt-key add - && \
-	echo deb http://nginx.org/packages/mainline/ubuntu/ trusty nginx >> /etc/apt/sources.list && \
-	echo deb-src http://nginx.org/packages/mainline/ubuntu/ trusty nginx >> /etc/apt/sources.list && \
-	apt-get update && \
 	apt-get -y install \
 		exim4 \
-		nginx \
 		php5-fpm \
 		php5-mysql \
 		php-apc \
@@ -30,8 +23,7 @@ RUN apt-get update && \
 	apt-get -y remove wget && \
 	apt-get clean
 
-RUN mkdir -p /app/www && \
-	mkdir /root/bin/ && \
+RUN mkdir /root/bin/ && \
 	echo "export PATH=/root/bin:$PATH" > /root/.bashrc
 
 VOLUME ["/app/www"]

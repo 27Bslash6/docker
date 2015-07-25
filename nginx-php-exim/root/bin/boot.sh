@@ -97,7 +97,7 @@ if [[ $EXISTING_USER_UID =~ $R_NUMBER ]] ; then
 else
 	# Create new user
  	echo " * - useradd ${APP_USER:-$DEFAULT_APP_USER}"
-	useradd -M -r -G nginx -s /usr/sbin/nologin -u ${APP_UID:-$DEFAULT_APP_UID} -g ${APP_GROUP:-$DEFAULT_APP_GROUP} ${APP_USER:-$DEFAULT_APP_USER}
+	useradd -r -s /usr/sbin/nologin -G nginx -u ${APP_UID:-$DEFAULT_APP_UID} -g ${APP_GROUP:-$DEFAULT_APP_GROUP} ${APP_USER:-$DEFAULT_APP_USER}
 fi
 
 if [[ "${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}" -eq "true" ]] ; then
@@ -127,8 +127,14 @@ sed -i -r "s/worker_processes\s+[0-9]+/worker_processes $procs/" /etc/nginx/ngin
 echo " * nginx:  worker_processes = $procs"
 
 sed -i -r "s/keepalive_timeout\s+[0-9]+/keepalive_timeout ${NGINX_KEEPALIVE_TIMEOUT:-$DEFAULT_NGINX_KEEPALIVE_TIMEOUT}/" /etc/nginx/nginx.conf
+sed -i -r "s/client_max_body_size.+M;/client_max_body_size ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE};/" /etc/nginx/nginx.conf
 echo " * nginx:  client_max_body_size = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
 echo " * nginx:  keepalive_timeout = ${NGINX_KEEPALIVE_TIMEOUT:-$DEFAULT_NGINX_KEEPALIVE_TIMEOUT}"
+
+if ! [[ -f /etc/nginx/ssl/dhparam.pem ]] ; then
+	echo " * nginx:  generating /etc/nginx/ssl/dhparam.pem ..."
+	openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048
+fi
 
 # =============================================================================
 # 	PHP5-FPM
