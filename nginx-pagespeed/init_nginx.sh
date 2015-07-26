@@ -1,10 +1,16 @@
 #!/bin/sh
 set -e
 
+echo "wtf"
+
 mkdir -p /etc/nginx/ssl
 mkdir -p /app/www
 
+ls -al /app/www
+
 mv /index.html /app/www
+
+ls -al /app/www
 
 # Generate a self signed certificate
 if [ ! -f /etc/nginx/ssl/default.key ] ; then

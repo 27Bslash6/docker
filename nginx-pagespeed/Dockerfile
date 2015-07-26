@@ -76,8 +76,6 @@ ENV DEFAULT_APP_GROUP nginx
 ENV	DEFAULT_UPLOAD_MAX_SIZE=30M
 ENV DEFAULT_NGINX_MAX_WORKER_PROCESSES=8
 
-# VOLUME ["/app/www"]
-
 COPY . /
 
 RUN chmod 750 /etc/service/nginx/run /boot.sh /init_nginx.sh
