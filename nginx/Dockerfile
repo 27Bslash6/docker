@@ -71,8 +71,6 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 	apt-get autoremove -yqq && \
 	apt-get clean
 
-VOLUME ["/app/www"]
-
 COPY . /
 
 RUN chmod 750 /etc/service/nginx/run /boot.sh /init_nginx.sh
