@@ -26,8 +26,6 @@ RUN apt-get update && \
 RUN mkdir /root/bin/ && \
 	echo "export PATH=/root/bin:$PATH" > /root/.bashrc
 
-VOLUME ["/app/www"]
-
 EXPOSE 443
 EXPOSE 80
 
