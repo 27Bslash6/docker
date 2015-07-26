@@ -25,7 +25,7 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 	wget -qO - https://github.com/pagespeed/ngx_pagespeed/archive/v${PAGESPEED_VERSION}-beta.tar.gz | tar zxf - -C /tmp && \
 	wget -qO - http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz | tar zxf - -C /tmp && \
 	wget -qO - https://dl.google.com/dl/page-speed/psol/${PAGESPEED_VERSION}.tar.gz | tar xzf  - -C /tmp/ngx_pagespeed-${PAGESPEED_VERSION}-beta && \
-	# Compile nginx with pagespeed module according to Ubuntu specific preset
+	wget -qO - https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xzf  - -C /tmp && \
 	cd /tmp/nginx-${NGINX_VERSION} && ./configure \
 		--prefix=/etc/nginx  \
 		--sbin-path=/usr/sbin/nginx  \
@@ -65,6 +65,7 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 		--with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--as-needed' \
 		--with-ipv6 \
 		--with-pcre-jit \
+		--with-openssl=/tmp/openssl-${OPENSSL_VERSION} \
 		--add-module=/tmp/ngx_pagespeed-${PAGESPEED_VERSION}-beta && make && make install && \
 	rm -Rf /tmp/* && \
 	apt-get purge -yqq wget build-essential && \
