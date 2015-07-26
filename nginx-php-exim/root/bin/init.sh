@@ -22,6 +22,9 @@ sed -i -r "s/;listen.mode = 0660/listen.mode = 0750/g" /etc/php5/fpm/pool.d/www.
 # Enable sendmail additional parameters
 sed -i -r "s/;sendmail_path =/sendmail_path =/g" /etc/php5/fpm/php.ini
 
+rm /app/www/index.html
+
+echo "<?php phpinfo(); " > /app/www/index.php
 
 # EXIM
 
