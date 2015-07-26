@@ -101,39 +101,9 @@ else
 fi
 
 if [[ "${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}" -eq "true" ]] ; then
-	echo " * - chown ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www /var/log/nginx"
-	chown -Rf ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www /var/log/nginx
+	echo " * - chown ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www"
+	chown -Rf ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www
 fi 
-
-# Set log dir writable by APP_USER
-# unnecessary due to group permissions?
-chown -Rf ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /var/log/nginx
-
-# =============================================================================
-# 	NGINX
-# =============================================================================
-
-# set nginx user
-echo " * nginx:  user ${APP_USER:-$DEFAULT_APP_USER}"
-sed -i -r "s/user\s+[a-z]+/user ${APP_USER:-$DEFAULT_APP_USER}/" /etc/nginx/nginx.conf
-
-# worker_processes = num cpu cores
-procs=$(cat /proc/cpuinfo |grep processor | wc -l)
-if [[ "$procs" > "${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_NGINX_MAX_WORKER_PROCESSES}" ]]; then
-	echo " * nginx:  use maximum ${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_NGINX_MAX_WORKER_PROCESSES} of $procs available cores"
-	procs=${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_NGINX_MAX_WORKER_PROCESSES}
-fi
-echo " * nginx:  worker_processes = $procs"
-sed -i -r "s/worker_processes\s+[0-9]+/worker_processes $procs/" /etc/nginx/nginx.conf
-
-echo " * nginx:  client_max_body_size = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
-sed -i -r "s/keepalive_timeout\s+[0-9]+/keepalive_timeout ${NGINX_KEEPALIVE_TIMEOUT:-$DEFAULT_NGINX_KEEPALIVE_TIMEOUT}/" /etc/nginx/nginx.conf
-sed -i -r "s/client_max_body_size.+M;/client_max_body_size ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE};/" /etc/nginx/nginx.conf
-
-if [ ! -f /etc/nginx/ssl/dhparam.pem ] ; then
-	echo " * nginx:  generating /etc/nginx/ssl/dhparam.pem ..."
-	openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048
-fi
 
 # =============================================================================
 # 	PHP5-FPM
@@ -171,7 +141,7 @@ sed -i -r "s/pm.max_spare_servers\s*=\s*[0-9]+/pm.max_spare_servers = ${PHP_MAX_
 sed -i -r "s/pm.max_requests\s*=\s*[0-9]+/pm.max_requests = ${PHP_MAX_REQUESTS:-$DEFAULT_PHP_MAX_REQUESTS}/g" /etc/php5/fpm/pool.d/www.conf
 
 if [[ "${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}" = "example.com" ]] ; then
-	echo " * exim:   mail_from ${VIRTUAL_HOST:-$DEFAULT_VIRTUAL_HOST}"
+	# echo " * exim:   mail_from ${VIRTUAL_HOST:-$DEFAULT_VIRTUAL_HOST}"
 	EXIM_MAIL_FROM=${VIRTUAL_HOST:-$DEFAULT_VIRTUAL_HOST}
 fi
 
@@ -191,7 +161,6 @@ if [[ "${EXIM_DELIVERY_MODE:-$DEFAULT_EXIM_DELIVERY_MODE}" = "smarthost" ]] ; th
 	# -------------------------------------------------------------------------
 	
 	echo " * exim4:  smarthost"
-
 	
 	if [[ "${EXIM_SMARTHOST_AUTH_USERNAME:-$DEFAULT_EXIM_SMARTHOST_AUTH_USERNAME}" = "postmaster@example.com" ]] ; then
 
