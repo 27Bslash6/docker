@@ -1,3 +1,4 @@
 *.sublime-*
 nginx_proxy
 proxy
+exim
