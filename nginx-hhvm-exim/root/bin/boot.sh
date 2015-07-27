@@ -106,10 +106,12 @@ if [[ "${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}" -eq "true" ]] ; then
 fi 
 
 # =============================================================================
-# 	PHP5-FPM
+# 	HHVM
 # =============================================================================
 
 # # set php-fpm user to match nginx
+
+# @todo - switch hhvm to socket once 
 # echo " * php:    user:  ${APP_USER:-$DEFAULT_APP_USER}"
 # echo " * php:    group: ${APP_GROUP:-$DEFAULT_APP_GROUP}"
 # sed -i -r "s/^user\s*=.+$/user = ${APP_USER:-$DEFAULT_APP_USER}/g" /etc/php5/fpm/pool.d/www.conf
