@@ -142,10 +142,6 @@ sed -i -r "s/post_max_size\s*=\s*[0-9]+M/post_max_size = ${UPLOAD_MAX_SIZE:-$DEF
 # sed -i -r "s/pm.max_spare_servers\s*=\s*[0-9]+/pm.max_spare_servers = ${PHP_MAX_SPARE_SERVERS:-$DEFAULT_PHP_MAX_SPARE_SERVERS}/g" /etc/php5/fpm/pool.d/www.conf
 # sed -i -r "s/pm.max_requests\s*=\s*[0-9]+/pm.max_requests = ${PHP_MAX_REQUESTS:-$DEFAULT_PHP_MAX_REQUESTS}/g" /etc/php5/fpm/pool.d/www.conf
 
-# if [[ "${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}" = "example.com" ]] ; then
-# 	# echo " * exim:   mail_from ${VIRTUAL_HOST:-$DEFAULT_VIRTUAL_HOST}"
-# 	EXIM_MAIL_FROM=${VIRTUAL_HOST:-$DEFAULT_VIRTUAL_HOST}
-# fi
 
 # # Update PHP sendmail_path 
 # echo " * php:    sendmail_path = /usr/bin/sendmail -t -f no-reply@${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}"
@@ -155,6 +151,10 @@ sed -i -r "s/post_max_size\s*=\s*[0-9]+M/post_max_size = ${UPLOAD_MAX_SIZE:-$DEF
 # 	EXIM4
 # =============================================================================
 
+if [[ "${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}" = "example.com" ]] ; then
+	# echo " * exim:   mail_from ${VIRTUAL_HOST:-$DEFAULT_VIRTUAL_HOST}"
+	EXIM_MAIL_FROM=${VIRTUAL_HOST:-$DEFAULT_VIRTUAL_HOST}
+fi
 
 if [[ "${EXIM_DELIVERY_MODE:-$DEFAULT_EXIM_DELIVERY_MODE}" = "smarthost" ]] ; then	
 
