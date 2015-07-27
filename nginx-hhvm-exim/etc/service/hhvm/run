@@ -1,4 +1,12 @@
 #!/bin/sh
 set -e
 
+# @todo figure out why hhvm refuses to pretty print stacktraces with xdebug
+#       even with implicit flush
+# if [[ "${APP_ENV}" = "development" ]] ; then
+# 	sed -i -r "s/xdebug.enable = 0/xdebug.enable = 1/g" /etc/hhvm/php.ini
+# else
+# 	sed -i -r "s/xdebug.enable = 1/xdebug.enable = 0/g" /etc/hhvm/php.ini
+# fi
+
 exec /usr/bin/hhvm --config /etc/hhvm/server.ini -m server -vPidFile=/var/run/hhvm/pid -vServer.Type=fastcgi

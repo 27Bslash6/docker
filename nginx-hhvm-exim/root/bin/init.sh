@@ -1,25 +1,35 @@
 #!/bin/bash
 set -e
 
-# make terminal programs happy, eg. vim, less
+# Make terminal programs happy, eg. vim, less
 echo "export TERM=xterm-256color" >> /root/.bashrc
 
 # HHVM
-/usr/share/hhvm/install_fastcgi.sh
 
-# cp /etc/php5/fpm/php.ini /etc/php5/fpm/php.ini.dist
-# cp /etc/php5/fpm/pool.d/www.conf /etc/php5/fpm/pool.d/www.conf.dist
+# Fix for missing ini parameters
+# https://github.com/facebook/hhvm/issues/4993
+echo "hhvm.enable_zend_ini_compat=false" >> /etc/hhvm/server.ini
 
-# echo "display_errors=On\nhtml_errors=On\n" >> /etc/php5/mods-available/xdebug.ini
+# Trying to get error messages to show properly
+# Still won't show Magento errors though
+echo "hhvm.server.implicit_flush = true" >> /etc/hhvm/server.ini
+echo "hhvm.error_handling.call_user_handler_on_fatals = true" >> /etc/hhvm/server.ini
 
-# # Still necessary in case of misconfiguration in sites-enabled/
-# sed -i -r "s/;cgi.fix_pathinfo\s*=\s*1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
-# # Don't fork
-# sed -i -r "s/;daemonize = yes/daemonize = no/g" /etc/php5/fpm/php-fpm.conf
-# # Catch PHP output
-# sed -i -r "s/;catch_workers_output =/catch_workers_output =/g" /etc/php5/fpm/pool.d/www.conf
+# Disable xdebug by default
+echo "xdebug.enable = 0" >> /etc/hhvm/php.ini
+
+# Limits
+echo "memory_limit = ${DEFAULT_PHP_MEMORY_LIMIT}" >> /etc/hhvm/php.ini
+echo "upload_max_filesize = ${DEFAULT_UPLOAD_MAX_SIZE}" >> /etc/hhvm/php.ini
+echo "post_max_size = ${DEFAULT_UPLOAD_MAX_SIZE}" >> /etc/hhvm/php.ini
+
+# Probably not safe for production
+echo "display_errors = 1" >> /etc/hhvm/php.ini
+echo "html_errors = 1" >> /etc/hhvm/php.ini
+
 # # Fix socket permissions
 # sed -i -r "s/;listen.mode = 0660/listen.mode = 0750/g" /etc/php5/fpm/pool.d/www.conf
+
 # # Enable sendmail additional parameters
 # sed -i -r "s/;sendmail_path =/sendmail_path =/g" /etc/php5/fpm/php.ini
 
