@@ -23,6 +23,11 @@ sed -i -r "s/worker_processes\s+[0-9]+/worker_processes $procs/" /etc/nginx/ngin
 echo " * nginx:  client_max_body_size = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
 sed -i -r "s/client_max_body_size.+M;/client_max_body_size ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE};/" /etc/nginx/nginx.conf
 
+# Generate a self signed certificate
+if [ ! -f /etc/nginx/ssl/default.key ] ; then
+	openssl req -x509 -newkey rsa:2048 -keyout /etc/nginx/ssl/default.key -out /etc/nginx/ssl/default.crt -nodes -days 365 -subj "/C=AU/ST=Tas/L=Launceston/O=/OU=/CN=localdomain"
+fi
+
 if [ ! -f /etc/nginx/ssl/dhparam.pem ] ; then
 	# https://wiki.mozilla.org/Security/Server_Side_TLS#DHE_handshake_and_dhparam
 	echo " * nginx:  generating /etc/nginx/ssl/dhparam.pem ..."

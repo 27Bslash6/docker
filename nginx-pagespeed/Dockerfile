@@ -54,6 +54,8 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 		--with-http_secure_link_module \
 		--with-http_stub_status_module  \
 		--with-http_auth_request_module  \
+		--without-http_autoindex_module \
+		--without-http_ssi_module \
 		--with-threads  \
 		--with-stream  \
 		--with-stream_ssl_module  \
