@@ -1,7 +1,7 @@
 # Nginx + Pagespeed + OpenSSL
 
 Nginx 1.9.3
-ngx_pagespeed 1.9.32.4
+ngx_pagespeed 1.9.32.6
 OpenSSL 1.0.1p
 
 Built on [funkygibbon/docker-ubuntu-base](https://registry.hub.docker.com/u/funkygibbon/docker-ubuntu-base/), a lightly modified [Phusion Base Image](https://phusion.github.io/baseimage-docker/)
