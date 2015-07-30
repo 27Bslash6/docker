@@ -1,7 +1,7 @@
 # Nginx + Pagespeed + OpenSSL
 
 Nginx 1.9.3
-ngx_pagespeed 1.9.32.6
+ngx_pagespeed 1.9.32.4
 OpenSSL 1.0.1p
 
 Built on [funkygibbon/docker-ubuntu-base](https://registry.hub.docker.com/u/funkygibbon/docker-ubuntu-base/), a lightly modified [Phusion Base Image](https://phusion.github.io/baseimage-docker/)
@@ -44,7 +44,6 @@ docker run -e "UPLOAD_MAX_SIZE=10M" funkygibbon/nginx-pagespeed
 - if `${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}` is true, `chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www\`  (default true)
 - `worker_processes` is set to the number of available processor cores and adjusts `/etc/nginx/nginx.conf` to match, up to a maximum number of cores `${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_MAX_WORKER_PROCESSES}`
 - `client_max_body_size` is set to ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}
-- 
 
 ### Security
 
