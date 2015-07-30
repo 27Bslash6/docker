@@ -1,5 +1,7 @@
 # docker-ubuntu-base
 
-Builds an Ubuntu base image from https://phusion.github.io/baseimage-docker/ 
+https://registry.hub.docker.com/u/funkygibbon/docker-ubuntu-base/
 
-Modified to use mirror://mirrors.ubuntu.com/mirrors.txt
+Automated daily build of an Ubuntu trusty base image from https://phusion.github.io/baseimage-docker/ 
+
+Modified apt sources.list to use `http://mirror.rackspace.com/ubuntu/`
