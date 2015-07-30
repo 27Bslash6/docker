@@ -38,13 +38,13 @@ if [[ $EXISTING_GROUP_GID =~ $R_NUMBER ]] ; then
 
 	if ! [[ "$EXISTING_GROUP_GID" = "${APP_GID:-$DEFAULT_APP_GID}" ]]; then
 		# Existing group does not have matching GID
-		APP_GID = $EXISTING_GROUP_GID
+		APP_GID=$EXISTING_GROUP_GID
 		export APP_GID
 
-		echo "\n================================================================================\n"
-		echo "\tWARNING: group has different gid $EXISTING_GROUP_GID\n"
-		echo "\t         new \$APP_GID is $EXISTING_GROUP_GID (was ${APP_GID:-$EXISTING_GROUP_GID})\n\n"	
-		echo "================================================================================"	
+		echo -e "\n================================================================================\n"
+		echo -e "\tWARNING: group has different gid $EXISTING_GROUP_GID\n"
+		echo -e "\t         new \$APP_GID is $EXISTING_GROUP_GID (was ${APP_GID:-$EXISTING_GROUP_GID})\n\n"	
+		echo -e "================================================================================"	
 	fi
 	
 else
@@ -70,13 +70,13 @@ if [[ $EXISTING_USER_UID =~ $R_NUMBER ]] ; then
 
 	if ! [[ "$EXISTING_USER_UID" = "${APP_UID:-$DEFAULT_APP_UID}" ]]; then
 		# Existing user does not have matching UID
-		APP_UID = $EXISTING_USER_UID
+		APP_UID=$EXISTING_USER_UID
 		export APP_UID
 
-		echo "================================================================================\n"
-		echo "\tWARNING: User has different id $EXISTING_USER_UID\n"
-		echo "\t         Setting \$APP_UID to $EXISTING_USER_UID (was ${APP_UID:-$DEFAULT_APP_UID})\n"	
-		echo "================================================================================"
+		echo -e "================================================================================\n"
+		echo -e "\tWARNING: User has different id $EXISTING_USER_UID\n"
+		echo -e "\t         Setting \$APP_UID to $EXISTING_USER_UID (was ${APP_UID:-$DEFAULT_APP_UID})\n"	
+		echo -e "================================================================================"
 
 	fi
 
