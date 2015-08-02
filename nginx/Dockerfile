@@ -1,31 +1,24 @@
 FROM funkygibbon/docker-ubuntu-base
 
-# RUN apt-get update && \
-# 	apt-get install -y wget && \
-# 	wget -q http://nginx.org/keys/nginx_signing.key -O- | sudo apt-key add - && \
-# 	echo deb http://nginx.org/packages/mainline/ubuntu/ trusty nginx >> /etc/apt/sources.list && \
-# 	echo deb-src http://nginx.org/packages/mainline/ubuntu/ trusty nginx >> /etc/apt/sources.list && \
-# 	apt-get update && \
-# 	apt-get -y install nginx && \
-# 	apt-get clean
-
 EXPOSE 80
 EXPOSE 443
 
-ENV PAGESPEED_VERSION 1.9.32.4
 ENV NGINX_VERSION 1.9.3
 
 ENV OPENSSL_VERSION 1.0.1p
 
 COPY sources.list /etc/apt/sources.list
 
+COPY nginx-${NGINX_VERSION}.tar.gz /tmp/nginx-${NGINX_VERSION}.tar.gz 
+RUN cd /tmp && tar zxf /tmp/nginx-${NGINX_VERSION}.tar.gz
+COPY openssl-${OPENSSL_VERSION}.tar.gz /tmp/openssl-${OPENSSL_VERSION}.tar.gz 
+RUN cd /tmp && tar zxf /tmp/openssl-${OPENSSL_VERSION}.tar.gz
+
 RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/nginx && \
 	apt-get update && \
-	apt-get -y install wget build-essential zlib1g-dev libpcre3-dev libssl-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
-	wget -qO - https://github.com/pagespeed/ngx_pagespeed/archive/v${PAGESPEED_VERSION}-beta.tar.gz | tar zxf - -C /tmp && \
-	wget -qO - http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz | tar zxf - -C /tmp && \
-	wget -qO - https://dl.google.com/dl/page-speed/psol/${PAGESPEED_VERSION}.tar.gz | tar xzf  - -C /tmp/ngx_pagespeed-${PAGESPEED_VERSION}-beta && \
-	# Compile nginx with pagespeed module according to Ubuntu specific preset
+	apt-get -y install wget build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
+	# echo "Downloading nginx v${NGINX_VERSION} ..." && wget -qO - http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz | tar zxf - -C /tmp && \
+	# echo "Downloading openssl v${OPENSSL_VERSION} ..." && wget -qO - https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xzf  - -C /tmp && \
 	cd /tmp/nginx-${NGINX_VERSION} && ./configure \
 		--prefix=/etc/nginx  \
 		--sbin-path=/usr/sbin/nginx  \
@@ -54,6 +47,8 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 		--with-http_secure_link_module \
 		--with-http_stub_status_module  \
 		--with-http_auth_request_module  \
+		--without-http_autoindex_module \
+		--without-http_ssi_module \
 		--with-threads  \
 		--with-stream  \
 		--with-stream_ssl_module  \
@@ -65,18 +60,23 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 		--with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--as-needed' \
 		--with-ipv6 \
 		--with-pcre-jit \
-		--add-module=/tmp/ngx_pagespeed-${PAGESPEED_VERSION}-beta && make && make install && \
+		--with-openssl=/tmp/openssl-${OPENSSL_VERSION} && make && make install && \
 	rm -Rf /tmp/* && \
 	apt-get purge -yqq wget build-essential && \
 	apt-get autoremove -yqq && \
 	apt-get clean
 
-COPY . /
+ENV DEFAULT_APP_USER nginx
+ENV DEFAULT_APP_GROUP nginx
+ENV	DEFAULT_UPLOAD_MAX_SIZE=30M
+ENV DEFAULT_NGINX_MAX_WORKER_PROCESSES=8
 
-RUN chmod 750 /etc/service/nginx/run /boot.sh /init_nginx.sh
-RUN /init_nginx.sh
+COPY . /app
 
-ENTRYPOINT ["/boot.sh"]
+RUN chmod 750 /app/init_nginx.sh
+RUN /app/init_nginx.sh
+
+VOLUME /app/www
 
 CMD ["/sbin/my_init"]
 

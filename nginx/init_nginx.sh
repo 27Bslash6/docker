@@ -1,12 +1,12 @@
 #!/bin/sh
 set -e
 
+cp -R /app/etc/* /etc
+
+chmod +x /etc/service/*/run
+
 mkdir -p /etc/nginx/ssl
 
-# Generate a self signed certificate
-if [ ! -f /etc/nginx/ssl/default.key ] ; then
-	openssl req -x509 -newkey rsa:2048 -keyout /etc/nginx/ssl/default.key -out /etc/nginx/ssl/default.crt -nodes -days 365 -subj "/C=AU/ST=Tas/L=Launceston/O=/OU=/CN=localdomain"
-fi
+mkdir -p /app/www
 
-
-echo -e "funkygibbon/nginx\n`date`" > /app/www/index.html
+echo "<html><head>Success</head><body><p><a href="https://hub.docker.com/u/funkygibbon/">funkygibbon</a>/nginx:${NGINX_VERSION}-${OPENSSL_VERSION} - `date`</p>" > /app/www/index.html
