@@ -13,10 +13,9 @@ echo "Starting config in ${APP_ENV:-$DEFAULT_APP_ENV} mode ..."
 
 # env | grep DEFAULT_
 
-# Overwrite 'example.com' default host with something appropriate
-export DEFAULT_VIRTUAL_HOST=${VIRTUAL_HOST:-`hostname -f`}
+export APP_HOSTNAME=${APP_HOSTNAME:-$(hostname -f)}
 
-echo " * host:   ${VIRTUAL_HOST:-$DEFAULT_VIRTUAL_HOST}"
+echo " * host:   ${APP_HOSTNAME}"
 
 # =============================================================================
 # 	HHVM
@@ -55,8 +54,8 @@ echo " * host:   ${VIRTUAL_HOST:-$DEFAULT_VIRTUAL_HOST}"
 # =============================================================================
 
 if [[ "${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}" = "example.com" ]] ; then
-	# echo " * exim:   mail_from ${VIRTUAL_HOST:-$DEFAULT_VIRTUAL_HOST}"
-	EXIM_MAIL_FROM=${VIRTUAL_HOST:-$DEFAULT_VIRTUAL_HOST}
+	# echo " * exim:   mail_from ${APP_HOSTNAME}"
+	EXIM_MAIL_FROM=${APP_HOSTNAME}
 fi
 
 if [[ "${EXIM_DELIVERY_MODE:-$DEFAULT_EXIM_DELIVERY_MODE}" = "smarthost" ]] ; then	

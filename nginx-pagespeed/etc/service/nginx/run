@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-_HOSTNAME=${VIRTUAL_HOST:-$(hostname)}
+APP_HOSTNAME=${APP_HOSTNAME:-$(hostname)}
 
-echo " * nginx:  server_name ${_HOSTNAME}"
-sed -i -r "s/example.com/${_HOSTNAME}/g" /etc/nginx/sites-enabled/default.conf
+echo " * nginx:  server_name ${APP_HOSTNAME}"
+sed -i -r "s/example.com/${APP_HOSTNAME}/g" /etc/nginx/sites-enabled/default.conf
 
 if [ "${SSL_ENABLED}" = "false" ] ; then
 	# SSL disabled
@@ -21,22 +21,22 @@ else
 		cp /app/etc/nginx/sites-enabled/default-ssl.conf /etc/nginx/sites-enabled
 	fi
 
-	sed -i -r "s/example.com/${_HOSTNAME}/g" /etc/nginx/sites-enabled/default-ssl.conf
+	sed -i -r "s/example.com/${APP_HOSTNAME}/g" /etc/nginx/sites-enabled/default-ssl.conf
 
-	if [ ! -f /etc/nginx/ssl/${_HOSTNAME}.dhparam.pem ] ; then
+	if [ ! -f /etc/nginx/ssl/${APP_HOSTNAME}.dhparam.pem ] ; then
 		# Generate Diffie Hellman parameter file, as the default shipped with Ubuntu is 1024bits and considered insecure
 		# https://wiki.mozilla.org/Security/Server_Side_TLS#DHE_handshake_and_dhparam
-		echo " * nginx:  Generating /etc/nginx/ssl/${_HOSTNAME}.dhparam.pem"
+		echo " * nginx:  Generating /etc/nginx/ssl/${APP_HOSTNAME}.dhparam.pem"
 		export RANDFILE=/app/.rnd
 		rm -f $RANDFILE
-		openssl dhparam -out /etc/nginx/ssl/${_HOSTNAME}.dhparam.pem 2048
+		openssl dhparam -out /etc/nginx/ssl/${APP_HOSTNAME}.dhparam.pem 2048
 	fi
 
-	if [ ! -f /etc/nginx/ssl/${_HOSTNAME}.key ] ; then
+	if [ ! -f /etc/nginx/ssl/${APP_HOSTNAME}.key ] ; then
 		# Generate a self signed certificate if one does not exist
 		# Expires in 365 days
-		echo " * nginx:  Generating default /etc/nginx/ssl/${_HOSTNAME}.key /etc/nginx/ssl/${_HOSTNAME}.crt"
-		openssl req -x509 -newkey rsa:2048 -keyout /etc/nginx/ssl/${_HOSTNAME}.key -out /etc/nginx/ssl/${_HOSTNAME}.crt -nodes -days 365 -subj "/C=US/ST=State/L=Location/O=/OU=/CN=localdomain"
+		echo " * nginx:  Generating default /etc/nginx/ssl/${APP_HOSTNAME}.key /etc/nginx/ssl/${APP_HOSTNAME}.crt"
+		openssl req -x509 -newkey rsa:2048 -keyout /etc/nginx/ssl/${APP_HOSTNAME}.key -out /etc/nginx/ssl/${APP_HOSTNAME}.crt -nodes -days 365 -subj "/C=US/ST=State/L=Location/O=/OU=/CN=localdomain"
 	fi
 
 fi

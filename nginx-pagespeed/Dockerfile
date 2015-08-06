@@ -1,14 +1,5 @@
 FROM funkygibbon/docker-ubuntu-base
 
-# RUN apt-get update && \
-# 	apt-get install -y wget && \
-# 	wget -q http://nginx.org/keys/nginx_signing.key -O- | sudo apt-key add - && \
-# 	echo deb http://nginx.org/packages/mainline/ubuntu/ trusty nginx >> /etc/apt/sources.list && \
-# 	echo deb-src http://nginx.org/packages/mainline/ubuntu/ trusty nginx >> /etc/apt/sources.list && \
-# 	apt-get update && \
-# 	apt-get -y install nginx && \
-# 	apt-get clean
-
 EXPOSE 80
 EXPOSE 443
 
@@ -76,9 +67,10 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 	apt-get autoremove -yqq && \
 	apt-get clean
 
+
 ENV DEFAULT_APP_USER nginx
 ENV DEFAULT_APP_GROUP nginx
-ENV	DEFAULT_UPLOAD_MAX_SIZE 30M
+ENV DEFAULT_UPLOAD_MAX_SIZE 30M
 ENV DEFAULT_NGINX_MAX_WORKER_PROCESSES 8
 ENV DEFAULT_CHOWN_APP_DIR true
 
