@@ -9,16 +9,11 @@ ENV OPENSSL_VERSION 1.0.1p
 
 COPY sources.list /etc/apt/sources.list
 
-COPY nginx-${NGINX_VERSION}.tar.gz /tmp/nginx-${NGINX_VERSION}.tar.gz 
-RUN cd /tmp && tar zxf /tmp/nginx-${NGINX_VERSION}.tar.gz
-COPY openssl-${OPENSSL_VERSION}.tar.gz /tmp/openssl-${OPENSSL_VERSION}.tar.gz 
-RUN cd /tmp && tar zxf /tmp/openssl-${OPENSSL_VERSION}.tar.gz
-
 RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/nginx && \
 	apt-get update && \
 	apt-get -y install wget build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
-	# echo "Downloading nginx v${NGINX_VERSION} ..." && wget -qO - http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz | tar zxf - -C /tmp && \
-	# echo "Downloading openssl v${OPENSSL_VERSION} ..." && wget -qO - https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xzf  - -C /tmp && \
+	echo "Downloading nginx v${NGINX_VERSION} ..." && wget -qO - http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz | tar zxf - -C /tmp && \
+	echo "Downloading openssl v${OPENSSL_VERSION} ..." && wget -qO - https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xzf  - -C /tmp && \
 	cd /tmp/nginx-${NGINX_VERSION} && ./configure \
 		--prefix=/etc/nginx  \
 		--sbin-path=/usr/sbin/nginx  \
@@ -68,8 +63,10 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 
 ENV DEFAULT_APP_USER nginx
 ENV DEFAULT_APP_GROUP nginx
-ENV	DEFAULT_UPLOAD_MAX_SIZE=30M
+ENV DEFAULT_UPLOAD_MAX_SIZE=30M
 ENV DEFAULT_NGINX_MAX_WORKER_PROCESSES=8
+
+ENV SSL_ENABLED true
 
 COPY . /app
 
