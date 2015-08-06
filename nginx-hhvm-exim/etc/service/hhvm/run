@@ -9,4 +9,15 @@ set -e
 # 	sed -i -r "s/xdebug.enable = 1/xdebug.enable = 0/g" /etc/hhvm/php.ini
 # fi
 
+
+# # configure php memory limit
+echo " * hhvm:   memory_limit = ${PHP_MEMORY_LIMIT:-$DEFAULT_PHP_MEMORY_LIMIT}"
+sed -i -r "s/memory_limit\s*=\s*[0-9]+M/memory_limit = ${PHP_MEMORY_LIMIT:-$DEFAULT_PHP_MEMORY_LIMIT}/g" /etc/hhvm/php.ini
+
+# # configure php file upload limits
+echo " * hhvm:   upload_max_filesize = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
+echo " * hhvm:   post_max_size = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
+sed -i -r "s/upload_max_filesize\s*=\s*[0-9]+M/upload_max_filesize = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}/g" /etc/hhvm/php.ini
+sed -i -r "s/post_max_size\s*=\s*[0-9]+M/post_max_size = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}/g" /etc/hhvm/php.ini
+
 exec /usr/bin/hhvm --config /etc/hhvm/server.ini -m server -vPidFile=/var/run/hhvm/pid -vServer.Type=fastcgi
