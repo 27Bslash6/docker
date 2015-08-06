@@ -1,103 +1,51 @@
 #!/bin/bash
-
-# =============================================================================
-# 	NGINX
-# =============================================================================
-
 set -e
 
-# set nginx user
-echo " * nginx:  user ${APP_USER:-$DEFAULT_APP_USER}"
-sed -i -r "s/user\s+[a-z]+;$/user ${APP_USER:-$DEFAULT_APP_USER};/" /etc/nginx/nginx.conf
+_HOSTNAME=${VIRTUAL_HOST:-$(hostname)}
 
-# =============================================================================
-# Application is launched as $APP_USER:$APP_GROUP with specified UID and GID, 
-# This simplifies editing on the host via volumes, or securing volumes from host
+echo " * nginx:  server_name ${_HOSTNAME}"
+sed -i -r "s/example.com/${_HOSTNAME}/g" /etc/nginx/sites-enabled/default.conf
 
-echo " * user:   ${APP_USER:-$DEFAULT_APP_USER} ${APP_UID:-$DEFAULT_APP_UID}"
-echo " * group:  ${APP_GROUP:-$DEFAULT_APP_GROUP} ${APP_GID:-$DEFAULT_APP_GID}"
+if [ "${SSL_ENABLED}" = "false" ] ; then
+	# SSL disabled
 
-# Regex to detect an integer
-R_NUMBER='^[0-9]+$'
-
-# =============================================================================
-# 	GROUP
-# =============================================================================
-
-# - Group sanity checks
-
-EXISTING_GROUP_GID=$( getent group ${APP_GROUP:-$DEFAULT_APP_GROUP} | sed -r "s/${APP_GROUP:-$DEFAULT_APP_GROUP}\:x\:([[:digit:]]*):/\1/g" )
-
-if [[ $EXISTING_GROUP_GID =~ $R_NUMBER ]] ; then 
-	# Is number, is good.
-
-	# Group exists
-	# @todo test existing user logic!
-
-	echo " * - group found with gid $EXISTING_GROUP_GID"
-
-	if ! [[ "$EXISTING_GROUP_GID" = "${APP_GID:-$DEFAULT_APP_GID}" ]]; then
-		# Existing group does not have matching GID
-		APP_GID=$EXISTING_GROUP_GID
-		export APP_GID
-
-		echo -e "\n================================================================================\n"
-		echo -e "\tWARNING: group has different gid $EXISTING_GROUP_GID\n"
-		echo -e "\t         new \$APP_GID is $EXISTING_GROUP_GID (was ${APP_GID:-$EXISTING_GROUP_GID})\n\n"	
-		echo -e "================================================================================"	
-	fi
-	
+	echo " * nginx:  SSL disabled"
+	rm /etc/nginx/sites-enabled/default-ssl.conf
 else
+	# SSL enabled
 
-	# Create new group
-	echo " * - groupadd ${APP_GROUP:-$DEFAULT_APP_GROUP}"
-	groupadd -r -g ${APP_GID:-$DEFAULT_APP_GID} ${APP_GROUP:-$DEFAULT_APP_GROUP}
+	echo " * nginx:  SSL enabled"
+
+	if [ ! -f /etc/nginx/sites-enabled/default-ssl.conf ]; then
+		echo " * nginx: recovering default-ssl.conf"
+		cp /app/etc/nginx/sites-enabled/default-ssl.conf /etc/nginx/sites-enabled
+	fi
+
+	sed -i -r "s/example.com/${_HOSTNAME}/g" /etc/nginx/sites-enabled/default-ssl.conf
+
+	if [ ! -f /etc/nginx/ssl/${_HOSTNAME}.dhparam.pem ] ; then
+		# Generate Diffie Hellman parameter file, as the default shipped with Ubuntu is 1024bits and considered insecure
+		# https://wiki.mozilla.org/Security/Server_Side_TLS#DHE_handshake_and_dhparam
+		echo " * nginx:  Generating /etc/nginx/ssl/${_HOSTNAME}.dhparam.pem"
+		export RANDFILE=/app/.rnd
+		rm -f $RANDFILE
+		openssl dhparam -out /etc/nginx/ssl/${_HOSTNAME}.dhparam.pem 2048
+	fi
+
+	if [ ! -f /etc/nginx/ssl/${_HOSTNAME}.key ] ; then
+		# Generate a self signed certificate if one does not exist
+		# Expires in 365 days
+		echo " * nginx:  Generating default /etc/nginx/ssl/${_HOSTNAME}.key /etc/nginx/ssl/${_HOSTNAME}.crt"
+		openssl req -x509 -newkey rsa:2048 -keyout /etc/nginx/ssl/${_HOSTNAME}.key -out /etc/nginx/ssl/${_HOSTNAME}.crt -nodes -days 365 -subj "/C=US/ST=State/L=Location/O=/OU=/CN=localdomain"
+	fi
 
 fi
 
-# =============================================================================
-# 	USER
-# =============================================================================
-
-# - User sanity checks
-EXISTING_USER_UID=$( getent passwd ${APP_USER:-$DEFAULT_APP_USER} | sed -r "s/${APP_USER:-$DEFAULT_APP_USER}\:x\:([[:digit:]]*):.*/\1/g" )
-
-if [[ $EXISTING_USER_UID =~ $R_NUMBER ]] ; then 
-	# User exists
-	# @todo test existing user logic!
-
-	echo " * - user found with uid $EXISTING_USER_UID"
-
-	if ! [[ "$EXISTING_USER_UID" = "${APP_UID:-$DEFAULT_APP_UID}" ]]; then
-		# Existing user does not have matching UID
-		APP_UID=$EXISTING_USER_UID
-		export APP_UID
-
-		echo -e "================================================================================\n"
-		echo -e "\tWARNING: User has different id $EXISTING_USER_UID\n"
-		echo -e "\t         Setting \$APP_UID to $EXISTING_USER_UID (was ${APP_UID:-$DEFAULT_APP_UID})\n"	
-		echo -e "================================================================================"
-
-	fi
-
-else
-	# Create new user
- 	echo " * - useradd ${APP_USER:-$DEFAULT_APP_USER}"
-	useradd -r -s /usr/sbin/nologin -G nginx -u ${APP_UID:-$DEFAULT_APP_UID} -g ${APP_GROUP:-$DEFAULT_APP_GROUP} ${APP_USER:-$DEFAULT_APP_USER}
-fi
-
-if [[ "${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}" -eq "true" ]] ; then
-	echo " * - chown ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www"
-	chown -Rf ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www
-fi 
-
-# =============================================================================
-
-# worker_processes = num cpu cores
+# Set worker_processes = num cpu cores
 procs=$(cat /proc/cpuinfo |grep processor | wc -l)
 if [[ "$procs" > "${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_NGINX_MAX_WORKER_PROCESSES}" ]]; then
 	# number of available processor cores exceeds the maximum permitted, limit to maximum
-	echo " * nginx:  use maximum ${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_NGINX_MAX_WORKER_PROCESSES} of $procs available cores"
+	echo " * nginx:  Using max ${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_NGINX_MAX_WORKER_PROCESSES} of $procs available cores"
 	procs=${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_NGINX_MAX_WORKER_PROCESSES}
 fi
 
@@ -106,20 +54,5 @@ sed -i -r "s/worker_processes\s+[0-9]+/worker_processes $procs/" /etc/nginx/ngin
 
 echo " * nginx:  client_max_body_size = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
 sed -i -r "s/client_max_body_size.+M;/client_max_body_size ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE};/" /etc/nginx/nginx.conf
-
-if [ ! -f /etc/nginx/ssl/default.key ] ; then
-	# Generate a self signed certificate
-	openssl req -x509 -newkey rsa:2048 -keyout /etc/nginx/ssl/default.key -out /etc/nginx/ssl/default.crt -nodes -days 365 -subj "/C=AU/ST=Tas/L=Launceston/O=/OU=/CN=localdomain"
-fi
-
-if [ ! -f /etc/nginx/ssl/dhparam.pem ] ; then
-	# Generate Diffie Hellman parameter file, as the default shipped with Ubuntu is 1024bits and considered insecure
-	# https://wiki.mozilla.org/Security/Server_Side_TLS#DHE_handshake_and_dhparam
-	echo " * nginx:  generating /etc/nginx/ssl/dhparam.pem ..."
-	mkdir -p /etc/nginx/ssl
-	export RANDFILE=/root/.rnd
-	rm -f $RANDFILE
-	openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048
-fi
 
 exec nginx

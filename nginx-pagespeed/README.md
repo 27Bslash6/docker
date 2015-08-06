@@ -8,9 +8,9 @@ Built on [funkygibbon/docker-ubuntu-base](https://registry.hub.docker.com/u/funk
 
 ## TLDR;
 
-```docker run -v "/path/to/www:/app/www" -p "80:80" -p "443:443" funkygibbon/nginx-pagespeed```
+`docker run -v "/path/to/www:/app/www" -p "80:80" -p "443:443" funkygibbon/nginx-pagespeed`
 
-Nginx is compiled from mainline source, if you would like to build the stable version, clone this repository and edit the `NGINX_VERSION` version number to suit.
+Nginx is compiled from mainline source, if you would like to build the stable version, clone this repository and edit the `NGINX_VERSION` number to suit.
 
 Files are served from `/app/www/`
 
@@ -43,13 +43,13 @@ docker run -e "UPLOAD_MAX_SIZE=10M" funkygibbon/nginx-pagespeed
 - adds user and group from `{APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP}`, some sanity checks for matching UID / GID
 - if `${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}` is true, `chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www\`  (default true)
 - `worker_processes` is set to the number of available processor cores and adjusts `/etc/nginx/nginx.conf` to match, up to a maximum number of cores `${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_MAX_WORKER_PROCESSES}`
-- `client_max_body_size` is set to ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}
+- `client_max_body_size` is set to `${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}`
 
 ### Security
 
 Nginx is compiled from mainline source according to Ubuntu compile flags, with the following modifcations:
 - includes latest OpenSSL 1.0.1 sources - https://www.openssl.org/source/
-- includes latest Google Pagespeed 
+- includes latest Google Pagespeed  - https://github.com/pagespeed/ngx_pagespeed/releases
 - `http_ssi_module` and `http_autoindex_module` disabled
 
 HTTPS is configured using modern sane defaults, including

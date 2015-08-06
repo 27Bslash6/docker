@@ -82,13 +82,13 @@ ENV	DEFAULT_UPLOAD_MAX_SIZE 30M
 ENV DEFAULT_NGINX_MAX_WORKER_PROCESSES 8
 ENV DEFAULT_CHOWN_APP_DIR true
 
-COPY . /
+ENV SSL_ENABLED true
 
-RUN chmod 750 /etc/service/nginx/run /boot.sh /init_nginx.sh
+COPY . /app
 
-RUN /init_nginx.sh
+RUN chmod 750 /app/init_nginx.sh
 
-ENTRYPOINT ["/boot.sh"]
+RUN /app/init_nginx.sh
 
 CMD ["/sbin/my_init"]
 
