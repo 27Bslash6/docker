@@ -29,8 +29,8 @@ RUN mkdir /root/bin/ && \
 EXPOSE 443
 EXPOSE 80
 
-ENV DEFAULT_APP_ENV=production
-ENV DEFAULT_CHOWN_APP_DIR=true
+ENV DEFAULT_APP_ENV production
+ENV DEFAULT_CHOWN_APP_DIR true
 ENV DEFAULT_VIRTUAL_HOST example.com
 ENV DEFAULT_TIMEZONE Australia/Sydney
 ENV DEFAULT_APP_USER nginx-php
@@ -53,17 +53,12 @@ ENV DEFAULT_EXIM_SMARTHOST smtp.example.org::587
 ENV DEFAULT_EXIM_SMARTHOST_AUTH_USERNAME postmaster@example.com
 ENV DEFAULT_EXIM_SMARTHOST_AUTH_PASSWORD password_123
 
-COPY etc /etc
-COPY root /root
-COPY env.user /root/.env.user
-COPY index.php /app/www/index.php
+COPY . /app
 
-RUN chmod 750 /root/bin/* && \
-	chmod 750 /etc/service/nginx/run && \
-	chmod 750 /etc/service/php5/run
+RUN chmod 750 /app/bin/*
 
-RUN /root/bin/init.sh
+RUN /app/bin/init_php.sh
 
-ENTRYPOINT ["/root/bin/boot.sh"]
+ENTRYPOINT ["/app/bin/boot.sh"]
 
 CMD ["/sbin/my_init"]

@@ -8,8 +8,9 @@ var | default | description
 --- | ------- | -----------
 APP_ENV | production | production, development :: 'development' enables http://www.xdebug.org/
 CHOWN_APP_DIR | true | if true, `chown $APP_USER:$APP_GROUP /app/www`
-VIRTUAL_HOST | example.com | hostname of the application
-TIMEZONE | Australia/Sydney | 
+APP_HOSTNAME |  |  hostname of application
+VIRTUAL_HOST | example.com | virtualhosts which this service should respond to, separated by commmas
+TIMEZONE | Australia/Sydney | @todo timezone is not currently set
 APP_USER | nginx-php | nginx and php5-fpm user 
 APP_GROUP | nginx-php | nginx and php5-fpm group
 APP_UID | 1000 | user_id - setting to the host username can be useful when mounting volumes from host > guest

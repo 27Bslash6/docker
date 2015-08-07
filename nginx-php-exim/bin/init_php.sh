@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+cp -R /app/etc/* /etc
+
+chmod 750 /etc/service/*/run
+
 # make terminal programs happy, eg. vim, less
 echo "export TERM=xterm-256color" >> /root/.bashrc
 
@@ -9,7 +13,8 @@ echo "export TERM=xterm-256color" >> /root/.bashrc
 cp /etc/php5/fpm/php.ini /etc/php5/fpm/php.ini.dist
 cp /etc/php5/fpm/pool.d/www.conf /etc/php5/fpm/pool.d/www.conf.dist
 
-echo "display_errors=On\nhtml_errors=On\n" >> /etc/php5/mods-available/xdebug.ini
+echo "display_errors=On" >> /etc/php5/mods-available/xdebug.ini
+echo "html_errors=On" >> /etc/php5/mods-available/xdebug.ini
 
 # Still necessary in case of misconfiguration in sites-enabled/
 sed -i -r "s/;cgi.fix_pathinfo\s*=\s*1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
