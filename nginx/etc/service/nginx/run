@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Update nginx user
+sed -i -r "s/user\s+.+;/user ${APP_USER:-$DEFAULT_APP_USER};/g" /etc/nginx/nginx.conf
+
 APP_HOSTNAME=${APP_HOSTNAME:-$(hostname)}
 
 echo " * nginx:  server_name ${APP_HOSTNAME}"
@@ -10,7 +13,7 @@ if [ "${SSL_ENABLED}" = "false" ] ; then
 	# SSL disabled
 
 	echo " * nginx:  SSL disabled"
-	rm /etc/nginx/sites-enabled/default-ssl.conf
+	rm -f /etc/nginx/sites-enabled/default-ssl.conf
 else
 	# SSL enabled
 
@@ -18,7 +21,7 @@ else
 
 	if [ ! -f /etc/nginx/sites-enabled/default-ssl.conf ]; then
 		echo " * nginx: recovering default-ssl.conf"
-		cp /app/etc/nginx/sites-enabled/default-ssl.conf /etc/nginx/sites-enabled
+		cp /app/etc/nginx/sites-enabled/default-ssl.conf /etc/nginx/sites-enabled/default-ssl.conf
 	fi
 
 	sed -i -r "s/example.com/${APP_HOSTNAME}/g" /etc/nginx/sites-enabled/default-ssl.conf

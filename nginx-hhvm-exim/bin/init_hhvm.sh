@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+cp -R /app/etc/* /etc
+
+chmod 750 /etc/service/*/run
+
 # Make terminal programs happy, eg. vim, less
 echo "export TERM=xterm-256color" >> /root/.bashrc
 

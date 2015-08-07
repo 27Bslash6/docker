@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-/app/bin/add_user.sh
-
 # =============================================================================
 # 	PHP5-FPM
 # =============================================================================
@@ -54,4 +52,4 @@ echo " * php:    sendmail_path = /usr/bin/sendmail -t -f no-reply@${EXIM_MAIL_FR
 sed -i -r "s/sendmail_path =.*$/sendmail_path = \/usr\/sbin\/sendmail -t -f no-reply@${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}/g" /etc/php5/fpm/php.ini
 
 # exec php5-fpm -c /etc/php5/fpm >>/var/log/php-fpm.log 2>&1
-exec php5-fpm -c /etc/php5/fpm >>/var/log/php-fpm.log 2>&1
+exec php5-fpm -c /etc/php5/fpm

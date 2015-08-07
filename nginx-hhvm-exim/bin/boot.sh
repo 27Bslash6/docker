@@ -6,48 +6,11 @@
 
 set -e
 
-# Source changes to env file
-source /root/.env.user
-
 echo "Starting config in ${APP_ENV:-$DEFAULT_APP_ENV} mode ..."
-
-# env | grep DEFAULT_
 
 export APP_HOSTNAME=${APP_HOSTNAME:-$(hostname -f)}
 
 echo " * host:   ${APP_HOSTNAME}"
-
-# =============================================================================
-# 	HHVM
-# =============================================================================
-
-# # set php-fpm user to match nginx
-
-# @todo - switch hhvm to socket once 
-# echo " * php:    user:  ${APP_USER:-$DEFAULT_APP_USER}"
-# echo " * php:    group: ${APP_GROUP:-$DEFAULT_APP_GROUP}"
-# sed -i -r "s/^user\s*=.+$/user = ${APP_USER:-$DEFAULT_APP_USER}/g" /etc/php5/fpm/pool.d/www.conf
-# sed -i -r "s/^group\s*=.+$/group = ${APP_GROUP:-$DEFAULT_APP_GROUP}/g" /etc/php5/fpm/pool.d/www.conf
-# sed -i -r "s/^listen.owner\s*=.+$/listen.owner = ${APP_USER:-$DEFAULT_APP_USER}/g" /etc/php5/fpm/pool.d/www.conf
-# sed -i -r "s/^listen.group\s*=.+$/listen.group = ${APP_GROUP:-$DEFAULT_APP_GROUP}/g" /etc/php5/fpm/pool.d/www.conf
-
-# # configure php process manager
-# echo " * php:    pm.max_children = ${PHP_MAX_CHILDREN:-$DEFAULT_PHP_MAX_CHILDREN}"
-# echo " * php:    pm.start_servers = ${PHP_START_SERVERS:-$DEFAULT_PHP_START_SERVERS}"
-# echo " * php:    pm.min_spare_servers = ${PHP_MIN_SPARE_SERVERS:-$DEFAULT_PHP_MIN_SPARE_SERVERS}"
-# echo " * php:    pm.max_spare_servers = ${PHP_MAX_SPARE_SERVERS:-$DEFAULT_PHP_MAX_SPARE_SERVERS}"
-# echo " * php:    pm.max_requests = ${PHP_MAX_REQUESTS:-$DEFAULT_PHP_MAX_REQUESTS}"
-# sed -i -r "s/pm = \w+\s*=\s*[0-9]+/pm = ${PHP_PROCESS_MANAGER:-$DEFAULT_PHP_PROCESS_MANAGER}/g" /etc/php5/fpm/pool.d/www.conf
-# sed -i -r "s/pm.max_children\s*=\s*[0-9]+/pm.max_children = ${PHP_MAX_CHILDREN:-$DEFAULT_PHP_MAX_CHILDREN}/g" /etc/php5/fpm/pool.d/www.conf
-# sed -i -r "s/pm.start_servers\s*=\s*[0-9]+/pm.start_servers = ${PHP_START_SERVERS:-$DEFAULT_PHP_START_SERVERS}/g" /etc/php5/fpm/pool.d/www.conf
-# sed -i -r "s/pm.min_spare_servers\s*=\s*[0-9]+/pm.min_spare_servers =  ${PHP_MIN_SPARE_SERVERS:-$DEFAULT_PHP_MIN_SPARE_SERVERS}/g" /etc/php5/fpm/pool.d/www.conf
-# sed -i -r "s/pm.max_spare_servers\s*=\s*[0-9]+/pm.max_spare_servers = ${PHP_MAX_SPARE_SERVERS:-$DEFAULT_PHP_MAX_SPARE_SERVERS}/g" /etc/php5/fpm/pool.d/www.conf
-# sed -i -r "s/pm.max_requests\s*=\s*[0-9]+/pm.max_requests = ${PHP_MAX_REQUESTS:-$DEFAULT_PHP_MAX_REQUESTS}/g" /etc/php5/fpm/pool.d/www.conf
-
-
-# # Update PHP sendmail_path 
-# echo " * php:    sendmail_path = /usr/bin/sendmail -t -f no-reply@${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}"
-# sed -i -r "s/sendmail_path =.*$/sendmail_path = \/usr\/sbin\/sendmail -t -f no-reply@${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}/g" /etc/php5/fpm/php.ini
 
 # =============================================================================
 # 	EXIM4

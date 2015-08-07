@@ -78,9 +78,9 @@ ENV SSL_ENABLED true
 
 COPY . /app
 
-RUN chmod 750 /app/init_nginx.sh
+RUN chmod 750 /app/bin/*.sh
 
-RUN /app/init_nginx.sh
+RUN /app/bin/init_nginx.sh
 
 CMD ["/sbin/my_init"]
 

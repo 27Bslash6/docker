@@ -8,7 +8,6 @@ set -e
 
 echo "Starting config in ${APP_ENV:-$DEFAULT_APP_ENV} mode ..."
 
-# Overwrite 'example.com' default host with something appropriate
 export APP_HOSTNAME=${APP_HOSTNAME:-`hostname -f`}
 
 echo " * host:   ${APP_HOSTNAME}"

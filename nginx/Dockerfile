@@ -61,19 +61,20 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 	apt-get autoremove -yqq && \
 	apt-get clean
 
+
 ENV DEFAULT_APP_USER nginx
 ENV DEFAULT_APP_GROUP nginx
-ENV DEFAULT_UPLOAD_MAX_SIZE=30M
-ENV DEFAULT_NGINX_MAX_WORKER_PROCESSES=8
+ENV DEFAULT_UPLOAD_MAX_SIZE 30M
+ENV DEFAULT_NGINX_MAX_WORKER_PROCESSES 8
+ENV DEFAULT_CHOWN_APP_DIR true
 
 ENV SSL_ENABLED true
 
 COPY . /app
 
-RUN chmod 750 /app/init_nginx.sh
-RUN /app/init_nginx.sh
+RUN chmod 750 /app/bin/*.sh
 
-VOLUME /app/www
+RUN /app/bin/init_nginx.sh
 
 CMD ["/sbin/my_init"]
 
