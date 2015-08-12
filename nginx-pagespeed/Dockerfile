@@ -3,6 +3,8 @@ FROM funkygibbon/docker-ubuntu-base
 EXPOSE 80
 EXPOSE 443
 
+COPY sources.list /etc/apt/sources.list
+
 # https://github.com/pagespeed/ngx_pagespeed/releases
 ENV PAGESPEED_VERSION 1.9.32.6
 
