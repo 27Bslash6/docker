@@ -1,4 +1,4 @@
-FROM funkygibbon/docker-ubuntu-base
+FROM funkygibbon/ubuntu
 
 EXPOSE 80
 EXPOSE 443
