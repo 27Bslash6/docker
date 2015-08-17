@@ -13,8 +13,17 @@ echo "export TERM=xterm-256color" >> /root/.bashrc
 cp /etc/php5/fpm/php.ini /etc/php5/fpm/php.ini.dist
 cp /etc/php5/fpm/pool.d/www.conf /etc/php5/fpm/pool.d/www.conf.dist
 
+mkdir -p /app/xdebug
+
 echo "display_errors=On" >> /etc/php5/mods-available/xdebug.ini
 echo "html_errors=On" >> /etc/php5/mods-available/xdebug.ini
+echo "xdebug.remote_enable=0"  >> /etc/php5/mods-available/xdebug.ini
+echo "xdebug.ide_key=default_ide_key"  >> /etc/php5/mods-available/xdebug.ini
+echo "xdebug.remote_host=172.17.42.1" >> /etc/php5/mods-available/xdebug.ini
+echo "xdebug.remote_port=9000" >> /etc/php5/mods-available/xdebug.ini
+echo "xdebug.profiler_enable=0" >> /etc/php5/mods-available/xdebug.ini
+echo "xdebug.profiler_enable_trigger=0" >> /etc/php5/mods-available/xdebug.ini
+echo "xdebug.profiler_output_dir=/app/xdebug" >> /etc/php5/mods-available/xdebug.ini
 
 # Still necessary in case of misconfiguration in sites-enabled/
 sed -i -r "s/;cgi.fix_pathinfo\s*=\s*1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini

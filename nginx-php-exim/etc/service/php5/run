@@ -6,9 +6,18 @@ set -e
 # =============================================================================
 
 if [[ "${APP_ENV}" = "development" ]] ; then
+	# Configure xdebug to 
 	php5enmod xdebug
+	chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_USER:-$DEFAULT_APP_USER} /app/xdebug
+	sed -i -r "s/^xdebug.remote_enable=0$/xdebug.remote_enable=1/g" /etc/php5/mods-available/xdebug.ini
+	sed -i -r "s/^xdebug.profiler_enable_trigger=0$/xdebug.profiler_enable_trigger=1/g" /etc/php5/mods-available/xdebug.ini
+	sed -i -r "s/^xdebug.remote_host=.+$/xdebug.remote_host=${PHP_XDEBUG_REMOTE_HOST:-$DEFAULT_PHP_XDEBUG_REMOTE_HOST}/g" /etc/php5/mods-available/xdebug.ini
+	sed -i -r "s/^xdebug.remote_port=.+$/xdebug.remote_port=${PHP_XDEBUG_REMOTE_PORT:-$DEFAULT_PHP_XDEBUG_REMOTE_PORT}/g" /etc/php5/mods-available/xdebug.ini
+	sed -i -r "s/^xdebug.ide_key=.+$/xdebug.ide_key=${PHP_XDEBUG_IDE_KEY:-$DEFAULT_PHP_XDEBUG_IDE_KEY}/g" /etc/php5/mods-available/xdebug.ini
 else
 	php5dismod xdebug
+	sed -i -r "s/^xdebug.remote_enable=1$/xdebug.remote_enable=0/g" /etc/php5/mods-available/xdebug.ini
+	sed -i -r "s/^xdebug.profiler_enable_trigger=1$/xdebug.profiler_enable_trigger=0/g" /etc/php5/mods-available/xdebug.ini
 fi
 
 # set php-fpm user to match nginx
