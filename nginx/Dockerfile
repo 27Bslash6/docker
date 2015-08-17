@@ -1,4 +1,4 @@
-FROM funkygibbon/docker-ubuntu-base
+FROM funkygibbon/ubuntu
 
 EXPOSE 80
 EXPOSE 443
@@ -57,7 +57,7 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 		--with-pcre-jit \
 		--with-openssl=/tmp/openssl-${OPENSSL_VERSION} && make && make install && \
 	rm -Rf /tmp/* && \
-	apt-get purge -yqq wget build-essential && \
+	apt-get purge -yqq build-essential && \
 	apt-get autoremove -yqq && \
 	apt-get clean
 
