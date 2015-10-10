@@ -1,14 +1,14 @@
 # Nginx + Pagespeed + OpenSSL
 
-Nginx 1.9.3
-ngx_pagespeed 1.9.32.6
-OpenSSL 1.0.1p
+![Nginx 1.9.5](https://img.shields.io/badge/nginx-1.9.5-brightgreen.svg) ![ngx_pagespeed 1.9.32.6](https://img.shields.io/badge/pagespeed-1.9.32.6-brightgreen.svg) ![OpenSSL 1.0.1p](https://img.shields.io/badge/OpenSSL-1.0.1p-brightgreen.svg)
 
-Built on [funkygibbon/docker-ubuntu-base](https://registry.hub.docker.com/u/funkygibbon/docker-ubuntu-base/), a lightly modified [Phusion Base Image](https://phusion.github.io/baseimage-docker/)
+Built on [funkygibbon/ubuntu](https://registry.hub.docker.com/u/funkygibbon/ubuntu/), a lightly modified [Phusion Base Image](https://phusion.github.io/baseimage-docker/)
 
 ## TLDR;
 
-`docker run -v "/path/to/www:/app/www" -p "80:80" -p "443:443" funkygibbon/nginx-pagespeed`
+```bash
+docker run -v "/path/to/www:/app/www" -p "80:80" -p "443:443" funkygibbon/nginx-pagespeed
+```
 
 Nginx is compiled from mainline source, if you would like to build the stable version, clone this repository and edit the `NGINX_VERSION` number to suit.
 
@@ -23,7 +23,7 @@ Nginx reads `/etc/nginx/sites-enabled` for its virtual hosts, and comes with som
 Nginx is configurable via environment variables, which are applied to the configuration on each service start, so you can adjust server parameters on the fly with, for example:
 
 ```bash
-export "UPLOAD_MAX_SIZE=10M"; sv restart nginx
+docker exec -ti <nginx> export "UPLOAD_MAX_SIZE=10M"; sv restart nginx
 ```
 
 variable | value
@@ -50,6 +50,7 @@ docker run -e "UPLOAD_MAX_SIZE=10M" funkygibbon/nginx-pagespeed
 Nginx is compiled from mainline source according to Ubuntu compile flags, with the following modifcations:
 - includes latest OpenSSL 1.0.1 sources - https://www.openssl.org/source/
 - includes latest Google Pagespeed  - https://github.com/pagespeed/ngx_pagespeed/releases
+- includes headers-more module to enable removal of sensitive headers such as X-Powered-By
 - `http_ssi_module` and `http_autoindex_module` disabled
 
 HTTPS is configured using modern sane defaults, including
