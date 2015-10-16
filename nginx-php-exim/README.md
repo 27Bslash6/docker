@@ -7,6 +7,7 @@ Configurable via a plethora of environment variables, which are applied either o
 var | default | description
 --- | ------- | -----------
 APP_ENV | production | production, development :: 'development' enables http://www.xdebug.org/
+ADMIN_EMAIL | nobody@example.com | Server administrator email, used for rerouted email in `development` mode
 CHOWN_APP_DIR | true | if true, `chown $APP_USER:$APP_GROUP /app/www`
 APP_HOSTNAME |  |  hostname of application
 VIRTUAL_HOST | example.com | virtualhosts which this service should respond to, separated by commmas

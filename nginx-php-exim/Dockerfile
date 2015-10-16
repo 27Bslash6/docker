@@ -28,6 +28,7 @@ RUN mkdir /root/bin/ && \
 EXPOSE 443
 EXPOSE 80
 
+ENV DEFAULT_ADMIN_EMAIL nobody@example.com
 ENV DEFAULT_APP_ENV production
 ENV DEFAULT_CHOWN_APP_DIR true
 ENV DEFAULT_VIRTUAL_HOST example.com
