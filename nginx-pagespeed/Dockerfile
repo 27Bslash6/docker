@@ -24,7 +24,7 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 	echo "Downloading pagespeed psol v${PAGESPEED_VERSION} ..." && wget -qO - https://dl.google.com/dl/page-speed/psol/${PAGESPEED_VERSION}.tar.gz | tar xzf  - -C /tmp/ngx_pagespeed-${PAGESPEED_VERSION}-beta && \
 	echo "Downloading openssl v${OPENSSL_VERSION} ..." && wget -qO - https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xzf  - -C /tmp && \
 	cd /tmp/nginx-${NGINX_VERSION} && \
-	./configure \
+	POSITION_AUX=true ./configure \
 		--prefix=/etc/nginx  \
 		--sbin-path=/usr/sbin/nginx  \
 		--conf-path=/etc/nginx/nginx.conf  \
@@ -75,9 +75,8 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 	apt-get clean && \
 	rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
-
-ENV DEFAULT_APP_USER nginx
-ENV DEFAULT_APP_GROUP nginx
+ENV DEFAULT_APP_USER app
+ENV DEFAULT_APP_GROUP app
 ENV DEFAULT_APP_UID 1000
 ENV DEFAULT_APP_GID 1000
 ENV DEFAULT_UPLOAD_MAX_SIZE 30M

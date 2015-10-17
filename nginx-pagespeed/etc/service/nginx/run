@@ -4,6 +4,7 @@ set -e
 # Update nginx user
 sed -i -r "s/user\s+.+;/user ${APP_USER:-$DEFAULT_APP_USER};/g" /etc/nginx/nginx.conf
 
+# If APP_HOSTNAME is not set, use default `hostname`
 APP_HOSTNAME=${APP_HOSTNAME:-$(hostname)}
 
 echo " * nginx:  server_name ${APP_HOSTNAME}"
@@ -24,15 +25,16 @@ else
 		cp /app/etc/nginx/sites-enabled/default-ssl.conf /etc/nginx/sites-enabled/default-ssl.conf
 	fi
 
+	# Overwrite default domain in nginx default-ssl.conf
 	sed -i -r "s/example.com/${APP_HOSTNAME}/g" /etc/nginx/sites-enabled/default-ssl.conf
 
 	if [ ! -f /etc/nginx/ssl/${APP_HOSTNAME}.dhparam.pem ] ; then
 		# Generate Diffie Hellman parameter file, as the default shipped with Ubuntu is 1024bits and considered insecure
 		# https://wiki.mozilla.org/Security/Server_Side_TLS#DHE_handshake_and_dhparam
-		echo " * nginx:  Generating /etc/nginx/ssl/${APP_HOSTNAME}.dhparam.pem"
+		echo " * nginx:  Generating /etc/nginx/ssl/${APP_HOSTNAME}.dhparam.pem ..."
 		export RANDFILE=/app/.rnd
 		rm -f $RANDFILE
-		openssl dhparam -out /etc/nginx/ssl/${APP_HOSTNAME}.dhparam.pem 2048
+		openssl dhparam -out /etc/nginx/ssl/${APP_HOSTNAME}.dhparam.pem 2048 > /dev/null
 	fi
 
 	if [ ! -f /etc/nginx/ssl/${APP_HOSTNAME}.key ] ; then
