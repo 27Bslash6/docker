@@ -14,10 +14,11 @@ RUN apt-get update \
   && apt-get -y upgrade \
   && apt-get -y autoremove \
   && apt-get -y clean \
-  && rm -rf /tmp/* /var/tmp/*
+  && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* 
 
-ADD . /app
+COPY . /app
 
 RUN chmod +x /app/bin/*
+
 RUN ln -s /app/bin/set_timezone.sh /etc/my_init.d/00_set_timezone.sh
 
