@@ -1,6 +1,6 @@
 # docker-ubuntu-base
 
-https://registry.hub.docker.com/u/funkygibbon/docker-ubuntu-base/
+https://registry.hub.docker.com/u/funkygibbon/ubuntu/
 
 Automated daily build of an Ubuntu trusty base image from https://phusion.github.io/baseimage-docker/ 
 
