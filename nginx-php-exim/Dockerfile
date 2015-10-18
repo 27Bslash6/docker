@@ -3,7 +3,7 @@ FROM funkygibbon/nginx-pagespeed
 MAINTAINER Ray Walker <hello@raywalker.it>
 
 RUN apt-get update && \
-	apt-get -y install \
+	apt-get -y --no-install-recommends install \
 		exim4 \
 		php5-fpm \
 		php5-mysql \
@@ -17,6 +17,8 @@ RUN apt-get update && \
 		php5-mcrypt \
 		php5-mhash \
 		php5-redis \
+                php5-memcached \
+                php5-memcache \
 		php5-xdebug \
 		php5-recode && \
 	php5enmod mcrypt imap && \
