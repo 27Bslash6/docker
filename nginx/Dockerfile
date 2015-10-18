@@ -3,18 +3,23 @@ FROM funkygibbon/ubuntu
 EXPOSE 80
 EXPOSE 443
 
-ENV NGINX_VERSION 1.9.3
+# http://nginx.org/en/download.html
+ENV NGINX_VERSION 1.9.5
 
+# https://github.com/openresty/headers-more-nginx-module/tags
+ENV HEADERS_MORE_VERSION 0.261
+
+# https://www.openssl.org/source
 ENV OPENSSL_VERSION 1.0.1p
-
-COPY sources.list /etc/apt/sources.list
 
 RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/nginx && \
 	apt-get update && \
 	apt-get -y install wget build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
 	echo "Downloading nginx v${NGINX_VERSION} ..." && wget -qO - http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz | tar zxf - -C /tmp && \
-	echo "Downloading openssl v${OPENSSL_VERSION} ..." && wget -qO - https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xzf  - -C /tmp && \
-	cd /tmp/nginx-${NGINX_VERSION} && ./configure \
+	echo "Downloading headers-more v${HEADERS_MORE_VERSION} ..." && wget -qO - https://github.com/openresty/headers-more-nginx-module/archive/v${HEADERS_MORE_VERSION}.tar.gz | tar zxf - -C /tmp && \
+  echo "Downloading openssl v${OPENSSL_VERSION} ..." && wget -qO - https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xzf  - -C /tmp && \
+	cd /tmp/nginx-${NGINX_VERSION} && \
+	POSITION_AUX=true ./configure \
 		--prefix=/etc/nginx  \
 		--sbin-path=/usr/sbin/nginx  \
 		--conf-path=/etc/nginx/nginx.conf  \
@@ -50,20 +55,22 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 		--with-mail  \
 		--with-mail_ssl_module  \
 		--with-file-aio  \
-		--with-http_spdy_module  \
+		--with-http_v2_module \
 		--with-cc-opt='-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2'  \
 		--with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro -Wl,--as-needed' \
 		--with-ipv6 \
 		--with-pcre-jit \
-		--with-openssl=/tmp/openssl-${OPENSSL_VERSION} && make && make install && \
-	rm -Rf /tmp/* && \
-	apt-get purge -yqq build-essential && \
+		--with-openssl=/tmp/openssl-${OPENSSL_VERSION} \
+		--add-module=/tmp/headers-more-nginx-module-${HEADERS_MORE_VERSION} && \
+	make && \
+	make install && \
+	apt-get purge -yqq wget build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
 	apt-get autoremove -yqq && \
-	apt-get clean
+	apt-get clean && \
+	rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
-
-ENV DEFAULT_APP_USER nginx
-ENV DEFAULT_APP_GROUP nginx
+ENV DEFAULT_APP_USER app
+ENV DEFAULT_APP_GROUP app
 ENV DEFAULT_APP_UID 1000
 ENV DEFAULT_APP_GID 1000
 ENV DEFAULT_UPLOAD_MAX_SIZE 30M
