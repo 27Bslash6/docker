@@ -87,6 +87,7 @@ else
 fi
 
 echo " * exim4:  restarting service ..."
+rm -f /etc/exim4/exim4.conf.template.bak*
 service exim4 restart >> /dev/null
 
 # -----------------------------------------------------------------------------
