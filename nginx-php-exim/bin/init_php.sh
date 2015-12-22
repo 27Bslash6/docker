@@ -24,6 +24,7 @@ echo "xdebug.remote_port=9000" >> /etc/php5/mods-available/xdebug.ini
 echo "xdebug.profiler_enable=0" >> /etc/php5/mods-available/xdebug.ini
 echo "xdebug.profiler_enable_trigger=0" >> /etc/php5/mods-available/xdebug.ini
 echo "xdebug.profiler_output_dir=/app/xdebug" >> /etc/php5/mods-available/xdebug.ini
+echo "xdebug.var_display_max_children=256" >> /etc/php5/mods-available/xdebug.ini
 
 # Still necessary in case of misconfiguration in sites-enabled/
 sed -i -r "s/;cgi.fix_pathinfo\s*=\s*1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini
