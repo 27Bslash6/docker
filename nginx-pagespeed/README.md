@@ -1,6 +1,6 @@
 # Nginx + Pagespeed + OpenSSL
 
-![Nginx 1.9.5](https://img.shields.io/badge/nginx-1.9.5-brightgreen.svg) ![ngx_pagespeed 1.9.32.6](https://img.shields.io/badge/pagespeed-1.9.32.6-brightgreen.svg) ![OpenSSL 1.0.1p](https://img.shields.io/badge/OpenSSL-1.0.1p-brightgreen.svg)
+![Nginx 1.9.9](https://img.shields.io/badge/nginx-1.9.9-brightgreen.svg) ![ngx_pagespeed 1.9.32.10](https://img.shields.io/badge/pagespeed-1.9.32.10-brightgreen.svg) ![OpenSSL 1.0.1q](https://img.shields.io/badge/OpenSSL-1.0.1q-brightgreen.svg)
 
 Built on [funkygibbon/ubuntu](https://registry.hub.docker.com/u/funkygibbon/ubuntu/), a lightly modified [Phusion Base Image](https://phusion.github.io/baseimage-docker/)
 
