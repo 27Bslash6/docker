@@ -58,4 +58,8 @@ sed -i -r "s/worker_processes\s+[0-9]+/worker_processes $procs/" /etc/nginx/ngin
 echo " * nginx:  client_max_body_size = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
 sed -i -r "s/client_max_body_size.+M;/client_max_body_size ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE};/" /etc/nginx/nginx.conf
 
+# Update cloudflare IP ranges
+echo " * nginx:  update cloudflare IP ranges"
+/app/bin/cloudflare-ip-updater.sh
+
 exec nginx

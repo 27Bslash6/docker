@@ -14,11 +14,13 @@ ENV OPENSSL_VERSION 1.0.1q
 
 RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/nginx && \
 	apt-get update && \
-	apt-get -y --no-install-recommends install wget build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
+	apt-get -y --no-install-recommends install wget git-core autoconf automake libtool build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
 	echo "Downloading nginx v${NGINX_VERSION} ..." && wget -qO - http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz | tar zxf - -C /tmp && \
 	echo "Downloading headers-more v${HEADERS_MORE_VERSION} ..." && wget -qO - https://github.com/openresty/headers-more-nginx-module/archive/v${HEADERS_MORE_VERSION}.tar.gz | tar zxf - -C /tmp && \
-  echo "Downloading openssl v${OPENSSL_VERSION} ..." && wget -qO - https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xzf  - -C /tmp && \
-	cd /tmp/nginx-${NGINX_VERSION} && \
+    echo "Downloading openssl v${OPENSSL_VERSION} ..." && wget -qO - https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xzf  - -C /tmp && \
+    echo "Installing libbrotli ..." && git clone https://github.com/bagder/libbrotli /tmp/libbrotli && cd /tmp/libbrotli && ./autogen.sh && ./configure && make && make install && \
+    echo "Downloading ngx-brotli ..." && git clone https://github.com/google/ngx_brotli /tmp/ngx_brotli && \
+    cd /tmp/nginx-${NGINX_VERSION} && \
 	POSITION_AUX=true ./configure \
 		--prefix=/etc/nginx  \
 		--sbin-path=/usr/sbin/nginx  \
@@ -61,10 +63,11 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 		--with-ipv6 \
 		--with-pcre-jit \
 		--with-openssl=/tmp/openssl-${OPENSSL_VERSION} \
+		--add-module=/tmp/ngx_brotli \
 		--add-module=/tmp/headers-more-nginx-module-${HEADERS_MORE_VERSION} && \
 	make && \
 	make install && \
-	apt-get purge -yqq wget build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
+	apt-get purge -yqq wget build-essential autoconf automake libtool git-core zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
 	apt-get autoremove -yqq && \
 	apt-get clean && \
 	rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
@@ -86,4 +89,3 @@ RUN chmod 750 /app/bin/*.sh
 RUN /app/bin/init_nginx.sh
 
 CMD ["/sbin/my_init"]
-

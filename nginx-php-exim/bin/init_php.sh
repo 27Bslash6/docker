@@ -17,7 +17,10 @@ mkdir -p /app/xdebug
 
 echo "display_errors=On" >> /etc/php5/mods-available/xdebug.ini
 echo "html_errors=On" >> /etc/php5/mods-available/xdebug.ini
+echo "xdebug.default_enable=0"  >> /etc/php5/mods-available/xdebug.ini
 echo "xdebug.remote_enable=0"  >> /etc/php5/mods-available/xdebug.ini
+echo "xdebug.remote_autostart=0"  >> /etc/php5/mods-available/xdebug.ini
+echo "xdebug.remote_handler=dbgp"  >> /etc/php5/mods-available/xdebug.ini
 echo "xdebug.ide_key=default_ide_key"  >> /etc/php5/mods-available/xdebug.ini
 echo "xdebug.remote_host=172.17.42.1" >> /etc/php5/mods-available/xdebug.ini
 echo "xdebug.remote_port=9000" >> /etc/php5/mods-available/xdebug.ini
