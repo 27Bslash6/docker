@@ -32,6 +32,7 @@ APP_USER | nginx
 APP_GROUP | nginx
 UPLOAD_MAX_SIZE | 30M
 NGINX_MAX_WORKER_PROCESSES | 8
+CHOWN_APP_DIR | true
 
 ```bash
 docker run -e "UPLOAD_MAX_SIZE=10M" funkygibbon/nginx-pagespeed
@@ -41,7 +42,7 @@ docker run -e "UPLOAD_MAX_SIZE=10M" funkygibbon/nginx-pagespeed
 
 - nginx user is set to `${APP_USER:-$DEFAULT_APP_USER}` (default is nginx)
 - adds user and group from `{APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP}`, some sanity checks for matching UID / GID
-- if `${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}` is true, `chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www\`  (default true)
+- if `${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}` is true, `chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www`  (default true)
 - `worker_processes` is set to the number of available processor cores and adjusts `/etc/nginx/nginx.conf` to match, up to a maximum number of cores `${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_MAX_WORKER_PROCESSES}`
 - `client_max_body_size` is set to `${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}`
 
