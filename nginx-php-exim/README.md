@@ -1,6 +1,10 @@
 # Nginx + PHP5-FPM + Exim
 
-Webserver stack built on top of  [funkygibbon/nginx-pagespeed](https://registry.hub.docker.com/u/funkygibbon/nginx-pagespeed/), which is built on a [lightly modified Phusion Ubuntu base image](https://registry.hub.docker.com/u/funkygibbon/docker-ubuntu-base/)
+Webserver stack built on top of  [funkygibbon/nginx-pagespeed](https://hub.docker.com/r/funkygibbon/nginx-pagespeed/), which is built on a [lightly modified Phusion Ubuntu base image](https://hub.docker.com/r/funkygibbon/ubuntu/)
+
+Docker Hub: [funkygibbon/nginx-php-exim](https://hub.docker.com/r/funkygibbon/nginx-php-exim/)
+
+`docker run -p "80:80" -p "443:443" -e "APP_HOSTNAME=some.example.com" -v /some/dir/www:/app/www funkygibbon/nginx-php-exim`
 
 Configurable via a plethora of environment variables, which are applied on service start
 
@@ -12,8 +16,8 @@ CHOWN_APP_DIR | true | if true, `chown -R $APP_USER:$APP_GROUP /app/www`
 APP_HOSTNAME | `hostname -f` |  hostname of application 
 VIRTUAL_HOST | example.com | virtualhosts which this service should respond to, separated by commmas.  Useful for operating behind [jwilder/nginx-proxy](https://hub.docker.com/r/jwilder/nginx-proxy/).
 TIMEZONE | Australia/Sydney | Server timezone
-APP_USER | nginx-php | nginx and php5-fpm user 
-APP_GROUP | nginx-php | nginx and php5-fpm group
+APP_USER | app | nginx and php5-fpm user 
+APP_GROUP | app | nginx and php5-fpm group
 APP_UID | 1000 | user_id - useful when mounting volumes from host > guest to either share or delineate file access permission
 APP_GID | 1000 | group_id
 UPLOAD_MAX_SIZE | 30M | Maximum upload size, applied to nginx and php5-fpm
