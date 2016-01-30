@@ -18,6 +18,7 @@ sed -i -r "s/^group\s*=.+$/group = ${APP_GROUP:-$DEFAULT_APP_GROUP}/g" /etc/php5
 sed -i -r "s/^listen.owner\s*=.+$/listen.owner = ${APP_USER:-$DEFAULT_APP_USER}/g" /etc/php5/fpm/pool.d/www.conf
 sed -i -r "s/^listen.group\s*=.+$/listen.group = ${APP_GROUP:-$DEFAULT_APP_GROUP}/g" /etc/php5/fpm/pool.d/www.conf
 
+
 # memory limit
 echo " * php:    memory_limit:         ${PHP_MEMORY_LIMIT:-$DEFAULT_PHP_MEMORY_LIMIT}"
 sed -i -r "s/^.*memory_limit\s*=\s*[0-9]+[MG]/memory_limit = ${PHP_MEMORY_LIMIT:-$DEFAULT_PHP_MEMORY_LIMIT}/g" /etc/php5/fpm/php.ini
@@ -49,8 +50,15 @@ sed -i -r "s/pm.min_spare_servers\s*=\s*[0-9]+/pm.min_spare_servers =  ${PHP_MIN
 sed -i -r "s/pm.max_spare_servers\s*=\s*[0-9]+/pm.max_spare_servers = ${PHP_MAX_SPARE_SERVERS:-$DEFAULT_PHP_MAX_SPARE_SERVERS}/g" /etc/php5/fpm/pool.d/www.conf
 sed -i -r "s/pm.max_requests\s*=\s*[0-9]+/pm.max_requests = ${PHP_MAX_REQUESTS:-$DEFAULT_PHP_MAX_REQUESTS}/g" /etc/php5/fpm/pool.d/www.conf
 
+# disable_functions
+DIST_DISABLE_FUNCTIONS=`grep "disable_functions =" /etc/php5/fpm/php.ini.dist`
+if [[ "${PHP_DISABLE_FUNCTIONS:-$DEFAULT_PHP_DISABLE_FUNCTIONS}" != "false" ]]; then
+    echo " * php:    disable_functions:    ${PHP_DISABLE_FUNCTIONS:-$DEFAULT_PHP_DISABLE_FUNCTIONS}"
+    sed -i -r "s/^disable_functions =.*$/${DIST_DISABLE_FUNCTIONS}${PHP_DISABLE_FUNCTIONS:-$DEFAULT_PHP_DISABLE_FUNCTIONS}/g" /etc/php5/fpm/php.ini
+fi
+
 # xdebug
-if [[ "${APP_ENV}" = "development" ]] ; then
+if [[ "${APP_ENV:-$DEFAULT_APP_ENV}" == "development" ]]; then
     echo " * php:    xdebug.remote_host:   ${PHP_XDEBUG_REMOTE_HOST:-$DEFAULT_PHP_XDEBUG_REMOTE_HOST}"
     echo " * php:    xdebug.remote_port:   ${PHP_XDEBUG_REMOTE_PORT:-$DEFAULT_PHP_XDEBUG_REMOTE_PORT}"
     echo " * php:    xdebug.ide_key:       ${PHP_XDEBUG_IDE_KEY:-$DEFAULT_PHP_XDEBUG_IDE_KEY}"
@@ -69,7 +77,7 @@ else
 	sed -i -r "s/^xdebug.profiler_enable_trigger=1$/xdebug.profiler_enable_trigger=0/g" /etc/php5/mods-available/xdebug.ini
 fi
 
-if [ "${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}" = "example.com" ] ; then
+if [[ "${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}" == "example.com" ]]; then
 	# echo " * exim:   mail_from ${APP_HOSTNAME}"
 	EXIM_MAIL_FROM=${APP_HOSTNAME}
 fi
