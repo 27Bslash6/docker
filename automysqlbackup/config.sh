@@ -18,14 +18,8 @@ fi
 echo " * username:  ${BACKUP_USERNAME}"
 echo "username=${BACKUP_USERNAME}\npassword={$BACKUP_PASSWORD}" > $MYSQL_CONFIG_FILE
 
-echo " * email:        ${BACKUP_EMAIL}"
+echo " * email:     ${BACKUP_EMAIL}"
 sed -i -r "s/MAILADDR=.*/MAILADDR=${BACKUP_EMAIL}/g" $AUTOMYSQLBACKUP_CONFIG_FILE
 
-if [[ "$1" = "/sbin/my_init" ]] ; then
-	exec /sbin/my_init
-else
-	echo "$ /bin/sh -c $@"
-	exec /bin/sh -c "$@"
-fi
 
 
