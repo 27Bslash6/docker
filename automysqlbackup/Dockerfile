@@ -14,7 +14,7 @@ ENV BACKUP_EMAIL root
 
 ENV BACKUP_CRONTIME "12 5 * * *"
 
-COPY boot.sh /etc/my_init.d/10_config.sh
+COPY config.sh /etc/my_init.d/10_config.sh
 
 RUN cp /etc/default/automysqlbackup /etc/default/automysqlbackup.dist \
  && chmod +x /etc/my_init.d/*.sh
