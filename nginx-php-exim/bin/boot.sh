@@ -47,8 +47,6 @@ if [[ "${EXIM_DELIVERY_MODE:-$DEFAULT_EXIM_DELIVERY_MODE}" = "smarthost" ]] ; th
 
 		sed -i -r "s/dc_hide_mailname=''/dc_hide_mailname='true'/" /etc/exim4/update-exim4.conf.conf
 
-		# sed -i -r "s/*:.+:.+/*:${EXIM_SMARTHOST_MAIL_USERNAME}:${EXIM_SMARTHOST_MAIL_PASSWORD}" /etc/exim4/passwd.client
-	
 	fi
 
 	
@@ -57,10 +55,6 @@ else
 	# -------------------------------------------------------------------------
 	# 	LOCAL
 	# -------------------------------------------------------------------------
-
-	# # Update PHP sendmail_path 
-	# sed -i -r "s/sendmail_path =.*$/sendmail_path = \/usr\/bin\/sendmail -t -f no-reply@${EXIM_MAIL_FROM}/g" /etc/php5/fpm/php.ini
-	# echo " * php:    sendmail_path = /usr/bin/sendmail -t -f no-reply@${EXIM_MAIL_FROM}"
 	
 	echo " * exim4:  local"
 
@@ -73,7 +67,28 @@ else
 
 fi
 
-service exim4 restart
+# -----------------------------------------------------------------------------
+#   EXIM email redirect
+# -----------------------------------------------------------------------------
+
+if [[ "${APP_ENV:-$DEFAULT_APP_ENV}" = "development" ]]; then
+
+	if [[ ${ADMIN_EMAIL:-$DEFAULT_ADMIN_EMAIL} = "nobody@example.com" ]]; then
+		echo " ** WARNING ** admin email is default - nobody@example.com - emails will disappear into the void"
+	fi
+
+	echo " * exim4:  re-routing all outgoing email to ${ADMIN_EMAIL:-$DEFAULT_ADMIN_EMAIL}"
+	echo -e "catch_all_outgoing:\n  debug_print = \"R: redirecting email for \$local_part@\$domain\"\n  driver = redirect\n  domains = ! +local_domains\n  allow_fail\n  data = ${ADMIN_EMAIL:-$DEFAULT_ADMIN_EMAIL}\n  no_more\n" > /etc/exim4/conf.d/router/190_exim4-config_intercept
+	
+	update-exim4.conf.template -r
+
+else
+	rm -fr /etc/exim4/conf.d/router/190_exim4-config_intercept
+fi
+
+echo " * exim4:  restarting service ..."
+rm -f /etc/exim4/exim4.conf.template.bak*
+service exim4 restart >> /dev/null
 
 # -----------------------------------------------------------------------------
 
@@ -87,6 +102,6 @@ echo -e "\nDone\n$(date)\n"
 if [[ "$1" = "/sbin/my_init" ]] ; then
 	exec /sbin/my_init 
 else
-	echo "$ /bin/sh -c $1"
-	exec /bin/sh -c $1
+	echo "$ /bin/sh -c $@"
+	exec /bin/sh -c "$@"
 fi

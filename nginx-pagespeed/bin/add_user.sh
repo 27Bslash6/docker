@@ -24,8 +24,6 @@ if [[ $EXISTING_GROUP_GID =~ $R_NUMBER ]] ; then
 	# Is number, is good.
 
 	# Group exists
-	# @todo test existing user logic!
-
 	echo " * - group found with gid $EXISTING_GROUP_GID"
 
 	if ! [[ "$EXISTING_GROUP_GID" = "${APP_GID:-$DEFAULT_APP_GID}" ]]; then
@@ -54,15 +52,10 @@ fi
 
 # - User sanity checks
 EXISTING_USER_UID=$( getent passwd ${APP_USER:-$DEFAULT_APP_USER} | sed -r "s/${APP_USER:-$DEFAULT_APP_USER}\:x\:([[:digit:]]*):.*/\1/g" )
-if ! [[ -z "$EXISTING_USER_UID" ]] ; then
-	echo "**  - debug: user search result"
-	echo $EXISTING_USER_UID
-fi
 
-if [[ $EXISTING_USER_UID =~ $R_NUMBER ]] ; then 
+if [[ $EXISTING_USER_UID =~ $R_NUMBER ]] ; then
+
 	# User exists
-	# @todo test existing user logic!
-
 	echo " * - user found with uid $EXISTING_USER_UID"
 
 	if ! [[ "$EXISTING_USER_UID" = "${APP_UID:-$DEFAULT_APP_UID}" ]]; then
@@ -83,3 +76,7 @@ else
 	useradd -r -s /usr/sbin/nologin -G nginx -u ${APP_UID:-$DEFAULT_APP_UID} -g ${APP_GROUP:-$DEFAULT_APP_GROUP} ${APP_USER:-$DEFAULT_APP_USER}
 fi
 
+if [ "${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}" = "true" ] ; then
+	echo " * - chown ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www"
+	chown -Rf ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www
+fi 

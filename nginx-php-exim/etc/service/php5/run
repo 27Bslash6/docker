@@ -1,15 +1,14 @@
 #!/bin/bash
-set -e
+set -euf
 
 # =============================================================================
 # 	PHP5-FPM
 # =============================================================================
 
-if [[ "${APP_ENV}" = "development" ]] ; then
-	php5enmod xdebug
-else
-	php5dismod xdebug
-fi
+# replace PHP Pool name
+POOL_NAME=`echo ${APP_HOSTNAME} | sed -e 's/[^a-zA-Z]/_/g'`
+echo " * php:    pool name   ${POOL_NAME}"
+sed -i -r "s/^\[.*\]$/\[${POOL_NAME}\]/g" /etc/php5/fpm/pool.d/www.conf
 
 # set php-fpm user to match nginx
 echo " * php:    user:  ${APP_USER:-$DEFAULT_APP_USER}"
@@ -19,22 +18,31 @@ sed -i -r "s/^group\s*=.+$/group = ${APP_GROUP:-$DEFAULT_APP_GROUP}/g" /etc/php5
 sed -i -r "s/^listen.owner\s*=.+$/listen.owner = ${APP_USER:-$DEFAULT_APP_USER}/g" /etc/php5/fpm/pool.d/www.conf
 sed -i -r "s/^listen.group\s*=.+$/listen.group = ${APP_GROUP:-$DEFAULT_APP_GROUP}/g" /etc/php5/fpm/pool.d/www.conf
 
-# configure php memory limit
-echo " * php:    memory_limit = ${PHP_MEMORY_LIMIT:-$DEFAULT_PHP_MEMORY_LIMIT}"
-sed -i -r "s/memory_limit\s*=\s*[0-9]+M/memory_limit = ${PHP_MEMORY_LIMIT:-$DEFAULT_PHP_MEMORY_LIMIT}/g" /etc/php5/fpm/php.ini
 
-# configure php file upload limits
-echo " * php:    upload_max_filesize = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
-echo " * php:    post_max_size = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
-sed -i -r "s/upload_max_filesize\s*=\s*[0-9]+M/upload_max_filesize = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}/g" /etc/php5/fpm/php.ini
-sed -i -r "s/post_max_size\s*=\s*[0-9]+M/post_max_size = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}/g" /etc/php5/fpm/php.ini
+# memory limit
+echo " * php:    memory_limit:         ${PHP_MEMORY_LIMIT:-$DEFAULT_PHP_MEMORY_LIMIT}"
+sed -i -r "s/^.*memory_limit\s*=\s*[0-9]+[MG]/memory_limit = ${PHP_MEMORY_LIMIT:-$DEFAULT_PHP_MEMORY_LIMIT}/g" /etc/php5/fpm/php.ini
 
-# configure php process manager
-echo " * php:    pm.max_children = ${PHP_MAX_CHILDREN:-$DEFAULT_PHP_MAX_CHILDREN}"
-echo " * php:    pm.start_servers = ${PHP_START_SERVERS:-$DEFAULT_PHP_START_SERVERS}"
-echo " * php:    pm.min_spare_servers = ${PHP_MIN_SPARE_SERVERS:-$DEFAULT_PHP_MIN_SPARE_SERVERS}"
-echo " * php:    pm.max_spare_servers = ${PHP_MAX_SPARE_SERVERS:-$DEFAULT_PHP_MAX_SPARE_SERVERS}"
-echo " * php:    pm.max_requests = ${PHP_MAX_REQUESTS:-$DEFAULT_PHP_MAX_REQUESTS}"
+# file upload limits
+echo " * php:    upload_max_filesize:  ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
+echo " * php:    post_max_size:        ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
+sed -i -r "s/^.*upload_max_filesize\s*=\s*[0-9]+M/upload_max_filesize = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}/g" /etc/php5/fpm/php.ini
+sed -i -r "s/^.*post_max_size\s*=\s*[0-9]+M/post_max_size = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}/g" /etc/php5/fpm/php.ini
+
+# maximum execution time
+echo " * php:    max_execution_time:   ${PHP_MAX_EXECUTION_TIME:-$DEFAULT_PHP_MAX_EXECUTION_TIME}"
+sed -i -r "s/^.*max_execution_time\s*=.*$/max_execution_time = ${PHP_MAX_EXECUTION_TIME:-$DEFAULT_PHP_MAX_EXECUTION_TIME}/g" /etc/php5/fpm/php.ini
+
+# maximum input variables
+echo " * php:    max_input_vars:       ${PHP_MAX_INPUT_VARS:-$DEFAULT_PHP_MAX_INPUT_VARS}"
+sed -i -r "s/^.*max_input_vars\s*=.*$/max_input_vars = ${PHP_MAX_INPUT_VARS:-$DEFAULT_PHP_MAX_INPUT_VARS}/g" /etc/php5/fpm/php.ini
+
+# php process manager
+echo " * php:    pm.max_children:      ${PHP_MAX_CHILDREN:-$DEFAULT_PHP_MAX_CHILDREN}"
+echo " * php:    pm.start_servers:     ${PHP_START_SERVERS:-$DEFAULT_PHP_START_SERVERS}"
+echo " * php:    pm.min_spare_servers: ${PHP_MIN_SPARE_SERVERS:-$DEFAULT_PHP_MIN_SPARE_SERVERS}"
+echo " * php:    pm.max_spare_servers: ${PHP_MAX_SPARE_SERVERS:-$DEFAULT_PHP_MAX_SPARE_SERVERS}"
+echo " * php:    pm.max_requests:      ${PHP_MAX_REQUESTS:-$DEFAULT_PHP_MAX_REQUESTS}"
 sed -i -r "s/pm = \w+\s*=\s*[0-9]+/pm = ${PHP_PROCESS_MANAGER:-$DEFAULT_PHP_PROCESS_MANAGER}/g" /etc/php5/fpm/pool.d/www.conf
 sed -i -r "s/pm.max_children\s*=\s*[0-9]+/pm.max_children = ${PHP_MAX_CHILDREN:-$DEFAULT_PHP_MAX_CHILDREN}/g" /etc/php5/fpm/pool.d/www.conf
 sed -i -r "s/pm.start_servers\s*=\s*[0-9]+/pm.start_servers = ${PHP_START_SERVERS:-$DEFAULT_PHP_START_SERVERS}/g" /etc/php5/fpm/pool.d/www.conf
@@ -42,14 +50,41 @@ sed -i -r "s/pm.min_spare_servers\s*=\s*[0-9]+/pm.min_spare_servers =  ${PHP_MIN
 sed -i -r "s/pm.max_spare_servers\s*=\s*[0-9]+/pm.max_spare_servers = ${PHP_MAX_SPARE_SERVERS:-$DEFAULT_PHP_MAX_SPARE_SERVERS}/g" /etc/php5/fpm/pool.d/www.conf
 sed -i -r "s/pm.max_requests\s*=\s*[0-9]+/pm.max_requests = ${PHP_MAX_REQUESTS:-$DEFAULT_PHP_MAX_REQUESTS}/g" /etc/php5/fpm/pool.d/www.conf
 
-if [ "${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}" = "example.com" ] ; then
+# disable_functions
+DIST_DISABLE_FUNCTIONS=`grep "disable_functions =" /etc/php5/fpm/php.ini.dist`
+if [[ "${PHP_DISABLE_FUNCTIONS:-$DEFAULT_PHP_DISABLE_FUNCTIONS}" != "false" ]]; then
+    echo " * php:    disable_functions:    ${PHP_DISABLE_FUNCTIONS:-$DEFAULT_PHP_DISABLE_FUNCTIONS}"
+    sed -i -r "s/^disable_functions =.*$/${DIST_DISABLE_FUNCTIONS}${PHP_DISABLE_FUNCTIONS:-$DEFAULT_PHP_DISABLE_FUNCTIONS}/g" /etc/php5/fpm/php.ini
+fi
+
+# xdebug
+if [[ "${APP_ENV:-$DEFAULT_APP_ENV}" == "development" ]]; then
+    echo " * php:    xdebug.remote_host:   ${PHP_XDEBUG_REMOTE_HOST:-$DEFAULT_PHP_XDEBUG_REMOTE_HOST}"
+    echo " * php:    xdebug.remote_port:   ${PHP_XDEBUG_REMOTE_PORT:-$DEFAULT_PHP_XDEBUG_REMOTE_PORT}"
+    echo " * php:    xdebug.ide_key:       ${PHP_XDEBUG_IDE_KEY:-$DEFAULT_PHP_XDEBUG_IDE_KEY}"
+	sed -i -r "s/^xdebug.remote_enable=0$/xdebug.remote_enable=1/g" /etc/php5/mods-available/xdebug.ini
+	sed -i -r "s/^xdebug.remote_autostart=0$/xdebug.remote_autostart=1/g" /etc/php5/mods-available/xdebug.ini
+	sed -i -r "s/^xdebug.profiler_enable_trigger=0$/xdebug.profiler_enable_trigger=1/g" /etc/php5/mods-available/xdebug.ini
+	sed -i -r "s/^xdebug.remote_host=.+$/xdebug.remote_host=${PHP_XDEBUG_REMOTE_HOST:-$DEFAULT_PHP_XDEBUG_REMOTE_HOST}/g" /etc/php5/mods-available/xdebug.ini
+	sed -i -r "s/^xdebug.remote_port=.+$/xdebug.remote_port=${PHP_XDEBUG_REMOTE_PORT:-$DEFAULT_PHP_XDEBUG_REMOTE_PORT}/g" /etc/php5/mods-available/xdebug.ini
+	sed -i -r "s/^xdebug.ide_key=.+$/xdebug.ide_key=${PHP_XDEBUG_IDE_KEY:-$DEFAULT_PHP_XDEBUG_IDE_KEY}/g" /etc/php5/mods-available/xdebug.ini
+	php5enmod xdebug
+	# @todo - what is /app/xdebug used for?
+	chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_USER:-$DEFAULT_APP_USER} /app/xdebug
+else
+	php5dismod xdebug
+	sed -i -r "s/^xdebug.remote_enable=1$/xdebug.remote_enable=0/g" /etc/php5/mods-available/xdebug.ini
+	sed -i -r "s/^xdebug.profiler_enable_trigger=1$/xdebug.profiler_enable_trigger=0/g" /etc/php5/mods-available/xdebug.ini
+fi
+
+if [[ "${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}" == "example.com" ]]; then
 	# echo " * exim:   mail_from ${APP_HOSTNAME}"
 	EXIM_MAIL_FROM=${APP_HOSTNAME}
 fi
 
-# Update PHP sendmail_path 
-echo " * php:    sendmail_path = /usr/bin/sendmail -t -f no-reply@${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}"
+# sendmail parameters
+echo " * php:    sendmail_path:         /usr/bin/sendmail -t -f no-reply@${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}"
 sed -i -r "s/sendmail_path =.*$/sendmail_path = \/usr\/sbin\/sendmail -t -f no-reply@${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}/g" /etc/php5/fpm/php.ini
 
-# exec php5-fpm -c /etc/php5/fpm >>/var/log/php-fpm.log 2>&1
+# start PHP
 exec php5-fpm -c /etc/php5/fpm

@@ -1,4 +1,2 @@
+.idea
 *.sublime-*
-nginx_proxy
-proxy
-exim

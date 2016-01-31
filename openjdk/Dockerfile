@@ -1,4 +1,4 @@
-FROM funkygibbon/docker-ubuntu-base
+FROM funkygibbon/ubuntu
 
 MAINTAINER Ray Walker <hello@raywalker.it>
 
