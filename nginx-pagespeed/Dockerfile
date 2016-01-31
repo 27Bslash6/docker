@@ -3,12 +3,8 @@ FROM funkygibbon/ubuntu
 EXPOSE 80
 EXPOSE 443
 
-<<<<<<< HEAD
-COPY sources.list /etc/apt/sources.list
-=======
 # http://nginx.org/en/download.html
 ENV NGINX_VERSION 1.9.9
->>>>>>> d50648f7f9ab4b9da7f936fe5f5577dc92ee6e75
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
 ENV PAGESPEED_VERSION 1.9.32.10
