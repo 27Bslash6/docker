@@ -1,6 +1,6 @@
 # Nginx + OpenSSL
 
-![Nginx 1.9.9](https://img.shields.io/badge/nginx-1.9.9-brightgreen.svg) ![OpenSSL 1.0.1r](https://img.shields.io/badge/OpenSSL-1.0.1r-brightgreen.svg)
+![Nginx 1.9.10](https://img.shields.io/badge/nginx-1.9.10-brightgreen.svg) ![OpenSSL 1.0.1s](https://img.shields.io/badge/OpenSSL-1.0.1s-brightgreen.svg)
 
 Built on [funkygibbon/ubuntu](https://registry.hub.docker.com/u/funkygibbon/ubuntu/), a lightly modified [Phusion Base Image](https://phusion.github.io/baseimage-docker/)
 
