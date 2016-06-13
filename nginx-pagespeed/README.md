@@ -49,7 +49,7 @@ docker run -e "UPLOAD_MAX_SIZE=10M" funkygibbon/nginx-pagespeed
 ### Security
 
 Nginx is compiled from mainline source according to Ubuntu compile flags, with the following modifcations:
-- includes latest OpenSSL 1.0.1 sources - https://www.openssl.org/source/
+- includes latest OpenSSL 1.0.2h sources - https://www.openssl.org/source/
 - includes latest Google Pagespeed - https://github.com/pagespeed/ngx_pagespeed/releases
 - includes headers-more module to enable removal of sensitive headers such as X-Powered-By
 - `http_ssi_module` and `http_autoindex_module` disabled
