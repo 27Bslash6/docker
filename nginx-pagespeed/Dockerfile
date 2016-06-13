@@ -13,7 +13,7 @@ ENV PAGESPEED_VERSION 1.10.33.6
 ENV HEADERS_MORE_VERSION 0.29
 
 # https://www.openssl.org/source
-ENV OPENSSL_VERSION 1.0.1s
+ENV OPENSSL_VERSION 1.0.2h
 
 RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/nginx && \
 	apt-get update && \
@@ -95,4 +95,3 @@ RUN chmod 750 /app/bin/*.sh
 RUN /app/bin/init_nginx.sh
 
 CMD ["/sbin/my_init"]
-
