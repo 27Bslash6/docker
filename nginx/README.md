@@ -1,6 +1,6 @@
 # Nginx + OpenSSL
 
-![Nginx 1.9.10](https://img.shields.io/badge/nginx-1.9.10-brightgreen.svg) ![OpenSSL 1.0.1s](https://img.shields.io/badge/OpenSSL-1.0.1s-brightgreen.svg)
+![Nginx 1.9.10](https://img.shields.io/badge/nginx-1.9.10-brightgreen.svg) ![OpenSSL 1.0.2h](https://img.shields.io/badge/OpenSSL-1.0.2h-brightgreen.svg)
 
 Built on [funkygibbon/ubuntu](https://registry.hub.docker.com/u/funkygibbon/ubuntu/), a lightly modified [Phusion Base Image](https://phusion.github.io/baseimage-docker/)
 
@@ -18,7 +18,7 @@ SSL configuration is stored in `/etc/nginx/ssl`
 
 Nginx reads `/etc/nginx/sites-enabled` for its virtual hosts, and comes with some sane defaults for out-of-the-box webserving.
 
-### Environment 
+### Environment
 
 Nginx is configurable via environment variables, which are applied to the configuration on each service start, so you can adjust server parameters on the fly with, for example:
 
@@ -49,7 +49,7 @@ docker run -e "UPLOAD_MAX_SIZE=10M" funkygibbon/nginx-pagespeed
 ### Security
 
 Nginx is compiled from mainline source according to Ubuntu compile flags, with the following modifcations:
-- includes latest OpenSSL 1.0.1 sources - https://www.openssl.org/source/
+- includes latest OpenSSL 1.0.2h sources - https://www.openssl.org/source/
 - includes headers-more module to enable removal of sensitive headers such as X-Powered-By
 - includes Google Brotli compression module
 - `http_ssi_module` and `http_autoindex_module` disabled
