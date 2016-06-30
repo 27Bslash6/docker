@@ -4,6 +4,8 @@ MAINTAINER Ray Walker <hello@raywalker.it>
 
 RUN add-apt-repository ppa:ondrej/php # for 14.04
 
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 14AA40EC0831756756D7F66C4F4EA0AAE5267A6C
+
 RUN apt-get update && \
 	apt-get -y --no-install-recommends install \
 		exim4 \
