@@ -1,35 +1,35 @@
-FROM funkygibbon/nginx-pagespeed
+FROM fuww/nginx-pagespeed
 
 MAINTAINER Ray Walker <hello@raywalker.it>
 
-# add php-7.0 source list by [Ondřej Surý](https://github.com/oerdnj)
-RUN add-apt-repository ppa:ondrej/php # for 14.04
+# add php- source list by [Ondřej Surý](https://github.com/oerdnj)
+# RUN add-apt-repository ppa:ondrej/php # for 14.04
 
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 14AA40EC0831756756D7F66C4F4EA0AAE5267A6C
+# RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 14AA40EC0831756756D7F66C4F4EA0AAE5267A6C
 
 RUN apt-get update && \
 	apt-get -y --no-install-recommends install \
 		exim4 \
-		php7.0-fpm \
-		php7.0-mysql \
-		php7.0-cli \
-		php7.0-curl \
-		php7.0-gd \
-		php7.0-intl \
-		php7.0-imagick \
-		php7.0-imap \
-		php7.0-mcrypt \
-		php7.0-redis \
-        php7.0-memcached \
-        php7.0-memcache \
-		php7.0-xdebug \
-		php7.0-recode && \
-		phpenmod -v 7.0 mcrypt imap && \
+		php-fpm \
+		php-mysql \
+		php-cli \
+		php-curl \
+		php-gd \
+		php-intl \
+		php-imagick \
+		php-imap \
+		php-mcrypt \
+		php-redis \
+        php-memcached \
+        php-memcache \
+		php-xdebug \
+		php-recode && \
+		phpenmod -v  mcrypt imap && \
 	apt-get clean
 
 # TODO
-# php7.0enmod mcrypt imap && \ >>> php7enmod does not exist, must do this manual
-# php7.0-hash \ # php7.0-mhash \
+# phpenmod mcrypt imap && \ >>> php7enmod does not exist, must do this manual
+# php-hash \ # php-mhash \
 # 		php-apc \ not sure we need this anymore, better use opcache
 
 RUN mkdir /root/bin/ && \

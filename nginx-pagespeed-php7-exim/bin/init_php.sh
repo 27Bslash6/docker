@@ -43,7 +43,7 @@ sed -i -r "s/;catch_workers_output =/catch_workers_output =/g" /etc/php/7.0/fpm/
 sed -i -r "s/;listen.mode = 0660/listen.mode = 0750/g" /etc/php/7.0/fpm/pool.d/www.conf
 
 # Fix socket path
-sed -i -r "s/listen = \/run\/php\/php7.0-fpm.sock/listen = \/var\/run\/php\/php7.0-fpm.sock/g" /etc/php/7.0/fpm/pool.d/www.conf
+# sed -i -r "s/listen = \/run\/php\/php7.0-fpm.sock/listen = \/run\/php\/php7.0-fpm.sock/g" /etc/php/7.0/fpm/pool.d/www.conf
 
 # Enable sendmail additional parameters
 sed -i -r "s/;sendmail_path =/sendmail_path =/g" /etc/php/7.0/fpm/php.ini
