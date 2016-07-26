@@ -1,10 +1,13 @@
-# Nginx + PHP5-FPM + Exim
+# Nginx + PHP7-FPM + Exim
 
 Highly configurable nginx-PHP webserver stack built on [funkygibbon/nginx-pagespeed](https://hub.docker.com/r/funkygibbon/nginx-pagespeed/), which is in turn built on a [lightly modified Phusion Ubuntu base image](https://hub.docker.com/r/funkygibbon/ubuntu/)
 
 Docker Hub: [funkygibbon/nginx-php-exim](https://hub.docker.com/r/funkygibbon/nginx-php-exim/)
 
 `docker run -p "80:80" -p "443:443" -e "APP_HOSTNAME=some.example.com" -v /some/dir/www:/app/www funkygibbon/nginx-php-exim`
+
+Without SSL (faster boot)
+`docker run -p "80:80" -e "APP_HOSTNAME=some.example.com" -e "SSL_ENABLED=false" -v /some/dir/www:/app/www funkygibbon/nginx-php-exim`
 
 Configurable via a plethora of environment variables, which are applied on service start
 

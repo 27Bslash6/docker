@@ -68,7 +68,8 @@ COPY . /app
 
 RUN chmod 750 /app/bin/*
 
-# NOT proper way of doing this in Docker, but needed to create the socket file. https://serverfault.com/questions/786398/how-do-i-start-php7-0-fpm-with-supervisord
+# NOT proper way of doing this in Docker, but needed to create the socket file.
+# Should do this: https://github.com/phusion/baseimage-docker#adding-additional-daemons
 RUN service php7.0-fpm start
 
 RUN /app/bin/init_php.sh
