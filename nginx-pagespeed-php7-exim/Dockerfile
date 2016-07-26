@@ -5,27 +5,27 @@ MAINTAINER Joost van der Laan <joost@fashionunited.com>
 RUN apt-get update && \
 	apt-get -y --no-install-recommends install \
 		exim4 \
-		php-fpm \
-		php-mysql \
-		php-cli \
-		php-curl \
-		php-gd \
-		php-intl \
-		php-imagick \
-		php-imap \
-		php-mcrypt \
-		php-redis \
-        php-memcached \
-        php-memcache \
-		php-xdebug \
-		php-recode && \
+		php7.0-fpm \
+		php7.0-mysql \
+		php7.0-cli \
+		php7.0-curl \
+		php7.0-gd \
+		php7.0-intl \
+		php7.0-imap \
+		php7.0-mcrypt \
+		php7.0-recode && \
 		phpenmod -v  mcrypt imap && \
 	apt-get clean
 
 # TODO
 # phpenmod mcrypt imap && \ >>> php7enmod does not exist, must do this manual
-# php-hash \ # php-mhash \
+# php7.0-hash \ # php-mhash \
 # 		php-apc \ not sure we need this anymore, better use opcache
+# 				php7.0-redis \
+  #       php7.0-memcached \
+  #       php7.0-memcache \
+		# php7.0-xdebug \
+		# 		php7.0-imagick \
 
 RUN mkdir /root/bin/ && \
 	echo "export PATH=/root/bin:$PATH" > /root/.bashrc
