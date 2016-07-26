@@ -9,6 +9,21 @@ Docker Hub: [funkygibbon/nginx-php-exim](https://hub.docker.com/r/funkygibbon/ng
 Without SSL (faster boot)
 `docker run -p "80:80" -e "APP_HOSTNAME=some.example.com" -e "SSL_ENABLED=false" -v /some/dir/www:/app/www funkygibbon/nginx-php-exim`
 
+# Build the proxy
+
+fuww/nginx-pagespeed-php7-exim
+
+docker build -t fuww/nginx-pagespeed-php7-exim:latest . && \
+docker run -p "80:80" -e "SSL_ENABLED=false" fuww/nginx-pagespeed-php7-exim
+
+docker-compose up
+
+docker tag -f nginx-pagespeed-php7-exim:latest fuww/nginx-pagespeed-php7-exim:latest && \
+docker push fuww/nginx-pagespeed-php7-exim:latest
+
+
+
+
 Configurable via a plethora of environment variables, which are applied on service start
 
 var | default | description
