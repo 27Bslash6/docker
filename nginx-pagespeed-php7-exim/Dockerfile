@@ -1,11 +1,6 @@
 FROM fuww/nginx-pagespeed
 
-MAINTAINER Ray Walker <hello@raywalker.it>
-
-# add php- source list by [Ondřej Surý](https://github.com/oerdnj)
-# RUN add-apt-repository ppa:ondrej/php # for 14.04
-
-# RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 14AA40EC0831756756D7F66C4F4EA0AAE5267A6C
+MAINTAINER Joost van der Laan <joost@fashionunited.com>
 
 RUN apt-get update && \
 	apt-get -y --no-install-recommends install \
@@ -72,6 +67,9 @@ ENV DEFAULT_EXIM_SMARTHOST_AUTH_PASSWORD password_123
 COPY . /app
 
 RUN chmod 750 /app/bin/*
+
+# NOT proper way of doing this in Docker, but needed to create the socket file. https://serverfault.com/questions/786398/how-do-i-start-php7-0-fpm-with-supervisord
+RUN service php7.0-fpm start
 
 RUN /app/bin/init_php.sh
 
