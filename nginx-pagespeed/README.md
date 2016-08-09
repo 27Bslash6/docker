@@ -18,6 +18,19 @@ SSL configuration is stored in `/etc/nginx/ssl`
 
 Nginx reads `/etc/nginx/sites-enabled` for its virtual hosts, and comes with some sane defaults for out-of-the-box webserving.
 
+### Building the image
+
+fuww/nginx-pagespeed
+
+docker build -t fuww/nginx-pagespeed:latest . && \
+docker run -p "80:80" -e "SSL_ENABLED=false" fuww/nginx-pagespeed
+
+docker-compose up
+
+docker tag fuww/nginx-pagespeed:latest fuww/nginx-pagespeed:latest && \
+docker push fuww/nginx-pagespeed:latest
+
+
 ### Environment
 
 Nginx is configurable via environment variables, which are applied to the configuration on each service start, so you can adjust server parameters on the fly with, for example:

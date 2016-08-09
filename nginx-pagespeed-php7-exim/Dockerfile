@@ -34,7 +34,7 @@ RUN apt-get update && \
 # 				php7.0-redis \
   #       php7.0-memcached \
   #       php7.0-memcache \
-		# php7.0-xdebug \
+		# php7.0-xdebug \//
 		# 		php7.0-imagick \
 
 RUN mkdir /root/bin/ && \
