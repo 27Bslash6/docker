@@ -24,10 +24,10 @@ RUN	rm joomla.tar.gz
 # && chown -R www-data:www-data /app/www
 
 # Local MySQL, disable to use live configuration.php
-COPY ./configuration-qa-with-testdb.php /app/www/configuration.php
+# COPY ./configuration-qa-with-testdb.php /app/www/configuration.php
 
 RUN apt-get -y --no-install-recommends install nano
 
-COPY .docker/etc /etc
+# COPY .docker/etc /etc
 
 CMD ["/sbin/my_init"]
