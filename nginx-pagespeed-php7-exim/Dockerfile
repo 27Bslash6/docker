@@ -18,8 +18,6 @@ RUN apt-get update && \
 		php7.0-mbstring \
 		php-pear \
 		php7.0-pspell \
-		php7.0-recode \
-		php7.0-sqlite3 \
 		php7.0-tidy \
 		php7.0-xmlrpc \
 		php7.0-xsl \
@@ -74,7 +72,7 @@ ENV DEFAULT_EXIM_SMARTHOST smtp.example.org::587
 ENV DEFAULT_EXIM_SMARTHOST_AUTH_USERNAME postmaster@example.com
 ENV DEFAULT_EXIM_SMARTHOST_AUTH_PASSWORD password_123
 
-RUN sed -i '/^;clear_env = no/s/^;//' /etc/php/7.0/fpm/pool.d/www.conf
+# RUN sed -i '/^;clear_env = no/s/^;//' /etc/php/7.0/fpm/pool.d/www.conf
 
 COPY . /app
 
