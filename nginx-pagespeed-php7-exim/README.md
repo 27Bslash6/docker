@@ -1,5 +1,7 @@
 # Nginx + PHP7-FPM + Exim
 
+![Nginx 1.9.10](https://img.shields.io/badge/nginx-1.9.10-brightgreen.svg) ![ngx_pagespeed 1.9.33.6](https://img.shields.io/badge/pagespeed-1.9.33.6-brightgreen.svg) ![OpenSSL 1.0.2h](https://img.shields.io/badge/OpenSSL-1.0.2h-brightgreen.svg)
+
 Highly configurable nginx-PHP webserver stack built on [funkygibbon/nginx-pagespeed](https://hub.docker.com/r/funkygibbon/nginx-pagespeed/), which is in turn built on a [lightly modified Phusion Ubuntu base image](https://hub.docker.com/r/funkygibbon/ubuntu/)
 
 Docker Hub: [funkygibbon/nginx-php-exim](https://hub.docker.com/r/funkygibbon/nginx-php-exim/)
