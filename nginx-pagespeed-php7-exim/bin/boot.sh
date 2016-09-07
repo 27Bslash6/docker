@@ -6,6 +6,22 @@
 
 set -e
 
+# =============================================================================
+# 	New Relic by Joost van der Laan
+# =============================================================================
+
+echo "Enabling APM metrics for ${NR_APP_NAME}"
+
+/opt/newrelic/newrelic-install install
+
+# Also add the plugin agent
+pip install newrelic-plugin-agent
+
+# Update the application name
+sed -i "s/newrelic.appname = \"PHP Application\"/newrelic.appname = \"${NR_APP_NAME}\"/" /etc/php/7.0/fpm/conf.d/newrelic.ini
+
+
+
 echo "Starting config in ${APP_ENV:-$DEFAULT_APP_ENV} mode ..."
 
 export APP_HOSTNAME=${APP_HOSTNAME:-`hostname -f`}

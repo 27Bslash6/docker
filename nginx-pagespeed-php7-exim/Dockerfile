@@ -38,6 +38,23 @@ RUN apt-get update && \
 RUN mkdir /root/bin/ && \
 	echo "export PATH=/root/bin:$PATH" > /root/.bashrc
 
+RUN apt-get -yqq install python-setuptools
+RUN easy_install pip
+RUN mkdir -p /opt/newrelic
+WORKDIR /opt/newrelic
+RUN wget -r -nd --no-parent -Alinux.tar.gz \
+    http://download.newrelic.com/php_agent/release/ >/dev/null 2>&1 \
+    && tar -xzf newrelic-php*.tar.gz --strip=1
+
+ENV NR_INSTALL_SILENT 1
+ENV NR_INSTALL_KEY **ChangeMe**
+ENV NR_APP_NAME "Default App Name"
+
+RUN mkdir -p /var/log/newrelic
+RUN mkdir -p /var/run/newrelic
+
+
+
 EXPOSE 443
 EXPOSE 80
 

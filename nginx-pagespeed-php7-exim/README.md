@@ -13,18 +13,17 @@ Without SSL (faster boot)
 
 # Build the proxy
 
-fuww/nginx-pagespeed-php7-exim
+	fuww/nginx-pagespeed-php7-exim
 
-docker build -t fuww/nginx-pagespeed-php7-exim:latest . && \
-docker run -p "80:80" -e "SSL_ENABLED=false" fuww/nginx-pagespeed-php7-exim
+	docker build -t fuww/nginx-pagespeed-php7-exim:latest . && \
+	docker run -p "80:80" -e "SSL_ENABLED=false" -e "NR_INSTALL_KEY=8xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx0" -e "NR_APP_NAME=MyApp" fuww/nginx-pagespeed-php7-exim
 
-docker-compose up
+	docker-compose up
 
-docker tag -f fuww/nginx-pagespeed-php7-exim:latest fuww/nginx-pagespeed-php7-exim:latest && \
-docker push fuww/nginx-pagespeed-php7-exim:latest
+	docker tag -f fuww/nginx-pagespeed-php7-exim:latest fuww/nginx-pagespeed-php7-exim:latest && \
+	docker push fuww/nginx-pagespeed-php7-exim:latest
 
-
-
+# Environment variables
 
 Configurable via a plethora of environment variables, which are applied on service start
 
