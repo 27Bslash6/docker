@@ -71,8 +71,6 @@ if [[ "${APP_ENV:-$DEFAULT_APP_ENV}" == "development" ]]; then
 	sed -i -r "s/^xdebug.remote_host=.+$/xdebug.remote_host=${PHP_XDEBUG_REMOTE_HOST:-$DEFAULT_PHP_XDEBUG_REMOTE_HOST}/g" /etc/php/5.6/mods-available/xdebug.ini
 	sed -i -r "s/^xdebug.remote_port=.+$/xdebug.remote_port=${PHP_XDEBUG_REMOTE_PORT:-$DEFAULT_PHP_XDEBUG_REMOTE_PORT}/g" /etc/php/5.6/mods-available/xdebug.ini
 	sed -i -r "s/^xdebug.ide_key=.+$/xdebug.ide_key=${PHP_XDEBUG_IDE_KEY:-$DEFAULT_PHP_XDEBUG_IDE_KEY}/g" /etc/php/5.6/mods-available/xdebug.ini
-	php5enmod xdebug
-	# @todo - what is /app/xdebug used for?
 	chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_USER:-$DEFAULT_APP_USER} /app/xdebug
 else
 	sed -i -r "s/^xdebug.remote_enable=1$/xdebug.remote_enable=0/g" /etc/php/5.6/mods-available/xdebug.ini
