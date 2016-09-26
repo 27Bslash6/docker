@@ -13,7 +13,7 @@ ENV PAGESPEED_VERSION 1.11.33.4
 ENV HEADERS_MORE_VERSION 0.31
 
 # https://www.openssl.org/source
-ENV OPENSSL_VERSION 1.0.2h
+ENV OPENSSL_VERSION 1.0.2i
 
 RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/nginx && \
 	apt-get update && \
