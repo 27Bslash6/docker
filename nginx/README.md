@@ -1,4 +1,4 @@
-# Nginx + Pagespeed + OpenSSL
+# Nginx + OpenSSL
 
 ![Nginx 1.11.4](https://img.shields.io/badge/nginx-1.11.4-brightgreen.svg) ![OpenSSL 1.0.2i](https://img.shields.io/badge/OpenSSL-1.0.2i-brightgreen.svg)
 
