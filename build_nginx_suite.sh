@@ -10,7 +10,7 @@ PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "nginx-proxy" )
 
 cd ${PROJECT_DIR}/nginx
 
-docker pull funkygibbon/ubuntu
+#docker pull funkygibbon/ubuntu
 
 for i in "${PROJECTS[@]}"
 do

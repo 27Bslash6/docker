@@ -1,6 +1,6 @@
 # Nginx + Pagespeed + OpenSSL
 
-![Nginx 1.11.3](https://img.shields.io/badge/nginx-1.11.3-brightgreen.svg) ![OpenSSL 1.0.2h](https://img.shields.io/badge/OpenSSL-1.0.2h-brightgreen.svg)
+![Nginx 1.11.4](https://img.shields.io/badge/nginx-1.11.4-brightgreen.svg) ![OpenSSL 1.0.2i](https://img.shields.io/badge/OpenSSL-1.0.2i-brightgreen.svg)
 
 
 Built on [funkygibbon/ubuntu](https://registry.hub.docker.com/u/funkygibbon/ubuntu/), a lightly modified Ubuntu Xenial [Phusion Base Image](https://phusion.github.io/baseimage-docker/).
@@ -65,6 +65,6 @@ HTTPS is configured using modern sane defaults, including
 
 - nginx user is set to `${APP_USER:-$DEFAULT_APP_USER}` (default is nginx)
 - creates user and group from `{APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP}`, some sanity checks for matching UID / GID in the event that user/group already exists
-- if `${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}` is true, `chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www`  (default true)
+- if `${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}` is true, `chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www`  (default false)
 - `worker_processes` is set to the number of available processor cores and adjusts `/etc/nginx/nginx.conf` to match, up to a maximum number of cores `${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_MAX_WORKER_PROCESSES}`
 - `client_max_body_size` is set to `${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}`

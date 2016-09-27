@@ -1,6 +1,6 @@
 # Nginx + Pagespeed + OpenSSL
 
-![Nginx 1.11.3](https://img.shields.io/badge/nginx-1.11.3-brightgreen.svg) ![ngx_pagespeed 1.11.33.2](https://img.shields.io/badge/pagespeed-1.11.33.2-brightgreen.svg) ![OpenSSL 1.0.2h](https://img.shields.io/badge/OpenSSL-1.0.2h-brightgreen.svg)
+![Nginx 1.11.4](https://img.shields.io/badge/nginx-1.11.4-brightgreen.svg) ![ngx_pagespeed 1.11.33.4](https://img.shields.io/badge/pagespeed-1.11.33.4-brightgreen.svg) ![OpenSSL 1.0.2i](https://img.shields.io/badge/OpenSSL-1.0.2i-brightgreen.svg)
 
 
 Built on [funkygibbon/ubuntu](https://registry.hub.docker.com/u/funkygibbon/ubuntu/), a lightly modified Ubuntu Xenial [Phusion Base Image](https://phusion.github.io/baseimage-docker/).
@@ -66,41 +66,6 @@ HTTPS is configured using modern sane defaults, including
 
 - nginx user is set to `${APP_USER:-$DEFAULT_APP_USER}` (default is nginx)
 - creates user and group from `{APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP}`, some sanity checks for matching UID / GID in the event that user/group already exists
-- if `${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}` is true, `chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www`  (default true)
-- `worker_processes` is set to the number of available processor cores and adjusts `/etc/nginx/nginx.conf` to match, up to a maximum number of cores `${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_MAX_WORKER_PROCESSES}`
-- `client_max_body_size` is set to `${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}`
-
-
-##### Variables
-
-variable | default | description
--------- | ------- | ---
-APP_USER | nginx | Service user name
-APP_GROUP | nginx | Service group name
-UPLOAD_MAX_SIZE | 30M | Sets `nginx_client_max_body_size`
-NGINX_MAX_WORKER_PROCESSES | 8 | Sets `worker_processes`, defaults to largest of eight, or the number available cores
-CHOWN_APP_DIR | false | If true `chown` `/app/www` as `APP_USER:APP_GROUP`
-
-
-### Security
-
-Nginx is compiled from mainline source according to Ubuntu compile flags, with the following modifications:
-- OpenSSL 1.0.2 sources - https://www.openssl.org/source/
-- Google Pagespeed nginx module - https://github.com/pagespeed/ngx_pagespeed/releases
-- headers-more nginx module - https://github.com/openresty/headers-more-nginx-module/tags
-- `http_ssi_module` and `http_autoindex_module` disabled
-
-HTTPS is configured using modern sane defaults, including
-- Mozilla's intermediate profile - see https://wiki.mozilla.org/Security/Server_Side_TLS
-- SSLv2 and SSLv3 are disabled, TLSv1 TLSv2 and TLSv3 are enabled
-- Automatic generation of a 2048bit DH parameter file if one is not provided
-- Self-signed SSL certificates are generated on first container start, and stored in `/etc/nginx/ssl/default.key` `/etc/nginx/ssl/default.crt`.  To install your own certificates I recommend bind-mounting `ssl` and `sites-enabled` folders.
-- @todo LetsEncrypt!
-
-### On service start
-
-- nginx user is set to `${APP_USER:-$DEFAULT_APP_USER}` (default is nginx)
-- creates user and group from `{APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP}`, some sanity checks for matching UID / GID in the event that user/group already exists
-- if `${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}` is true, `chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www`  (default true)
+- if `${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}` is true, `chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www`  (default false)
 - `worker_processes` is set to the number of available processor cores and adjusts `/etc/nginx/nginx.conf` to match, up to a maximum number of cores `${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_MAX_WORKER_PROCESSES}`
 - `client_max_body_size` is set to `${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}`

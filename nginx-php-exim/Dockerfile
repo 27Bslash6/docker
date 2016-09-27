@@ -1,28 +1,32 @@
-FROM funkygibbon/nginx-pagespeed
+FROM funkygibbon/nginx-pagespeed:xenial
 
 MAINTAINER Ray Walker <hello@raywalker.it>
 
-RUN apt-get update && \
-	apt-get -y --no-install-recommends install \
+RUN add-apt-repository ppa:ondrej/php && \
+    apt-get update && \
+    apt-get -y --no-install-recommends --allow-unauthenticated install \
 		exim4 \
-		php5-fpm \
-		php5-mysql \
-		php-apc \
-		php5-cli \
-		php5-curl \
-		php5-gd \
-		php5-intl \
-		php5-imagick \
-		php5-imap \
-		php5-mcrypt \
-		php5-mhash \
-		php5-redis \
-                php5-memcached \
-                php5-memcache \
-		php5-xdebug \
-		php5-recode && \
-	php5enmod mcrypt imap && \
-	apt-get clean
+		php5.6 \
+		php5.6-apc \
+		php5.6-fpm \
+		php5.6-mysql \
+		php5.6-cli \
+		php5.6-curl \
+		php5.6-gd \
+		php5.6-intl \
+		php5.6-imagick \
+		php5.6-imap \
+		php5.6-mcrypt \
+#		php5.6-mhash \
+        php5.6-mbstring \
+		php5.6-redis \
+        php5.6-memcached \
+        php5.6-memcache \
+		php5.6-xdebug \
+		php5.6-xml \
+		php5.6-recode && \
+	apt-get clean && \
+    rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
 RUN mkdir /root/bin/ && \
 	echo "export PATH=/root/bin:$PATH" > /root/.bashrc
@@ -32,7 +36,7 @@ EXPOSE 80
 
 ENV DEFAULT_ADMIN_EMAIL nobody@example.com
 ENV DEFAULT_APP_ENV production
-ENV DEFAULT_CHOWN_APP_DIR true
+ENV DEFAULT_CHOWN_APP_DIR false
 ENV DEFAULT_VIRTUAL_HOST example.com
 ENV DEFAULT_APP_HOSTNAME example.com
 ENV DEFAULT_APP_USER app
