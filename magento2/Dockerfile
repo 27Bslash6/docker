@@ -1,0 +1,1 @@
+FROM funkygibbon/nginx-php-exim:7
