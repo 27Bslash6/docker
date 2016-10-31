@@ -2,29 +2,28 @@ FROM funkygibbon/nginx-pagespeed:xenial
 
 MAINTAINER Ray Walker <hello@raywalker.it>
 
-RUN add-apt-repository ppa:ondrej/php && \
-    apt-get update && \
-    apt-get -y --no-install-recommends --allow-unauthenticated install \
+RUN apt-get update && \
+    apt-get -y --no-install-recommends install \
 		exim4 \
-		php5.6 \
-		php5.6-apc \
-		php5.6-fpm \
-		php5.6-mysql \
-		php5.6-cli \
-		php5.6-curl \
-		php5.6-gd \
-		php5.6-intl \
-		php5.6-imagick \
-		php5.6-imap \
-		php5.6-mcrypt \
-#		php5.6-mhash \
-        php5.6-mbstring \
-		php5.6-redis \
-        php5.6-memcached \
-        php5.6-memcache \
-		php5.6-xdebug \
-		php5.6-xml \
-		php5.6-recode && \
+		php \
+		php-cli \
+		php-curl \
+        php-fpm \
+		php-gd \
+		php-imagick \
+		php-imap \
+        php-intl \
+        php-mbstring \
+		php-mcrypt \
+        php-mysql \
+        php-memcached \
+        php-memcache \
+        php-recode \
+        php-redis \
+		php-xdebug \
+		php-xml \
+		php-xsl \
+		php-zip && \
 	apt-get clean && \
     rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
@@ -33,6 +32,8 @@ RUN mkdir /root/bin/ && \
 
 EXPOSE 443
 EXPOSE 80
+
+ENV PHP_VERSION 7.0
 
 ENV DEFAULT_ADMIN_EMAIL nobody@example.com
 ENV DEFAULT_APP_ENV production

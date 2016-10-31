@@ -11,41 +11,43 @@ mkdir -p /run/php
 echo "export TERM=xterm-256color" >> /root/.bashrc
 
 # PHP-FPM
+sed -i -r "s/fastcgi_pass unix:.*;/fastcgi_pass unix:\/run\/php\/php${PHP_VERSION}-fpm\.sock;/g" /etc/nginx/sites-enabled/default.conf
+sed -i -r "s/fastcgi_pass unix:.*;/fastcgi_pass unix:\/run\/php\/php${PHP_VERSION}-fpm\.sock;/g" /etc/nginx/sites-enabled/default-ssl.conf
 
 # Backup original information
-cp /etc/php/5.6/fpm/php.ini /etc/php/5.6/fpm/php.ini.dist
-cp /etc/php/5.6/fpm/pool.d/www.conf /etc/php/5.6/fpm/pool.d/www.conf.dist
+cp /etc/php/${PHP_VERSION}/fpm/php.ini /etc/php/${PHP_VERSION}/fpm/php.ini.dist
+cp /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf.dist
 
 mkdir -p /app/xdebug
 
-echo "display_errors=On" >> /etc/php/5.6/mods-available/xdebug.ini
-echo "html_errors=On" >> /etc/php/5.6/mods-available/xdebug.ini
-echo "xdebug.default_enable=0"  >> /etc/php/5.6/mods-available/xdebug.ini
-echo "xdebug.remote_enable=0"  >> /etc/php/5.6/mods-available/xdebug.ini
-echo "xdebug.remote_autostart=0"  >> /etc/php/5.6/mods-available/xdebug.ini
-echo "xdebug.remote_handler=dbgp"  >> /etc/php/5.6/mods-available/xdebug.ini
-echo "xdebug.ide_key=default_ide_key"  >> /etc/php/5.6/mods-available/xdebug.ini
-echo "xdebug.remote_host=172.17.42.1" >> /etc/php/5.6/mods-available/xdebug.ini
-echo "xdebug.remote_port=9000" >> /etc/php/5.6/mods-available/xdebug.ini
-echo "xdebug.profiler_enable=0" >> /etc/php/5.6/mods-available/xdebug.ini
-echo "xdebug.profiler_enable_trigger=0" >> /etc/php/5.6/mods-available/xdebug.ini
-echo "xdebug.profiler_output_dir=/app/xdebug" >> /etc/php/5.6/mods-available/xdebug.ini
-echo "xdebug.var_display_max_children=256" >> /etc/php/5.6/mods-available/xdebug.ini
+echo "display_errors=On" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "html_errors=On" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.default_enable=0"  >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.remote_enable=0"  >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.remote_autostart=0"  >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.remote_handler=dbgp"  >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.ide_key=default_ide_key"  >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.remote_host=172.17.42.1" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.remote_port=9000" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.profiler_enable=0" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.profiler_enable_trigger=0" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.profiler_output_dir=/app/xdebug" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.var_display_max_children=256" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
 
 # Still necessary in case of misconfiguration in sites-enabled/
-sed -i -r "s/;cgi.fix_pathinfo\s*=\s*1/cgi.fix_pathinfo=0/g" /etc/php/5.6/fpm/php.ini
+sed -i -r "s/;cgi.fix_pathinfo\s*=\s*1/cgi.fix_pathinfo=0/g" /etc/php/${PHP_VERSION}/fpm/php.ini
 
 # Don't fork
-sed -i -r "s/;daemonize = yes/daemonize = no/g" /etc/php/5.6/fpm/php-fpm.conf
+sed -i -r "s/;daemonize = yes/daemonize = no/g" /etc/php/${PHP_VERSION}/fpm/php-fpm.conf
 
 # Catch PHP output
-sed -i -r "s/;catch_workers_output =/catch_workers_output =/g" /etc/php/5.6/fpm/pool.d/www.conf
+sed -i -r "s/;catch_workers_output =/catch_workers_output =/g" /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
 
 # Fix socket permissions
-sed -i -r "s/;listen.mode = 0660/listen.mode = 0750/g" /etc/php/5.6/fpm/pool.d/www.conf
+sed -i -r "s/;listen.mode = 0660/listen.mode = 0750/g" /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
 
 # Enable sendmail additional parameters
-sed -i -r "s/;sendmail_path =/sendmail_path =/g" /etc/php/5.6/fpm/php.ini
+sed -i -r "s/;sendmail_path =/sendmail_path =/g" /etc/php/${PHP_VERSION}/fpm/php.ini
 
 # Clear upstream data
 rm /app/www/index.html
