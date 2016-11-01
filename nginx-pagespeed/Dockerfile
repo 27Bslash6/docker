@@ -70,7 +70,7 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 		--with-pcre-jit \
 		--with-openssl=/tmp/openssl-${OPENSSL_VERSION} \
         --add-module=/tmp/headers-more-nginx-module-${HEADERS_MORE_VERSION} \
-		--add-module=/tmp/ngx_pagespeed-${PAGESPEED_VERSION}-beta  && \
+		--add-module=/tmp/ngx_pagespeed-${PAGESPEED_VERSION}  && \
 	make && \
 	make install && \
 	apt-get purge -yqq automake autoconf libtool git-core build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
