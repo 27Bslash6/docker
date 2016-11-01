@@ -8,7 +8,7 @@ TAG=latest
 
 PROJECT_DIR=`pwd`
 
-PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "nginx-proxy" )
+PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "magento2" "nginx-proxy")
 
 NGINX_VERSION="1.11.5"
 
@@ -19,6 +19,8 @@ NGINX_PSOL_VERSION="1.11.33.4"
 OPENSSL_VERSION="1.0.2j"
 
 HEADERS_MORE_VERSION="0.31"
+
+PHP_VERSION="7.0"
 
 while getopts n:t: opt; do
   case $opt in
@@ -48,10 +50,14 @@ do
   sed -i -r "s/ENV NGINX_PSOL_VERSION .*/ENV NGINX_PSOL_VERSION ${NGINX_PSOL_VERSION}/g" Dockerfile
   sed -i -r "s/ENV OPENSSL_VERSION .*/ENV OPENSSL_VERSION ${OPENSSL_VERSION}/g" Dockerfile
   sed -i -r "s/ENV HEADERS_MORE_VERSION .*/ENV HEADERS_MORE_VERSION ${HEADERS_MORE_VERSION}/g" Dockerfile
+  sed -i -r "s/ENV PHP_VERSION .*/ENV PHP_VERSION ${PHP_VERSION}/g" Dockerfile
 
   sed -i -r "s/(nginx)([ -])[0-9\.]+/\1\2${NGINX_VERSION}/ig" README.md
   sed -i -r "s/(ngx_pagespeed)([ -])[0-9\.]+/\1\2${NGINX_PAGESPEED_VERSION}/ig" README.md
+  # Special case for nginx latest-stable image
+  sed -i -r "s/ngx_pagespeed-latest-stable/ngx_pagespeed-latest--stable/ig" README.md
   sed -i -r "s/(openssl)([ -])[0-9a-z\.]+/\1\2${OPENSSL_VERSION}/ig" README.md
+  sed -i -r "s/(php)([ -])[0-9\.]+/\1\2${PHP_VERSION}/ig" README.md
 
   echo -e "Building ${NAMESPACE}/${PROJECT}:${TAG} ..."
   docker build -t ${NAMESPACE}/${PROJECT}:${TAG} .
