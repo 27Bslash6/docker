@@ -8,34 +8,22 @@ Docker Hub: [funkygibbon/magento2](https://hub.docker.com/r/funkygibbon/magento2
 
 Mount Magento root to `/app/www` and certificates to `/etc/nginx/ssl`
 
-Example docker-compose.yml
+Example minimal docker-compose.yml
 
 ```yaml
 version: '2'
 services:
   app:
     image: funkygibbon/magento2
-    hostname: shop
-    domainname: example.com
-    extra_hosts:
-     - "mysql:192.168.1.2"
     volumes:
      - ./ssl:/etc/nginx/ssl
      - ./magento:/app/www
-    networks:
-     - default
-    depends_on:
-     - redis
-  redis:
-    image: redis
-    networks:
-      - default
-    volumes:
-      - ./redis/data:/data
-
 ```
 
-Includes cron tasks and latest composer 
+Includes ngx_pagespeed, cron tasks, latest composer, sudo for manipulating files as the correct user and vaguely sane security defaults
 
+Use provided alias for command-line configuration changes `magento`, which expands to `sudo -u ${APP_USER:-$DEFAULT_APP_USER} /usr/bin/php /app/www/bin/magento"` and helps prevent operations such as `magento cache:flush` from writing files as root
+
+Refer to [funkygibbon/nginx-php-exim](https://hub.docker.com/r/funkygibbon/nginx-php-exim/) and [funkygibbon/nginx-pagespeed](https://hub.docker.com/r/funkygibbon/nginx-pagespeed/) for many environment variables which affect container startup configuration. 
 
 More documentation to follow.
