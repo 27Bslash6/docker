@@ -22,7 +22,7 @@ services:
 
 Includes ngx_pagespeed, cron tasks, latest composer, sudo for manipulating files as the correct user and vaguely sane security defaults
 
-Use provided alias for command-line configuration changes `magento`, which expands to `sudo -u ${APP_USER:-$DEFAULT_APP_USER} /usr/bin/php /app/www/bin/magento"` and helps prevent operations such as `magento cache:flush` from writing files as root
+Use provided `magento` alias for command-line configuration changes, which expands to `sudo -u ${APP_USER:-$DEFAULT_APP_USER} /usr/bin/php /app/www/bin/magento"` and helps prevent operations such as `magento cache:flush` from writing files as root
 
 Refer to [funkygibbon/nginx-php-exim](https://hub.docker.com/r/funkygibbon/nginx-php-exim/) and [funkygibbon/nginx-pagespeed](https://hub.docker.com/r/funkygibbon/nginx-pagespeed/) for many environment variables which affect container startup configuration. 
 
