@@ -9,6 +9,7 @@ RUN cp -R /app/etc/nginx/sites-enabled/* /etc/nginx/sites-enabled/ && \
     apt-get clean && \
     rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/* && \
     chmod +x /app/bin/install_composer.sh && \
-    chmod +x /etc/my_init.d/*
+    chmod +x /etc/my_init.d/* && \
+    echo 'alias magento="sudo -u ${APP_USER:-$DEFAULT_APP_USER} /usr/bin/php /app/www/bin/magento"' >> /root/.bashrc
 
 RUN /app/bin/install_composer.sh
