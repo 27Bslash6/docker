@@ -34,6 +34,9 @@ echo "xdebug.profiler_enable_trigger=0" >> /etc/php/${PHP_VERSION}/mods-availabl
 echo "xdebug.profiler_output_dir=/app/xdebug" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
 echo "xdebug.var_display_max_children=256" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
 
+# Newrelic
+sed -i -r "s/;newrelic.enabled =/newrelic.enabled =/g" /etc/php/${PHP_VERSION}/mods-available/newrelic.ini
+
 # Still necessary in case of misconfiguration in sites-enabled/
 sed -i -r "s/;cgi.fix_pathinfo\s*=\s*1/cgi.fix_pathinfo=0/g" /etc/php/${PHP_VERSION}/fpm/php.ini
 
