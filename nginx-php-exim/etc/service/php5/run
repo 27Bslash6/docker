@@ -67,19 +67,14 @@ if [[ "${NEWRELIC_ENABLED:-$DEFAULT_NEWRELIC_ENABLED}" == "false" ]] || [[ "${NE
     phpdismod newrelic
     sed -i -r "s/newrelic.enabled =$/newrelic.enabled = false/g" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
 else
-    NEWRELIC_ENABLED=true
-
     echo " * php:    newrelic.enabled:     true"
     echo " * php:    newrelic.appname:     ${NEWRELIC_APPNAME:-$POOL_NAME}"
     echo " * php:    newrelic.license:     ${NEWRELIC_LICENSE:-$DEFAULT_NEWRELIC_LICENSE}"
     sed -i -r "s/newrelic.enabled\s=.*$/newrelic.enabled = true/g" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
     sed -i -r "s/newrelic.appname\s=.*$/newrelic.appname = \"${NEWRELIC_APPNAME:-$POOL_NAME}\"/g" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
     sed -i -r "s/newrelic.license\s=.*$/newrelic.license=\"${NEWRELIC_LICENSE:-$DEFAULT_NEWRELIC_LICENSE}\"/g" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
-    echo " * php:    Disabling xdebug to reveal errors in newrelic dashboard"
-    phpdismod xdebug
-    sed -i -r "s/^xdebug.remote_enable=1$/xdebug.remote_enable=0/g" /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
-	sed -i -r "s/^xdebug.profiler_enable_trigger=1$/xdebug.profiler_enable_trigger=0/g" /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
     phpenmod newrelic
+    NEWRELIC_ENABLED=true
 fi
 
 # xdebug
@@ -94,8 +89,10 @@ if [[ "$NEWRELIC_ENABLED" != "true" ]] && [[ "${APP_ENV:-$DEFAULT_APP_ENV}" == "
 	sed -i -r "s/^xdebug.remote_port=.+$/xdebug.remote_port=${PHP_XDEBUG_REMOTE_PORT:-$DEFAULT_PHP_XDEBUG_REMOTE_PORT}/g" /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
 	sed -i -r "s/^xdebug.ide_key=.+$/xdebug.ide_key=${PHP_XDEBUG_IDE_KEY:-$DEFAULT_PHP_XDEBUG_IDE_KEY}/g" /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
 	chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_USER:-$DEFAULT_APP_USER} /app/xdebug
+	phpenmod xdebug
 else
-	sed -i -r "s/^xdebug.remote_enable=1$/xdebug.remote_enable=0/g" /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+	phpdismod xdebug
+    sed -i -r "s/^xdebug.remote_enable=1$/xdebug.remote_enable=0/g" /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
 	sed -i -r "s/^xdebug.profiler_enable_trigger=1$/xdebug.profiler_enable_trigger=0/g" /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
 fi
 
