@@ -1,8 +1,10 @@
-FROM funkygibbon/nginx-pagespeed:xenial
+FROM funkygibbon/nginx-pagespeed:latest
 
 MAINTAINER Ray Walker <hello@raywalker.it>
 
-RUN apt-get update && \
+RUN wget -O - https://download.newrelic.com/548C16BF.gpg | apt-key add - && \
+    sh -c 'echo "deb http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list' && \
+    apt-get update && \
     apt-get -y --no-install-recommends install \
 		exim4 \
 		php \
@@ -23,7 +25,9 @@ RUN apt-get update && \
 		php-xdebug \
 		php-xml \
 		php-xsl \
-		php-zip && \
+		php-zip \
+		newrelic-php5 && \
+    newrelic-install install && \
 	apt-get clean && \
     rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
@@ -65,6 +69,9 @@ ENV DEFAULT_EXIM_MAIL_FROM example.com
 ENV DEFAULT_EXIM_SMARTHOST smtp.example.org::587
 ENV DEFAULT_EXIM_SMARTHOST_AUTH_USERNAME postmaster@example.com
 ENV DEFAULT_EXIM_SMARTHOST_AUTH_PASSWORD password_123
+
+ENV DEFAULT_NEWRELIC_ENABLED true
+ENV DEFAULT_NEWRELIC_LICENSE DISABLED
 
 COPY . /app
 

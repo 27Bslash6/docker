@@ -42,3 +42,6 @@ EXIM_MAIL_FROM | example.com | domain from which exim4 mail appears to originate
 EXIM_SMARTHOST | smtp.example.org::587 | smarthost relay SMTP server address and port (note the double colon (::) before port number)
 EXIM_SMARTHOST_AUTH_USERNAME | postmaster@example.com | SMTP username
 EXIM_SMARTHOST_AUTH_PASSWORD | password_123 | SMTP password
+NEWRELIC_ENABLED | true | Enables or disables [Newrelic.com](https://newrelic.com/) reporting
+NEWRELIC_APPNAME | $PHP_POOL_NAME | Application name in Newrelic APM list. Defaults to PHP pool name (APP_HOSTNAME with underscores instead of periods)   
+NEWRELIC_LICENSE | \_\_DISABLED\_\_ | Newrelic account license key.  Available from your Newrelic account page
