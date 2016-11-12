@@ -6,11 +6,24 @@ Highly configurable nginx-PHP webserver stack built on [funkygibbon/nginx-pagesp
 
 Docker Hub: [funkygibbon/nginx-php-exim](https://hub.docker.com/r/funkygibbon/nginx-php-exim/)
 
-
+---
 
 `docker run -p "80:80" -p "443:443" -e "APP_HOSTNAME=some.example.com" -v /some/dir/www:/app/www funkygibbon/nginx-php-exim`
 
-Configurable via a plethora of environment variables, which are applied on service start
+---
+
+Included in this image:
+- [ngx_pagespeed](https://github.com/pagespeed/ngx_pagespeed)
+- [newrelic PHP monitoring](https://newrelic.com)
+- exim4, ready for smarthost delivery to [sendgrid](https://sendgrid.net) or [mailgun](http://mailgun.net/)
+- fully functional cron daemon
+- [xdebug](https://xdebug.org/) with configurable remote host/port/key
+- Production / development environments.  All outgoing email is redirected to a configurable destination (`$ADMIN_EMAIL`)in development
+- Sane security defaults, and SSL confugration based on Mozilla's intermediate profile. See: [funkygibbon/nginx-pagespeed](https://hub.docker.com/r/funkygibbon/nginx-pagespeed/) for details
+
+---
+
+This container is configurable via a plethora of environment variables, which are applied on service start so you can generally reconfigure any aspect of the stack by executing `docker exec foo_bar_1 sv restart php|nginx`
 
 var | default | description
 --- | ------- | -----------
@@ -45,3 +58,7 @@ EXIM_SMARTHOST_AUTH_PASSWORD | password_123 | SMTP password
 NEWRELIC_ENABLED | true | Enables or disables [Newrelic.com](https://newrelic.com/) reporting
 NEWRELIC_APPNAME | $PHP_POOL_NAME | Application name in Newrelic APM list. Defaults to PHP pool name (APP_HOSTNAME with underscores instead of periods)   
 NEWRELIC_LICENSE | \_\_DISABLED\_\_ | Newrelic account license key.  Available from your Newrelic account page
+
+See also configuration options from upstream images:
+- [funkygibbon/nginx-pagespeed](https://hub.docker.com/r/funkygibbon/nginx-pagespeed/)
+- [funkygibbon/ubuntu](https://hub.docker.com/r/funkygibbon/ubuntu/)
