@@ -14,7 +14,7 @@ Docker Hub: [funkygibbon/nginx-php-exim](https://hub.docker.com/r/funkygibbon/ng
 
 Included in this image:
 - [ngx_pagespeed](https://github.com/pagespeed/ngx_pagespeed)
-- [newrelic PHP monitoring](https://newrelic.com)
+- [NewRelic PHP monitoring](https://newrelic.com)
 - exim4, ready for smarthost delivery to [sendgrid](https://sendgrid.net) or [mailgun](http://mailgun.net/)
 - fully functional cron daemon
 - [xdebug](https://xdebug.org/) with configurable remote host/port/key
@@ -32,7 +32,7 @@ ADMIN_EMAIL | nobody@example.com | Server administrator email, used for intercep
 CHOWN_APP_DIR | true | if true, `chown -R $APP_USER:$APP_GROUP /app/www`
 APP_HOSTNAME | `hostname -f` |  hostname of application 
 VIRTUAL_HOST | example.com | virtualhosts which this service should respond to, separated by commmas.  Useful for operating behind [jwilder/nginx-proxy](https://hub.docker.com/r/jwilder/nginx-proxy/).
-TIMEZONE | Australia/Sydney | Server timezone
+CONTAINER_TIMEZONE | Australia/Sydney | Server timezone
 APP_USER | app | nginx and php5-fpm user 
 APP_GROUP | app | nginx and php5-fpm group
 APP_UID | 1000 | user_id - useful when mounting volumes from host > guest to either share or delineate file access permission
@@ -62,3 +62,13 @@ NEWRELIC_LICENSE | \_\_DISABLED\_\_ | Newrelic account license key.  Available f
 See also configuration options from upstream images:
 - [funkygibbon/nginx-pagespeed](https://hub.docker.com/r/funkygibbon/nginx-pagespeed/)
 - [funkygibbon/ubuntu](https://hub.docker.com/r/funkygibbon/ubuntu/)
+
+---
+
+### Philosophy
+
+I understand a degree of pushback against the idea of bundling so much into one container, at first glance it seems 'against the Docker microservice philosophy'.
+
+However, in my experience, so much is gained by bundling these items together - nginx and php have similar configuration options which require tweaking synchronously - think nginx `UPLOAD_MAX_SIZE`, php `UPLOAD_MAX_FILESIZE` and `POST_MAX_SIZE`, file and socket permissions, performance improvement in communication over socket vs tcp.
+
+I am prepared to be convinced that this is totally utterly wrong-headed, and may consider breaking this PHP installation out to separate nginx/PHP containers if there's a need, but for now, it just works for me.
