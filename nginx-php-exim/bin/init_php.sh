@@ -37,6 +37,12 @@ echo "xdebug.var_display_max_children=256" >> /etc/php/${PHP_VERSION}/mods-avail
 # Newrelic
 sed -i -r "s/;newrelic.enabled =/newrelic.enabled =/g" /etc/php/${PHP_VERSION}/mods-available/newrelic.ini
 
+# Remove duplicate newrelic.ini files. Solves "Module 'newrelic' already loaded" warning message
+# See: https://discuss.newrelic.com/t/php-warning-module-newrelic-already-loaded-in-unknown-on-line-0/2903/21
+rm -f /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
+rm -f /etc/php/${PHP_VERSION}/cli/conf.d/newrelic.ini
+
+
 # Still necessary in case of misconfiguration in sites-enabled/
 sed -i -r "s/;cgi.fix_pathinfo\s*=\s*1/cgi.fix_pathinfo=0/g" /etc/php/${PHP_VERSION}/fpm/php.ini
 
