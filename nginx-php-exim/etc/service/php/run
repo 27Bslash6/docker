@@ -64,8 +64,8 @@ fi
 # newrelic
 if [[ "${NEWRELIC_ENABLED:-$DEFAULT_NEWRELIC_ENABLED}" == "false" ]] || [[ "${NEWRELIC_LICENSE:-$DEFAULT_NEWRELIC_LICENSE}" =~ "DISABLED" ]]; then
     echo " * php:    newrelic.enabled:     false"
-    phpdismod newrelic
     sed -i -r "s/newrelic.enabled =$/newrelic.enabled = false/g" /etc/php/${PHP_VERSION}/fpm/conf.d/20-newrelic.ini
+    phpdismod newrelic
 else
     echo " * php:    newrelic.enabled:     true"
     echo " * php:    newrelic.appname:     ${NEWRELIC_APPNAME:-$POOL_NAME}"
@@ -91,9 +91,9 @@ if [[ "$NEWRELIC_ENABLED" != "true" ]] && [[ "${APP_ENV:-$DEFAULT_APP_ENV}" == "
 	chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_USER:-$DEFAULT_APP_USER} /app/xdebug
 	phpenmod xdebug
 else
-	phpdismod xdebug
     sed -i -r "s/^xdebug.remote_enable=1$/xdebug.remote_enable=0/g" /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
 	sed -i -r "s/^xdebug.profiler_enable_trigger=1$/xdebug.profiler_enable_trigger=0/g" /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+    phpdismod xdebug
 fi
 
 if [[ "${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}" == "example.com" ]]; then
