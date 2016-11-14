@@ -65,14 +65,14 @@ fi
 if [[ "${NEWRELIC_ENABLED:-$DEFAULT_NEWRELIC_ENABLED}" == "false" ]] || [[ "${NEWRELIC_LICENSE:-$DEFAULT_NEWRELIC_LICENSE}" =~ "DISABLED" ]]; then
     echo " * php:    newrelic.enabled:     false"
     phpdismod newrelic
-    sed -i -r "s/newrelic.enabled =$/newrelic.enabled = false/g" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
+    sed -i -r "s/newrelic.enabled =$/newrelic.enabled = false/g" /etc/php/${PHP_VERSION}/fpm/conf.d/20-newrelic.ini
 else
     echo " * php:    newrelic.enabled:     true"
     echo " * php:    newrelic.appname:     ${NEWRELIC_APPNAME:-$POOL_NAME}"
     echo " * php:    newrelic.license:     ${NEWRELIC_LICENSE:-$DEFAULT_NEWRELIC_LICENSE}"
-    sed -i -r "s/newrelic.enabled\s=.*$/newrelic.enabled = true/g" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
-    sed -i -r "s/newrelic.appname\s=.*$/newrelic.appname = \"${NEWRELIC_APPNAME:-$POOL_NAME}\"/g" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
-    sed -i -r "s/newrelic.license\s=.*$/newrelic.license=\"${NEWRELIC_LICENSE:-$DEFAULT_NEWRELIC_LICENSE}\"/g" /etc/php/${PHP_VERSION}/fpm/conf.d/newrelic.ini
+    sed -i -r "s/newrelic.enabled\s=.*$/newrelic.enabled = true/g" /etc/php/${PHP_VERSION}/fpm/conf.d/20-newrelic.ini
+    sed -i -r "s/newrelic.appname\s=.*$/newrelic.appname = \"${NEWRELIC_APPNAME:-$POOL_NAME}\"/g" /etc/php/${PHP_VERSION}/fpm/conf.d/20-newrelic.ini
+    sed -i -r "s/newrelic.license\s=.*$/newrelic.license=\"${NEWRELIC_LICENSE:-$DEFAULT_NEWRELIC_LICENSE}\"/g" /etc/php/${PHP_VERSION}/fpm/conf.d/20-newrelic.ini
     phpenmod newrelic
     NEWRELIC_ENABLED=true
 fi
