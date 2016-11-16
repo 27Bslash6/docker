@@ -31,6 +31,6 @@ chown ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} ${APP_PATH
 
 # Call Magento's cron tasks every minute
 # See: http://devdocs.magento.com/guides/v2.0/config-guide/cli/config-cli-subcommands-cron.html
-(crontab -l ; echo "* * * * * /sbin/setuser ${APP_USER:-$DEFAULT_APP_USER} ${PHP_BINARY} ${APP_PATH}/bin/magento cron:run | grep -v "Ran jobs by schedule" >> ${APP_PATH}/var/log/magento.cron.log")  | sort - | uniq - | crontab -
+(crontab -l ; echo "* * * * * /sbin/setuser ${APP_USER:-$DEFAULT_APP_USER} ${PHP_BINARY} ${APP_PATH}/bin/magento cron:run | grep -v \"Ran jobs by schedule\" >> ${APP_PATH}/var/log/magento.cron.log")  | sort - | uniq - | crontab -
 (crontab -l ; echo "* * * * * /sbin/setuser ${APP_USER:-$DEFAULT_APP_USER} ${PHP_BINARY} ${APP_PATH}/update/cron.php >> ${APP_PATH}/var/log/update.cron.log")  | sort - | uniq - | crontab -
 (crontab -l ; echo "* * * * * /sbin/setuser ${APP_USER:-$DEFAULT_APP_USER} ${PHP_BINARY} ${APP_PATH}/bin/magento setup:cron:run >> ${APP_PATH}/var/log/setup.cron.log")  | sort - | uniq - | crontab -
