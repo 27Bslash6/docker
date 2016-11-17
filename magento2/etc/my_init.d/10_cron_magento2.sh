@@ -21,6 +21,9 @@ fi
 # Rotate all magento logs once weekly
 (crontab -l ; echo "@weekly /usr/sbin/logrotate -f ${LOGROTATE_FILENAME}")  | sort - | uniq - | crontab -
 
+# Fix for potential kernel issue between container and host
+# See: https://stackoverflow.com/questions/21926465/issues-running-cron-in-docker-on-different-hosts
+sed -i -r "s/^session\s+required\s+pam_loginuid.so/# session required pam_loginuid.so/g" /etc/pam.d/cron
 
 # Set permissions
 touch ${APP_PATH}/var/log/magento.cron.log
