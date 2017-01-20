@@ -66,6 +66,7 @@ if [[ "${NEWRELIC_ENABLED:-$DEFAULT_NEWRELIC_ENABLED}" == "false" ]] || [[ "${NE
     echo " * php:    newrelic.enabled:     false"
     sed -i -r "s/newrelic.enabled =$/newrelic.enabled = false/g" /etc/php/${PHP_VERSION}/fpm/conf.d/20-newrelic.ini
     phpdismod newrelic
+    NEWRELIC_ENABLED=false
 else
     echo " * php:    newrelic.enabled:     true"
     echo " * php:    newrelic.appname:     ${NEWRELIC_APPNAME:-$POOL_NAME}"
