@@ -10,7 +10,7 @@ PROJECT_DIR=`pwd`
 
 PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "magento2" "nginx-proxy")
 
-NGINX_VERSION="1.11.5"
+NGINX_VERSION="1.11.9"
 
 NGINX_PAGESPEED_VERSION="latest-stable"
 
@@ -18,7 +18,7 @@ NGINX_PSOL_VERSION="1.11.33.4"
 
 OPENSSL_VERSION="1.0.2j"
 
-HEADERS_MORE_VERSION="0.31"
+HEADERS_MORE_VERSION="0.32"
 
 PHP_VERSION="7.0"
 
