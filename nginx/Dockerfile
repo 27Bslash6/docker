@@ -10,7 +10,7 @@ ENV NGINX_VERSION 1.11.9
 ENV HEADERS_MORE_VERSION 0.32
 
 # https://www.openssl.org/source
-ENV OPENSSL_VERSION 1.0.2j
+ENV OPENSSL_VERSION 1.0.2k
 
 RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/nginx && \
 	apt-get update && \
