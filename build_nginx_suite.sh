@@ -28,13 +28,22 @@ PHP_VERSION="7.0"
 
 SED_COMMAND="docker run --rm -v ${PROJECT_DIR}:/app busybox sed"
 SED_TARGET_LOCATION="/app"
+
+#
+BUILD=true
+
+while getopts "b:n:t:" opt; do
   case $opt in
+  b)
+      BUILD=[ $OPTARG -eq "true" ]
+      ;;
   n)
       NAMESPACE=$OPTARG
       ;;
   t)
       TAG=$OPTARG
       ;;
+
   esac
 done
 
@@ -66,7 +75,9 @@ do
     -e "s/(php)([ -])[0-9\.]+/\1\2${PHP_VERSION}/ig" \
     ${SED_TARGET_LOCATION}/${PROJECT}/README.md
 
-  echo -e "Building ${NAMESPACE}/${PROJECT}:${TAG} ..."
-  docker build -t ${NAMESPACE}/${PROJECT}:${TAG} ${PROJECT_DIR}/${PROJECT}
+  if [ $BUILD ]; then
+      echo -e "Building ${NAMESPACE}/${PROJECT}:${TAG} ..."
+      docker build -t ${NAMESPACE}/${PROJECT}:${TAG} ${PROJECT_DIR}/${PROJECT}
+  fi
 
 done
