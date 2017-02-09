@@ -10,34 +10,24 @@ PROJECT_DIR=`pwd`
 
 PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "magento2" "nginx-proxy")
 
+# http://nginx.org/en/download.html
 NGINX_VERSION="1.11.9"
 
+# https://github.com/pagespeed/ngx_pagespeed/releases
 NGINX_PAGESPEED_VERSION="latest-stable"
 
 NGINX_PSOL_VERSION="1.11.33.4"
 
+# https://www.openssl.org/source
 OPENSSL_VERSION="1.0.2k"
 
+# https://github.com/openresty/headers-more-nginx-module/tags
 HEADERS_MORE_VERSION="0.32"
 
 PHP_VERSION="7.0"
 
-SED_COMMAND="sed"
-SED_TARGET_LOCATION="."
-case $(uname)
-in
-    *BSD)
-        SED_COMMAND="docker run --rm -v ${PROJECT_DIR}:/app busybox sed"
-        SED_TARGET_LOCATION="/app"
-        ;;
-    Darwin)
-        SED_COMMAND="docker run --rm -v ${PROJECT_DIR}:/app busybox sed"
-        SED_TARGET_LOCATION="/app"
-        ;;
-esac
-
-
-while getopts n:t: opt; do
+SED_COMMAND="docker run --rm -v ${PROJECT_DIR}:/app busybox sed"
+SED_TARGET_LOCATION="/app"
   case $opt in
   n)
       NAMESPACE=$OPTARG
@@ -59,7 +49,7 @@ do
     continue
   fi
 
-  $SED_COMMAND -i \
+  $SED_COMMAND -i -r \
     -e "s/ENV NGINX_VERSION .*/ENV NGINX_VERSION ${NGINX_VERSION}/g" \
     -e "s/ENV NGINX_PAGESPEED_VERSION .*/ENV NGINX_PAGESPEED_VERSION ${NGINX_PAGESPEED_VERSION}/g" \
     -e "s/ENV NGINX_PSOL_VERSION .*/ENV NGINX_PSOL_VERSION ${NGINX_PSOL_VERSION}/g" \
@@ -68,7 +58,7 @@ do
     -e "s/ENV PHP_VERSION .*/ENV PHP_VERSION ${PHP_VERSION}/g" \
     ${SED_TARGET_LOCATION}/${PROJECT}/Dockerfile
 
-  $SED_COMMAND -i \
+  $SED_COMMAND -i -r \
     -e "s/(nginx)([ -])[0-9\.]+/\1\2${NGINX_VERSION}/ig" \
     -e "s/(ngx_pagespeed)([ -])[0-9\.]+/\1\2${NGINX_PAGESPEED_VERSION}/ig" \
     -e "s/ngx_pagespeed-latest-stable/ngx_pagespeed-latest--stable/ig" \
