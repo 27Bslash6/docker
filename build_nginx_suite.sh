@@ -8,7 +8,7 @@ TAG=latest
 
 PROJECT_DIR=`pwd`
 
-PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "magento2" "nginx-proxy")
+PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "magento2" "nginx-proxy" "wordpress")
 
 # http://nginx.org/en/download.html
 NGINX_VERSION="1.11.9"
