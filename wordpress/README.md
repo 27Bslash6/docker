@@ -13,7 +13,7 @@ Docker Hub: [funkygibbon/wordpress](https://hub.docker.com/r/funkygibbon/wordpre
 ---
 
 Included in this image:
-- [wp-cli](http://wp-cli.org/), automatically drops root to $APP_USER and preconfigured with -path="/app/www"
+- [wp-cli](http://wp-cli.org/), automatically drops root to $APP_USER and is preconfigured with -path="/app/www"
 - [ngx_pagespeed](https://github.com/pagespeed/ngx_pagespeed)
 - [NewRelic](https://newrelic.com) PHP application monitoring
 - exim4, ready for smarthost delivery to [sendgrid](https://sendgrid.net) or [mailgun](http://mailgun.net/)
@@ -61,7 +61,6 @@ NEWRELIC_APPNAME | $PHP_POOL_NAME | Application name in Newrelic APM list. Defau
 NEWRELIC_LICENSE | \_\_DISABLED\_\_ | Newrelic account license key.  Available from your Newrelic account page
 
 See also configuration options from upstream images:
+- [funkygibbon/nginx-php-exim](https://hub.docker.com/r/funkygibbon/nginx-php-exim/)
 - [funkygibbon/nginx-pagespeed](https://hub.docker.com/r/funkygibbon/nginx-pagespeed/)
 - [funkygibbon/ubuntu](https://hub.docker.com/r/funkygibbon/ubuntu/)
-
-ced that this is totally utterly wrong-headed, and may consider breaking this PHP installation out to separate nginx/PHP containers if there's a need, but for now, it just works for me.
