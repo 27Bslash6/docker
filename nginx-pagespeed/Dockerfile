@@ -4,7 +4,7 @@ EXPOSE 80
 EXPOSE 443
 
 # http://nginx.org/en/download.html
-ENV NGINX_VERSION 1.11.9
+ENV NGINX_VERSION 1.11.10
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
 ENV PAGESPEED_VERSION latest-stable

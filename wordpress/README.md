@@ -1,25 +1,26 @@
-# Nginx + PHP + Exim
+# Wordpress
 
 ![PHP 7.0](https://img.shields.io/badge/php-7.0-brightgreen.svg) ![Nginx 1.11.10](https://img.shields.io/badge/nginx-1.11.10-brightgreen.svg) ![ngx_pagespeed latest-stable](https://img.shields.io/badge/ngx_pagespeed-latest--stable-brightgreen.svg) ![OpenSSL 1.0.2k](https://img.shields.io/badge/OpenSSL-1.0.2k-brightgreen.svg)
 
-Highly configurable nginx-PHP webserver stack built on [funkygibbon/nginx-pagespeed](https://hub.docker.com/r/funkygibbon/nginx-pagespeed/), which is in turn built on a [lightly modified Phusion Ubuntu base image](https://hub.docker.com/r/funkygibbon/ubuntu/)
+Wordpress-ready webserver stack built on [funkygibbon/nginx-php-exim](https://hub.docker.com/r/funkygibbon/nginx-php-exim/)
 
-Docker Hub: [funkygibbon/nginx-php-exim](https://hub.docker.com/r/funkygibbon/nginx-php-exim/)
+Docker Hub: [funkygibbon/wordpress](https://hub.docker.com/r/funkygibbon/wordpress/)
 
 ---
 
-`docker run -p "80:80" -p "443:443" -e "APP_HOSTNAME=some.example.com" -v /some/dir/www:/app/www funkygibbon/nginx-php-exim`
+`docker run -p "80:80" -p "443:443" -e "APP_HOSTNAME=some.example.com" -v /some/dir/www:/app/www funkygibbon/wordpress`
 
 ---
 
 Included in this image:
+- [wp-cli](http://wp-cli.org/), automatically drops root to $APP_USER and is preconfigured with -path="/app/www"
 - [ngx_pagespeed](https://github.com/pagespeed/ngx_pagespeed)
-- [NewRelic PHP monitoring](https://newrelic.com)
+- [NewRelic](https://newrelic.com) PHP application monitoring
 - exim4, ready for smarthost delivery to [sendgrid](https://sendgrid.net) or [mailgun](http://mailgun.net/)
-- fully functional cron daemon
+- fully configurable cron daemon
 - [xdebug](https://xdebug.org/) with configurable remote host/port/key
-- Production / development environments.  All outgoing email is redirected to a configurable destination (`$ADMIN_EMAIL`)in development
-- Sane security defaults, and SSL confugration based on Mozilla's intermediate profile. See: [funkygibbon/nginx-pagespeed](https://hub.docker.com/r/funkygibbon/nginx-pagespeed/) for details
+- Production / development environments.  All outgoing email is redirected to a configurable destination (`$ADMIN_EMAIL`) in development
+- Sane security defaults, and SSL configuration based on Mozilla's intermediate profile. See: [funkygibbon/nginx-pagespeed](https://hub.docker.com/r/funkygibbon/nginx-pagespeed/) for more details
 
 ---
 
@@ -31,7 +32,7 @@ APP_ENV | production | production, development :: 'development' enables http://w
 ADMIN_EMAIL | nobody@example.com | Server administrator email, used for intercepted email in `development` mode
 CHOWN_APP_DIR | true | if true, `chown -R $APP_USER:$APP_GROUP /app/www`
 APP_HOSTNAME | `hostname -f` |  hostname of application 
-VIRTUAL_HOST | example.com | virtualhosts which this service should respond to, separated by commmas.  Useful for operating behind [jwilder/nginx-proxy](https://hub.docker.com/r/jwilder/nginx-proxy/).
+VIRTUAL_HOST | example.com | virtualhosts which this service should respond to, separated by commmas (eg. foo.com,www.foo.com,bar.foo.com). Also useful for operating behind [jwilder/nginx-proxy](https://hub.docker.com/r/jwilder/nginx-proxy/).
 CONTAINER_TIMEZONE | Australia/Sydney | Server timezone
 APP_USER | app | nginx and php5-fpm user 
 APP_GROUP | app | nginx and php5-fpm group
@@ -60,15 +61,6 @@ NEWRELIC_APPNAME | $PHP_POOL_NAME | Application name in Newrelic APM list. Defau
 NEWRELIC_LICENSE | \_\_DISABLED\_\_ | Newrelic account license key.  Available from your Newrelic account page
 
 See also configuration options from upstream images:
+- [funkygibbon/nginx-php-exim](https://hub.docker.com/r/funkygibbon/nginx-php-exim/)
 - [funkygibbon/nginx-pagespeed](https://hub.docker.com/r/funkygibbon/nginx-pagespeed/)
 - [funkygibbon/ubuntu](https://hub.docker.com/r/funkygibbon/ubuntu/)
-
----
-
-### Philosophy
-
-I understand a degree of pushback against the idea of bundling so much into one container, at first glance it seems 'against the Docker microservice philosophy'.
-
-However, in my experience, so much is gained by bundling these items together - nginx and php have similar configuration options which require tweaking synchronously - think nginx `UPLOAD_MAX_SIZE`, php `UPLOAD_MAX_FILESIZE` and `POST_MAX_SIZE`, file and socket permissions, performance improvement in communication over socket vs tcp.
-
-I am prepared to be convinced that this is totally utterly wrong-headed, and may consider breaking this PHP installation out to separate nginx/PHP containers if there's a need, but for now, it just works for me.

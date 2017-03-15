@@ -8,10 +8,10 @@ TAG=latest
 
 PROJECT_DIR=`pwd`
 
-PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "magento2" "nginx-proxy")
+PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "magento2" "nginx-proxy" "wordpress")
 
 # http://nginx.org/en/download.html
-NGINX_VERSION="1.11.9"
+NGINX_VERSION="1.11.10"
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
 NGINX_PAGESPEED_VERSION="latest-stable"
@@ -30,12 +30,17 @@ SED_COMMAND="docker run --rm -v ${PROJECT_DIR}:/app busybox sed"
 SED_TARGET_LOCATION="/app"
 
 #
-BUILD=true
+BUILD=1
 
 while getopts "b:n:t:" opt; do
   case $opt in
   b)
-      BUILD=[ $OPTARG -eq "true" ]
+      if [ "$OPTARG" == "true" ]
+      then
+        BUILD=1
+      else
+        BUILD=0
+      fi
       ;;
   n)
       NAMESPACE=$OPTARG
@@ -51,7 +56,7 @@ shift $((OPTIND - 1))
 
 for PROJECT in "${PROJECTS[@]}"
 do
-  echo -e " ->> ${NAMESPACE}/${PROJECT}"
+  echo -e "->> ${NAMESPACE}/${PROJECT}"
 
   if [ ! -d ${PROJECT_DIR}/${PROJECT} ]; then
     echo -e "ERROR :: Directory not found : ${PROJECT_DIR}/${PROJECT}"
@@ -75,8 +80,8 @@ do
     -e "s/(php)([ -])[0-9\.]+/\1\2${PHP_VERSION}/ig" \
     ${SED_TARGET_LOCATION}/${PROJECT}/README.md
 
-  if [ $BUILD ]; then
-      echo -e "Building ${NAMESPACE}/${PROJECT}:${TAG} ..."
+  if [ "$BUILD" -eq 1 ]; then
+      echo -e "\nBuilding ${NAMESPACE}/${PROJECT}:${TAG} ...\n"
       docker build -t ${NAMESPACE}/${PROJECT}:${TAG} ${PROJECT_DIR}/${PROJECT}
   fi
 
