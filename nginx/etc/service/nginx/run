@@ -4,41 +4,43 @@ set -e
 # Update nginx user
 sed -i -r "s/user\s+.+;/user ${APP_USER:-$DEFAULT_APP_USER};/g" /etc/nginx/nginx.conf
 
+# If APP_HOSTNAME is not set, use default `hostname`
 APP_HOSTNAME=${APP_HOSTNAME:-$(hostname)}
 
-echo " * nginx:  server_name ${APP_HOSTNAME}"
+_good "nginx:  server_name ${APP_HOSTNAME}"
 sed -i -r "s/example.com/${APP_HOSTNAME}/g" /etc/nginx/sites-enabled/default.conf
 
 if [ "${SSL_ENABLED}" = "false" ] ; then
 	# SSL disabled
 
-	echo " * nginx:  SSL disabled"
+	_good "nginx:  SSL disabled"
 	rm -f /etc/nginx/sites-enabled/default-ssl.conf
 else
 	# SSL enabled
 
-	echo " * nginx:  SSL enabled"
+	_good "nginx:  SSL enabled"
 
 	if [ ! -f /etc/nginx/sites-enabled/default-ssl.conf ]; then
-		echo " * nginx: recovering default-ssl.conf"
+		_good "nginx: recovering default-ssl.conf"
 		cp /app/etc/nginx/sites-enabled/default-ssl.conf /etc/nginx/sites-enabled/default-ssl.conf
 	fi
 
+	# Overwrite default domain in nginx default-ssl.conf
 	sed -i -r "s/example.com/${APP_HOSTNAME}/g" /etc/nginx/sites-enabled/default-ssl.conf
 
 	if [ ! -f /etc/nginx/ssl/${APP_HOSTNAME}.dhparam.pem ] ; then
 		# Generate Diffie Hellman parameter file, as the default shipped with Ubuntu is 1024bits and considered insecure
 		# https://wiki.mozilla.org/Security/Server_Side_TLS#DHE_handshake_and_dhparam
-		echo " * nginx:  Generating /etc/nginx/ssl/${APP_HOSTNAME}.dhparam.pem"
+		_good "nginx:  Generating /etc/nginx/ssl/${APP_HOSTNAME}.dhparam.pem ..."
 		export RANDFILE=/app/.rnd
 		rm -f $RANDFILE
-		openssl dhparam -out /etc/nginx/ssl/${APP_HOSTNAME}.dhparam.pem 2048
+		openssl dhparam -out /etc/nginx/ssl/${APP_HOSTNAME}.dhparam.pem 2048 > /dev/null &
 	fi
 
 	if [ ! -f /etc/nginx/ssl/${APP_HOSTNAME}.key ] ; then
 		# Generate a self signed certificate if one does not exist
 		# Expires in 365 days
-		echo " * nginx:  Generating default /etc/nginx/ssl/${APP_HOSTNAME}.key /etc/nginx/ssl/${APP_HOSTNAME}.crt"
+		_good "nginx:  Generating default /etc/nginx/ssl/${APP_HOSTNAME}.key /etc/nginx/ssl/${APP_HOSTNAME}.crt"
 		openssl req -x509 -newkey rsa:2048 -keyout /etc/nginx/ssl/${APP_HOSTNAME}.key -out /etc/nginx/ssl/${APP_HOSTNAME}.crt -nodes -days 365 -subj "/C=US/ST=State/L=Location/O=/OU=/CN=localdomain"
 	fi
 
@@ -48,18 +50,19 @@ fi
 procs=$(cat /proc/cpuinfo |grep processor | wc -l)
 if [[ "$procs" > "${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_NGINX_MAX_WORKER_PROCESSES}" ]]; then
 	# number of available processor cores exceeds the maximum permitted, limit to maximum
-	echo " * nginx:  Using max ${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_NGINX_MAX_WORKER_PROCESSES} of $procs available cores"
+	_good "nginx:  Using max ${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_NGINX_MAX_WORKER_PROCESSES} of $procs available cores"
 	procs=${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_NGINX_MAX_WORKER_PROCESSES}
 fi
 
-echo " * nginx:  worker_processes = $procs"
+_good "nginx:  worker_processes = $procs"
 sed -i -r "s/worker_processes\s+[0-9]+/worker_processes $procs/" /etc/nginx/nginx.conf
 
-echo " * nginx:  client_max_body_size = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
+_good "nginx:  client_max_body_size = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
 sed -i -r "s/client_max_body_size.+M;/client_max_body_size ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE};/" /etc/nginx/nginx.conf
 
 # Update cloudflare IP ranges
-echo " * nginx:  update cloudflare IP ranges"
+_good "nginx:  update cloudflare IP ranges"
 /app/bin/cloudflare-ip-updater.sh
 
+wait # for openssl dhparam generation to finish
 exec nginx
