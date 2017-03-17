@@ -13,7 +13,7 @@ Docker Hub: [funkygibbon/wordpress](https://hub.docker.com/r/funkygibbon/wordpre
 ---
 
 Included in this image:
-- [wp-cli](http://wp-cli.org/), automatically drops root to `$APP_USER` and is preconfigured with -path="/app/www"
+- [wp-cli](http://wp-cli.org/), executes as `$APP_USER` and is preconfigured with --path="/app/www"
 - [ngx_pagespeed](https://github.com/pagespeed/ngx_pagespeed)
 - [NewRelic](https://newrelic.com) PHP application monitoring - just add license
 - exim4, ready for smarthost delivery to [sendgrid](https://sendgrid.net) or [mailgun](http://mailgun.net/)
