@@ -2,7 +2,7 @@
 set -euf
 
 # =============================================================================
-# 	PHP5-FPM
+# 	PHP-FPM
 # =============================================================================
 
 # Ubuntu xenial php doesn't create /run/php, where it expects socket files to live
@@ -10,12 +10,12 @@ chown -R ${APP_USER:-$DEFAULT_APP_USER} /run/php
 
 # replace PHP Pool name
 POOL_NAME=`echo ${APP_HOSTNAME} | sed -e 's/[^a-zA-Z]/_/g'`
-echo " * php:    pool name   ${POOL_NAME}"
+_good "php:    pool name   ${POOL_NAME}"
 sed -i -r "s/^\[.*\]$/\[${POOL_NAME}\]/g" /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
 
 # set php-fpm user to match nginx
-echo " * php:    user:  ${APP_USER:-$DEFAULT_APP_USER}"
-echo " * php:    group: ${APP_GROUP:-$DEFAULT_APP_GROUP}"
+_good "php:    user:  ${APP_USER:-$DEFAULT_APP_USER}"
+_good "php:    group: ${APP_GROUP:-$DEFAULT_APP_GROUP}"
 sed -i -r "s/^user\s*=.+$/user = ${APP_USER:-$DEFAULT_APP_USER}/g" /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
 sed -i -r "s/^group\s*=.+$/group = ${APP_GROUP:-$DEFAULT_APP_GROUP}/g" /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
 sed -i -r "s/^listen.owner\s*=.+$/listen.owner = ${APP_USER:-$DEFAULT_APP_USER}/g" /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
@@ -23,29 +23,29 @@ sed -i -r "s/^listen.group\s*=.+$/listen.group = ${APP_GROUP:-$DEFAULT_APP_GROUP
 
 
 # memory limit
-echo " * php:    memory_limit:         ${PHP_MEMORY_LIMIT:-$DEFAULT_PHP_MEMORY_LIMIT}"
+_good "php:    memory_limit:         ${PHP_MEMORY_LIMIT:-$DEFAULT_PHP_MEMORY_LIMIT}"
 sed -i -r "s/^.*memory_limit\s*=\s*[0-9]+[MG]/memory_limit = ${PHP_MEMORY_LIMIT:-$DEFAULT_PHP_MEMORY_LIMIT}/g" /etc/php/${PHP_VERSION}/fpm/php.ini
 
 # file upload limits
-echo " * php:    upload_max_filesize:  ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
-echo " * php:    post_max_size:        ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
+_good "php:    upload_max_filesize:  ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
+_good "php:    post_max_size:        ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
 sed -i -r "s/^.*upload_max_filesize\s*=\s*[0-9]+M/upload_max_filesize = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}/g" /etc/php/${PHP_VERSION}/fpm/php.ini
 sed -i -r "s/^.*post_max_size\s*=\s*[0-9]+M/post_max_size = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}/g" /etc/php/${PHP_VERSION}/fpm/php.ini
 
 # maximum execution time
-echo " * php:    max_execution_time:   ${PHP_MAX_EXECUTION_TIME:-$DEFAULT_PHP_MAX_EXECUTION_TIME}"
+_good "php:    max_execution_time:   ${PHP_MAX_EXECUTION_TIME:-$DEFAULT_PHP_MAX_EXECUTION_TIME}"
 sed -i -r "s/^.*max_execution_time\s*=.*$/max_execution_time = ${PHP_MAX_EXECUTION_TIME:-$DEFAULT_PHP_MAX_EXECUTION_TIME}/g" /etc/php/${PHP_VERSION}/fpm/php.ini
 
 # maximum input variables
-echo " * php:    max_input_vars:       ${PHP_MAX_INPUT_VARS:-$DEFAULT_PHP_MAX_INPUT_VARS}"
+_good "php:    max_input_vars:       ${PHP_MAX_INPUT_VARS:-$DEFAULT_PHP_MAX_INPUT_VARS}"
 sed -i -r "s/^.*max_input_vars\s*=.*$/max_input_vars = ${PHP_MAX_INPUT_VARS:-$DEFAULT_PHP_MAX_INPUT_VARS}/g" /etc/php/${PHP_VERSION}/fpm/php.ini
 
 # php process manager
-echo " * php:    pm.max_children:      ${PHP_MAX_CHILDREN:-$DEFAULT_PHP_MAX_CHILDREN}"
-echo " * php:    pm.start_servers:     ${PHP_START_SERVERS:-$DEFAULT_PHP_START_SERVERS}"
-echo " * php:    pm.min_spare_servers: ${PHP_MIN_SPARE_SERVERS:-$DEFAULT_PHP_MIN_SPARE_SERVERS}"
-echo " * php:    pm.max_spare_servers: ${PHP_MAX_SPARE_SERVERS:-$DEFAULT_PHP_MAX_SPARE_SERVERS}"
-echo " * php:    pm.max_requests:      ${PHP_MAX_REQUESTS:-$DEFAULT_PHP_MAX_REQUESTS}"
+_good "php:    pm.max_children:      ${PHP_MAX_CHILDREN:-$DEFAULT_PHP_MAX_CHILDREN}"
+_good "php:    pm.start_servers:     ${PHP_START_SERVERS:-$DEFAULT_PHP_START_SERVERS}"
+_good "php:    pm.min_spare_servers: ${PHP_MIN_SPARE_SERVERS:-$DEFAULT_PHP_MIN_SPARE_SERVERS}"
+_good "php:    pm.max_spare_servers: ${PHP_MAX_SPARE_SERVERS:-$DEFAULT_PHP_MAX_SPARE_SERVERS}"
+_good "php:    pm.max_requests:      ${PHP_MAX_REQUESTS:-$DEFAULT_PHP_MAX_REQUESTS}"
 sed -i -r "s/pm = \w+\s*=\s*[0-9]+/pm = ${PHP_PROCESS_MANAGER:-$DEFAULT_PHP_PROCESS_MANAGER}/g" /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
 sed -i -r "s/pm.max_children\s*=\s*[0-9]+/pm.max_children = ${PHP_MAX_CHILDREN:-$DEFAULT_PHP_MAX_CHILDREN}/g" /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
 sed -i -r "s/pm.start_servers\s*=\s*[0-9]+/pm.start_servers = ${PHP_START_SERVERS:-$DEFAULT_PHP_START_SERVERS}/g" /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
@@ -56,21 +56,21 @@ sed -i -r "s/pm.max_requests\s*=\s*[0-9]+/pm.max_requests = ${PHP_MAX_REQUESTS:-
 # disable_functions
 DIST_DISABLE_FUNCTIONS=`grep "disable_functions =" /etc/php/${PHP_VERSION}/fpm/php.ini.dist`
 if [[ "${PHP_DISABLE_FUNCTIONS:-$DEFAULT_PHP_DISABLE_FUNCTIONS}" != "false" ]]; then
-    echo " * php:    disable_functions:    ${PHP_DISABLE_FUNCTIONS:-$DEFAULT_PHP_DISABLE_FUNCTIONS}"
+    _good "php:    disable_functions:    ${PHP_DISABLE_FUNCTIONS:-$DEFAULT_PHP_DISABLE_FUNCTIONS}"
     sed -i -r "s/^disable_functions =.*$/${DIST_DISABLE_FUNCTIONS}${PHP_DISABLE_FUNCTIONS:-$DEFAULT_PHP_DISABLE_FUNCTIONS}/g" /etc/php/${PHP_VERSION}/fpm/php.ini
 fi
 
 
 # newrelic
 if [[ "${NEWRELIC_ENABLED:-$DEFAULT_NEWRELIC_ENABLED}" == "false" ]] || [[ "${NEWRELIC_LICENSE:-$DEFAULT_NEWRELIC_LICENSE}" =~ "DISABLED" ]]; then
-    echo " * php:    newrelic.enabled:     false"
+    _good "php:    newrelic.enabled:     false"
     sed -i -r "s/newrelic.enabled =$/newrelic.enabled = false/g" /etc/php/${PHP_VERSION}/fpm/conf.d/20-newrelic.ini
     phpdismod newrelic
     NEWRELIC_ENABLED=false
 else
-    echo " * php:    newrelic.enabled:     true"
-    echo " * php:    newrelic.appname:     ${NEWRELIC_APPNAME:-$POOL_NAME}"
-    echo " * php:    newrelic.license:     ${NEWRELIC_LICENSE:-$DEFAULT_NEWRELIC_LICENSE}"
+    _good "php:    newrelic.enabled:     true"
+    _good "php:    newrelic.appname:     ${NEWRELIC_APPNAME:-$POOL_NAME}"
+    _good "php:    newrelic.license:     ${NEWRELIC_LICENSE:-$DEFAULT_NEWRELIC_LICENSE}"
     sed -i -r "s/newrelic.enabled\s=.*$/newrelic.enabled = true/g" /etc/php/${PHP_VERSION}/fpm/conf.d/20-newrelic.ini
     sed -i -r "s/newrelic.appname\s=.*$/newrelic.appname = \"${NEWRELIC_APPNAME:-$POOL_NAME}\"/g" /etc/php/${PHP_VERSION}/fpm/conf.d/20-newrelic.ini
     sed -i -r "s/newrelic.license\s=.*$/newrelic.license=\"${NEWRELIC_LICENSE:-$DEFAULT_NEWRELIC_LICENSE}\"/g" /etc/php/${PHP_VERSION}/fpm/conf.d/20-newrelic.ini
@@ -80,9 +80,9 @@ fi
 
 # xdebug
 if [[ "$NEWRELIC_ENABLED" != "true" ]] && [[ "${APP_ENV:-$DEFAULT_APP_ENV}" == "development" ]]; then
-    echo " * php:    xdebug.remote_host:   ${PHP_XDEBUG_REMOTE_HOST:-$DEFAULT_PHP_XDEBUG_REMOTE_HOST}"
-    echo " * php:    xdebug.remote_port:   ${PHP_XDEBUG_REMOTE_PORT:-$DEFAULT_PHP_XDEBUG_REMOTE_PORT}"
-    echo " * php:    xdebug.ide_key:       ${PHP_XDEBUG_IDE_KEY:-$DEFAULT_PHP_XDEBUG_IDE_KEY}"
+    _good "php:    xdebug.remote_host:   ${PHP_XDEBUG_REMOTE_HOST:-$DEFAULT_PHP_XDEBUG_REMOTE_HOST}"
+    _good "php:    xdebug.remote_port:   ${PHP_XDEBUG_REMOTE_PORT:-$DEFAULT_PHP_XDEBUG_REMOTE_PORT}"
+    _good "php:    xdebug.ide_key:       ${PHP_XDEBUG_IDE_KEY:-$DEFAULT_PHP_XDEBUG_IDE_KEY}"
 	sed -i -r "s/^xdebug.remote_enable=0$/xdebug.remote_enable=1/g" /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
 	sed -i -r "s/^xdebug.remote_autostart=0$/xdebug.remote_autostart=1/g" /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
 	sed -i -r "s/^xdebug.profiler_enable_trigger=0$/xdebug.profiler_enable_trigger=1/g" /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
@@ -98,12 +98,12 @@ else
 fi
 
 if [[ "${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}" == "example.com" ]]; then
-	# echo " * exim:   mail_from ${APP_HOSTNAME}"
+	# _good "exim:   mail_from ${APP_HOSTNAME}"
 	EXIM_MAIL_FROM=${APP_HOSTNAME}
 fi
 
 # sendmail parameters
-echo " * php:    sendmail_path:         /usr/bin/sendmail -t -f no-reply@${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}"
+_good "php:    sendmail_path:         /usr/bin/sendmail -t -f no-reply@${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}"
 sed -i -r "s/sendmail_path =.*$/sendmail_path = \/usr\/sbin\/sendmail -t -f no-reply@${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}/g" /etc/php/${PHP_VERSION}/fpm/php.ini
 
 # start PHP
