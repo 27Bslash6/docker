@@ -3,71 +3,70 @@ set -e
 
 source /app/.colours
 
-title "funkygibbon/wordpress"
+_title "funkygibbon/wordpress"
 
 # BOOT ENVIRONMENT CONFIGURATION
 
 
-
 # PRE-INSTALLATION CHECKS
 
-([ "$(ls -A /app/www)" ] && [ "${FORCE_INSTALL_WORDPRESS,,}" != "true" ]) && good "Not installing Wordpress as destination not empty" && exit 0;
+([ "$(ls -A /app/www)" ] && [ "${FORCE_INSTALL_WORDPRESS,,}" != "true" ]) && _good "Not installing Wordpress as destination not empty" && exit 0;
 
 if [ "$WP_ADMIN_NAME" == "" ]; then
     warning "WP_ADMIN_NAME is blank"
 else
-    good "WP_ADMIN_NAME      $WP_ADMIN_NAME"
+    _good "WP_ADMIN_NAME      $WP_ADMIN_NAME"
 fi
 
 if [ "$WP_ADMIN_USER" == "" ]; then
-    error "WP_ADMIN_USER is blank"
+    _error "WP_ADMIN_USER is blank"
 else
-    good "WP_ADMIN_USER      $WP_ADMIN_USER"
+    _good "WP_ADMIN_USER      $WP_ADMIN_USER"
 fi
 
 if [ "${WP_ADMIN_EMAIL:-$ADMIN_EMAIL}" == "" ]; then
-    error "WP_ADMIN_EMAIL cannot be blank"
+    _error "WP_ADMIN_EMAIL cannot be blank"
 else
-    good "WP_ADMIN_EMAIL     ${WP_ADMIN_EMAIL:-$ADMIN_EMAIL}"
+    _good "WP_ADMIN_EMAIL     ${WP_ADMIN_EMAIL:-$ADMIN_EMAIL}"
 fi
 
 if [ "$WP_ADMIN_PASS" == "" ]; then
     warning "Generating random WP_ADMIN_PASS"
 else
-    good "WP_ADMIN_PASS      ********"
+    _good "WP_ADMIN_PASS      ********"
 fi
 
 
 if [ "$WP_DB_HOST" == "mysql" ]; then
     warning "Default WP_DB_HOST: mysql"
 else
-    good "WP_DB_HOST         $WP_DB_HOST"
+    _good "WP_DB_HOST         $WP_DB_HOST"
 fi
 
 
 if [ "${WP_DB_NAME:-$MYSQL_DATABASE}" == "" ]; then
-    error "WP_DB_NAME cannot be blank"
+    _error "WP_DB_NAME cannot be blank"
 else
-    good "WP_DB_NAME         ${WP_DB_NAME:-$MYSQL_DATABASE}"
+    _good "WP_DB_NAME         ${WP_DB_NAME:-$MYSQL_DATABASE}"
 fi
 
 
 if [ "${WP_DB_USER:-$MYSQL_USER}" == "" ]; then
-    error "WP_DB_USER cannot be blank"
+    _error "WP_DB_USER cannot be blank"
 else
-    good "WP_DB_USER         ${WP_DB_USER:-$MYSQL_USER}"
+    _good "WP_DB_USER         ${WP_DB_USER:-$MYSQL_USER}"
 fi
 
 
 if [ "${WP_DB_PASS:-$MYSQL_PASSWORD}" == "" ]; then
-    error "WP_DB_PASS cannot be blank"
+    _error "WP_DB_PASS cannot be blank"
 fi
 
-good "WP_DB_PREFIX       ${WP_DB_PREFIX}"
+_good "WP_DB_PREFIX       ${WP_DB_PREFIX}"
 
 # WORDPRESS INSTALLATION
 
-good "Installing Wordpress for site ${WP_HOSTNAME:-${APP_HOSTNAME:-$DEFAULT_APP_HOSTNAME}}..."
+_good "Installing Wordpress for site ${WP_HOSTNAME:-${APP_HOSTNAME:-$DEFAULT_APP_HOSTNAME}}..."
 
 wp_install() {
 
@@ -114,7 +113,7 @@ theme_install() {
         if [ "$WP_THEME_USERNAME" == "" ] || [ "$WP_THEME_PASSWORD" == "" ]; then
             wp theme install --activate $WP_THEME
         else
-            good "Downloading theme from $WP_THEME ..."
+            _good "Downloading theme from $WP_THEME ..."
             curl --user $WP_THEME_USERNAME:$WP_THEME_PASSWORD $WP_THEME -o /app/theme.zip
             wp theme install --activate /app/theme.zip
         fi
@@ -123,7 +122,7 @@ theme_install() {
     if [ "$WP_THEME_GIT" != "" ]; then
         ssh-keyscan -H bitbucket.org >> ~/.ssh/known_hosts
         ssh-keyscan -H github.com >> ~/.ssh/known_hosts
-        good "Cloning $WP_THEME_GIT into /app/www/wp-content/themes/theme"
+        _good "Cloning $WP_THEME_GIT into /app/www/wp-content/themes/theme"
         git clone $WP_THEME_GIT /app/www/wp-content/themes/theme
         wp theme activate theme
         return 0;
