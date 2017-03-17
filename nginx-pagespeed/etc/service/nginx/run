@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+source /app/.colours
+
 # Update nginx user
 sed -i -r "s/user\s+.+;/user ${APP_USER:-$DEFAULT_APP_USER};/g" /etc/nginx/nginx.conf
 
