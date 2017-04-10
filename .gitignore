@@ -1,3 +1,4 @@
 .idea
 wordpress/wp-cli.phar
 *.sublime-*
+docker-ubuntu-base
