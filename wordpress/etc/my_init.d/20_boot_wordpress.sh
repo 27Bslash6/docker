@@ -10,10 +10,10 @@ _title "funkygibbon/wordpress"
 
 # PRE-INSTALLATION CHECKS
 
-([ "$(ls -A /app/www)" ] && [ "${FORCE_INSTALL_WORDPRESS,,}" != "true" ]) && _good "Not installing Wordpress as destination not empty" && exit 0;
+([ "$(ls -A /app/www)" ] && [ "${OVERWRITE_FILES,,}" != "true" ]) && _good "Destination not empty: Not installing Wordpress" && exit 0;
 
 if [ "$WP_ADMIN_NAME" == "" ]; then
-    warning "WP_ADMIN_NAME is blank"
+    _warning "WP_ADMIN_NAME is blank"
 else
     _good "WP_ADMIN_NAME      $WP_ADMIN_NAME"
 fi
@@ -31,14 +31,14 @@ else
 fi
 
 if [ "$WP_ADMIN_PASS" == "" ]; then
-    warning "Generating random WP_ADMIN_PASS"
+    _warning "Generating random WP_ADMIN_PASS"
 else
     _good "WP_ADMIN_PASS      ********"
 fi
 
 
 if [ "$WP_DB_HOST" == "mysql" ]; then
-    warning "Default WP_DB_HOST: mysql"
+    _warning "Default WP_DB_HOST: mysql"
 else
     _good "WP_DB_HOST         $WP_DB_HOST"
 fi
@@ -89,7 +89,7 @@ define('WP_TEMP_DIR', sys_get_temp_dir());
 " >> /app/www/wp-config.php
 
     if [ "${WP_HOSTNAME:-$APP_HOSTNAME}" == "" ]; then
-        warning "WP_HOSTNAME and APP_HOSTNAME are undefined, falling back to $(hostname)"
+        _warning "WP_HOSTNAME and APP_HOSTNAME are undefined, falling back to $(hostname)"
         export WP_HOSTNAME=$(hostname)
     fi
 

@@ -4,7 +4,7 @@ EXPOSE 80
 EXPOSE 443
 
 # http://nginx.org/en/download.html
-ENV NGINX_VERSION 1.11.10
+ENV NGINX_VERSION 1.11.13
 
 # https://github.com/openresty/headers-more-nginx-module/tags
 ENV HEADERS_MORE_VERSION 0.32

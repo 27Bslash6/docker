@@ -4,13 +4,14 @@ EXPOSE 80
 EXPOSE 443
 
 # http://nginx.org/en/download.html
-ENV NGINX_VERSION 1.11.10
+ENV NGINX_VERSION 1.11.13
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
-ENV PAGESPEED_VERSION latest-stable
+ENV NGINX_PAGESPEED_VERSION latest
+ENV NGINX_PAGESPEED_RELEASE_STATUS beta
 
 # Releases after 1.11.33.4 there will be a PSOL_BINARY_URL file that tells us where to look, until then this is hardcoded
-ENV PAGESPEED_PSOL_VERSION 1.11.33.4
+#ENV PAGESPEED_PSOL_VERSION 1.11.33.4
 
 # https://github.com/openresty/headers-more-nginx-module/tags
 ENV HEADERS_MORE_VERSION 0.32
@@ -18,14 +19,18 @@ ENV HEADERS_MORE_VERSION 0.32
 # https://www.openssl.org/source
 ENV OPENSSL_VERSION 1.0.2k
 
-RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/nginx && \
+COPY . /app
+
+RUN chmod 750 /app/bin/*.sh && \
+    useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/nginx && \
 	apt-get update && \
 	apt-get -y --no-install-recommends install wget git-core autoconf automake libtool build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
-	echo "Downloading nginx ${NGINX_VERSION} from http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz ..." && wget -qO - http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz | tar zxf - -C /tmp && \
-	echo "Downloading headers-more ${HEADERS_MORE_VERSION} from https://github.com/openresty/headers-more-nginx-module/archive/v${HEADERS_MORE_VERSION}.tar.gz ..." && wget -qO - https://github.com/openresty/headers-more-nginx-module/archive/v${HEADERS_MORE_VERSION}.tar.gz | tar zxf - -C /tmp && \
-	echo "Downloading ngx_pagespeed ${PAGESPEED_VERSION} from https://github.com/pagespeed/ngx_pagespeed/archive/${PAGESPEED_VERSION}.tar.gz..." && wget -qO - https://github.com/pagespeed/ngx_pagespeed/archive/${PAGESPEED_VERSION}.tar.gz | tar zxf - -C /tmp && \
-	echo "Downloading pagespeed psol ${PAGESPEED_PSOL_VERSION} from https://dl.google.com/dl/page-speed/psol/${PAGESPEED_PSOL_VERSION}.tar.gz..." && wget -qO - https://dl.google.com/dl/page-speed/psol/${PAGESPEED_PSOL_VERSION}.tar.gz | tar xzf  - -C /tmp/ngx_pagespeed-${PAGESPEED_VERSION} && \
-	echo "Downloading openssl v${OPENSSL_VERSION} from https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz ..." && wget -qO - https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xzf  - -C /tmp && \
+	echo "Downloading nginx ${NGINX_VERSION} from http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz ..." && \
+	wget -O - http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz --progress=bar --tries=3 | tar zxf - -C /tmp && \
+	echo "Downloading headers-more ${HEADERS_MORE_VERSION} from https://github.com/openresty/headers-more-nginx-module/archive/v${HEADERS_MORE_VERSION}.tar.gz ..." && \
+	wget -O - https://github.com/openresty/headers-more-nginx-module/archive/v${HEADERS_MORE_VERSION}.tar.gz --progress=bar  --tries=3 | tar zxf - -C /tmp && \
+	/app/bin/download_pagespeed.sh && \
+	echo "Downloading openssl v${OPENSSL_VERSION} from https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz ..." && wget -O - https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz  --progress=bar --tries=3 | tar xzf  - -C /tmp && \
 	cd /tmp/nginx-${NGINX_VERSION} && \
 	./configure \
 		--prefix=/etc/nginx  \
@@ -70,7 +75,7 @@ RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/
 		--with-pcre-jit \
 		--with-openssl=/tmp/openssl-${OPENSSL_VERSION} \
         --add-module=/tmp/headers-more-nginx-module-${HEADERS_MORE_VERSION} \
-		--add-module=/tmp/ngx_pagespeed-${PAGESPEED_VERSION}  && \
+		--add-module=/tmp/ngx_pagespeed-${NGINX_PAGESPEED_VERSION}-${NGINX_PAGESPEED_RELEASE_STATUS}  && \
 	make && \
 	make install && \
 	apt-get purge -yqq automake autoconf libtool git-core build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
@@ -87,10 +92,6 @@ ENV DEFAULT_NGINX_MAX_WORKER_PROCESSES 8
 ENV DEFAULT_CHOWN_APP_DIR true
 
 ENV SSL_ENABLED true
-
-COPY . /app
-
-RUN chmod 750 /app/bin/*.sh
 
 RUN /app/bin/init_nginx.sh
 

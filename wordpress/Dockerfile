@@ -19,7 +19,8 @@ RUN rm -fr /app/www && mkdir /app/www && \
 
 RUN [ -f /app/wp-cli.phar ] || curl -o /app/wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 
-ENV FORCE_INSTALL_WORDPRESS "false"
+# If set to true then will install Wordpress in /app/www overwriting any contents
+ENV OVERWRITE_FILES "false"
 
 ENV WP_TITLE "funkygibbon/wordpress"
 
@@ -44,7 +45,7 @@ ENV WP_LOCALE "en_AU"
 
 ENV WP_THEME_HTTP ""
 ENV WP_THEME_GIT ""
-ENV WP_THEME_USERNAME ""bi
+ENV WP_THEME_USERNAME ""
 ENV WP_THEME_PASSWORD ""
 
 ENV SSH_DOMAIN_HOSTKEYS ""

@@ -8,15 +8,14 @@ TAG=latest
 
 PROJECT_DIR=`pwd`
 
-PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "magento2" "nginx-proxy" "wordpress")
+PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "magento2" "wordpress" "nginx-proxy")
 
 # http://nginx.org/en/download.html
-NGINX_VERSION="1.11.10"
+NGINX_VERSION="1.11.13"
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
-NGINX_PAGESPEED_VERSION="latest-stable"
-
-NGINX_PSOL_VERSION="1.11.33.4"
+NGINX_PAGESPEED_VERSION="latest"
+NGINX_PAGESPEED_RELEASE_STATUS="beta"
 
 # https://www.openssl.org/source
 OPENSSL_VERSION="1.0.2k"
@@ -59,14 +58,14 @@ do
   echo -e "->> ${NAMESPACE}/${PROJECT}"
 
   if [ ! -d ${PROJECT_DIR}/${PROJECT} ]; then
-    echo -e "ERROR :: Directory not found : ${PROJECT_DIR}/${PROJECT}"
+    _warning "ERROR :: Directory not found : ${PROJECT_DIR}/${PROJECT}"
     continue
   fi
 
   $SED_COMMAND -i -r \
     -e "s/ENV NGINX_VERSION .*/ENV NGINX_VERSION ${NGINX_VERSION}/g" \
     -e "s/ENV NGINX_PAGESPEED_VERSION .*/ENV NGINX_PAGESPEED_VERSION ${NGINX_PAGESPEED_VERSION}/g" \
-    -e "s/ENV NGINX_PSOL_VERSION .*/ENV NGINX_PSOL_VERSION ${NGINX_PSOL_VERSION}/g" \
+    -e "s/ENV NGINX_PAGESPEED_RELEASE_STATUS .*/ENV NGINX_PAGESPEED_RELEASE_STATUS ${NGINX_PAGESPEED_RELEASE_STATUS}/g" \
     -e "s/ENV OPENSSL_VERSION .*/ENV OPENSSL_VERSION ${OPENSSL_VERSION}/g" \
     -e "s/ENV HEADERS_MORE_VERSION .*/ENV HEADERS_MORE_VERSION ${HEADERS_MORE_VERSION}/g" \
     -e "s/ENV PHP_VERSION .*/ENV PHP_VERSION ${PHP_VERSION}/g" \
@@ -75,7 +74,7 @@ do
   $SED_COMMAND -i -r \
     -e "s/(nginx)([ -])[0-9\.]+/\1\2${NGINX_VERSION}/ig" \
     -e "s/(ngx_pagespeed)([ -])[0-9\.]+/\1\2${NGINX_PAGESPEED_VERSION}/ig" \
-    -e "s/ngx_pagespeed-latest-stable/ngx_pagespeed-latest--stable/ig" \
+    -e "s/ngx_pagespeed-latest-${NGINX_PAGESPEED_RELEASE_STATUS}/ngx_pagespeed-latest--${NGINX_PAGESPEED_RELEASE_STATUS}/ig" \
     -e "s/(openssl)([ -])[0-9a-z\.]+/\1\2${OPENSSL_VERSION}/ig" \
     -e "s/(php)([ -])[0-9\.]+/\1\2${PHP_VERSION}/ig" \
     ${SED_TARGET_LOCATION}/${PROJECT}/README.md
