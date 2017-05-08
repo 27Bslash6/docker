@@ -3,7 +3,7 @@ FROM funkygibbon/nginx-php-exim:latest
 RUN ssh-keyscan -H bitbucket.org >> ~/.ssh/known_hosts && \
     ssh-keyscan -H github.com >> ~/.ssh/known_hosts && \
     apt-get update && \
-    apt-get install -y --no-install-recommends git && \
+    apt-get install -y --no-install-recommends git mysql-client && \
     apt-get clean && \
     rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
