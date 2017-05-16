@@ -4,7 +4,7 @@ EXPOSE 80
 EXPOSE 443
 
 # http://nginx.org/en/download.html
-ENV NGINX_VERSION 1.11.13
+ENV NGINX_VERSION 1.13.0
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
 ENV NGINX_PAGESPEED_VERSION latest
@@ -17,7 +17,7 @@ ENV NGINX_PAGESPEED_RELEASE_STATUS beta
 ENV HEADERS_MORE_VERSION 0.32
 
 # https://www.openssl.org/source
-ENV OPENSSL_VERSION 1.0.2k
+ENV OPENSSL_VERSION 1.1.0e
 
 COPY . /app
 
