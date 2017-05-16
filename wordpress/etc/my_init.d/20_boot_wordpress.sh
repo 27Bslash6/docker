@@ -93,10 +93,10 @@ define('WP_TEMP_DIR', sys_get_temp_dir());
         export WP_HOSTNAME=$(hostname)
     fi
 
-    wp core install --url=http://${WP_HOSTNAME:-$APP_HOSTNAME}/ --title="${WP_TITLE}" --admin_user=${WP_ADMIN_USER} --admin_password=${WP_ADMIN_PASS} --admin_email=${WP_ADMIN_EMAIL:-$ADMIN_EMAIL}
+    wp core install --url=http://${WP_HOSTNAME:-$APP_HOSTNAME}/ --title=${WP_TITLE} --admin_user=${WP_ADMIN_USER} --admin_password=${WP_ADMIN_PASS} --admin_email=${WP_ADMIN_EMAIL:-$ADMIN_EMAIL}
 
-#    wp option set siteurl "http://${WP_HOSTNAME}/"
-#    wp option set home "http://${WP_HOSTNAME}/"
+    wp option set siteurl "http://${WP_HOSTNAME:-$APP_HOSTNAME}/"
+    wp option set home "http://${WP_HOSTNAME:-$APP_HOSTNAME}/"
 
 }
 

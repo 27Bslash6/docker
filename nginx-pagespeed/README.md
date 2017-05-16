@@ -1,6 +1,6 @@
 # Nginx + Pagespeed + OpenSSL
 
-![Nginx 1.11.13](https://img.shields.io/badge/nginx-1.11.13-brightgreen.svg) ![ngx_pagespeed latest-stable](https://img.shields.io/badge/ngx_pagespeed-latest--stable-brightgreen.svg) ![OpenSSL 1.0.2k](https://img.shields.io/badge/OpenSSL-1.0.2k-brightgreen.svg)
+![Nginx 1.13.0](https://img.shields.io/badge/nginx-1.13.0-brightgreen.svg) ![ngx_pagespeed latest-stable](https://img.shields.io/badge/ngx_pagespeed-latest--stable-brightgreen.svg) ![OpenSSL 1.1.0e](https://img.shields.io/badge/OpenSSL-1.1.0e-brightgreen.svg)
 
 
 Built on [funkygibbon/ubuntu](https://registry.hub.docker.com/u/funkygibbon/ubuntu/), a lightly modified Ubuntu Xenial [Phusion Base Image](https://phusion.github.io/baseimage-docker/).
@@ -50,7 +50,7 @@ CHOWN_APP_DIR | false | If true `chown` `/app/www` as `APP_USER:APP_GROUP`
 ### Security
 
 Nginx is compiled from mainline source according to Ubuntu compile flags, with the following modifications:
-- OpenSSL 1.0.2k sources - https://www.openssl.org/source/
+- OpenSSL 1.1.0e sources - https://www.openssl.org/source/
 - Google Pagespeed nginx module - https://github.com/pagespeed/ngx_pagespeed/releases
 - headers-more nginx module - https://github.com/openresty/headers-more-nginx-module/tags
 - `http_ssi_module` and `http_autoindex_module` disabled

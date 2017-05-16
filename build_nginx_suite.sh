@@ -6,29 +6,28 @@ NAMESPACE=funkygibbon
 
 TAG=latest
 
-PROJECT_DIR=`pwd`
-
 PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "magento2" "wordpress" "nginx-proxy")
 
 # http://nginx.org/en/download.html
-NGINX_VERSION="1.11.13"
+NGINX_VERSION="1.13.0"
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
 NGINX_PAGESPEED_VERSION="latest"
 NGINX_PAGESPEED_RELEASE_STATUS="beta"
 
 # https://www.openssl.org/source
-OPENSSL_VERSION="1.0.2k"
+OPENSSL_VERSION="1.1.0e"
 
 # https://github.com/openresty/headers-more-nginx-module/tags
 HEADERS_MORE_VERSION="0.32"
 
 PHP_VERSION="7.0"
 
+PROJECT_DIR=`pwd`
+
 SED_COMMAND="docker run --rm -v ${PROJECT_DIR}:/app busybox sed"
 SED_TARGET_LOCATION="/app"
 
-#
 BUILD=1
 
 while getopts "b:n:t:" opt; do
