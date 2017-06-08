@@ -22,6 +22,7 @@ RUN wget -O - https://download.newrelic.com/548C16BF.gpg | apt-key add - && \
         php-memcache \
         php-recode \
         php-redis \
+        php-soap \
 		php-xdebug \
 		php-xml \
 		php-xsl \
