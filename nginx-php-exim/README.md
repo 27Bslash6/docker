@@ -1,6 +1,6 @@
 # Nginx + PHP + Exim
 
-![PHP 7.0](https://img.shields.io/badge/php-7.0-brightgreen.svg) ![Nginx 1.13.0](https://img.shields.io/badge/nginx-1.13.0-brightgreen.svg) ![ngx_pagespeed latest-stable](https://img.shields.io/badge/ngx_pagespeed-latest--stable-brightgreen.svg) ![OpenSSL 1.1.0e](https://img.shields.io/badge/OpenSSL-1.1.0e-brightgreen.svg)
+![PHP 7.0](https://img.shields.io/badge/php-7.0-brightgreen.svg) ![Nginx 1.13.1](https://img.shields.io/badge/nginx-1.13.1-brightgreen.svg) ![ngx_pagespeed latest-stable](https://img.shields.io/badge/ngx_pagespeed-latest--stable-brightgreen.svg) ![OpenSSL 1.1.0f](https://img.shields.io/badge/OpenSSL-1.1.0f-brightgreen.svg)
 
 Highly configurable nginx-PHP webserver stack built on [funkygibbon/nginx-pagespeed](https://hub.docker.com/r/funkygibbon/nginx-pagespeed/), which is in turn built on a [lightly modified Phusion Ubuntu base image](https://hub.docker.com/r/funkygibbon/ubuntu/)
 
