@@ -9,14 +9,14 @@ TAG=latest
 PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "magento2" "wordpress" "nginx-proxy")
 
 # http://nginx.org/en/download.html
-NGINX_VERSION="1.13.0"
+NGINX_VERSION="1.13.1"
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
 NGINX_PAGESPEED_VERSION="latest"
 NGINX_PAGESPEED_RELEASE_STATUS="beta"
 
 # https://www.openssl.org/source
-OPENSSL_VERSION="1.1.0e"
+OPENSSL_VERSION="1.1.0f"
 
 # https://github.com/openresty/headers-more-nginx-module/tags
 HEADERS_MORE_VERSION="0.32"
