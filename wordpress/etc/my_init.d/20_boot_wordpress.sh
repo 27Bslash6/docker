@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-source /app/.colours
+source /app/bin/colours.sh
 
 _title "funkygibbon/wordpress"
 
