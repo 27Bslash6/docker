@@ -6,7 +6,7 @@
 
 set -e
 
-source /app/.colours
+source /app/bin/colours.sh
 
 _title "Starting config in ${APP_ENV:-$DEFAULT_APP_ENV} mode ..."
 

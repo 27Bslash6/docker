@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euf
 
-source /app/.colours
+source /app/bin/colours.sh
 
 # =============================================================================
 # 	PHP-FPM

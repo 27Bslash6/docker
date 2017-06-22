@@ -1,3 +1,6 @@
 [submodule "externals/ubuntu"]
 	path = externals/ubuntu
 	url = https://github.com/funkygibbing/docker-ubuntu-base
+[submodule "externals/nginx-proxy"]
+	path = externals/nginx-proxy
+	url = https://github.com/27Bslash6/nginx-proxy
