@@ -19,7 +19,7 @@ ENV HEADERS_MORE_VERSION 0.32
 # https://www.openssl.org/source
 ENV OPENSSL_VERSION 1.1.0f
 
-COPY . /app
+COPY ./bin/download_pagespeed.sh /app/bin/download_pagespeed.sh
 
 RUN chmod 750 /app/bin/*.sh && \
     useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/nginx && \
@@ -93,6 +93,9 @@ ENV DEFAULT_CHOWN_APP_DIR true
 
 ENV SSL_ENABLED true
 
-RUN /app/bin/init_nginx.sh
+COPY . /app
+
+RUN chmod 750 /app/bin/*.sh && \
+    /app/bin/init_nginx.sh
 
 CMD ["/sbin/my_init"]
