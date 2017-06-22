@@ -8,7 +8,7 @@ ENV NGINX_VERSION 1.13.1
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
 ENV NGINX_PAGESPEED_VERSION latest
-ENV NGINX_PAGESPEED_RELEASE_STATUS beta
+ENV NGINX_PAGESPEED_RELEASE_STATUS stable
 
 # Releases after 1.11.33.4 there will be a PSOL_BINARY_URL file that tells us where to look, until then this is hardcoded
 #ENV PAGESPEED_PSOL_VERSION 1.11.33.4

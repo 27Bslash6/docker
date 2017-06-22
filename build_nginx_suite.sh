@@ -13,7 +13,7 @@ NGINX_VERSION="1.13.1"
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
 NGINX_PAGESPEED_VERSION="latest"
-NGINX_PAGESPEED_RELEASE_STATUS="beta"
+NGINX_PAGESPEED_RELEASE_STATUS="stable"
 
 # https://www.openssl.org/source
 OPENSSL_VERSION="1.1.0f"
