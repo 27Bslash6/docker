@@ -1,7 +1,6 @@
 FROM funkygibbon/ubuntu:xenial
 
 RUN apt-get update && \
-  apt-get upgrade -y && \
   apt-get -y install varnish && \
   apt-get -y clean && \
   rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
@@ -13,7 +12,7 @@ EXPOSE 80
 
 COPY . /app
 
-RUN chmod 750 /app/bin/*.sh && \
+RUN chmod 750 /app/bin/*.sh && sync && \
     /app/bin/init_varnish.sh
 
 CMD ["/sbin/my_init"]
