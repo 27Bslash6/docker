@@ -74,7 +74,7 @@ sed -i -r "s/DownstreamCacheRebeaconingKey \"__PAGESPEED_REBEACON_KEY__\";/Downs
 
 
 # Update cloudflare IP ranges
-_good "nginx:  update cloudflare IP ranges"
+_good "nginx:  updating cloudflare IP ranges"
 /app/bin/cloudflare-ip-updater.sh
 
 wait # for openssl dhparam generation to finish
