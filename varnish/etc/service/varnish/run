@@ -7,4 +7,6 @@ sed -i "s@__PROBE_INTERVAL__@${VARNISH_PROBE_INTERVAL}@" /etc/varnish/default.vc
 sed -i "s@__PROBE_TIMEOUT__@${VARNISH_PROBE_TIMEOUT}@" /etc/varnish/default.vcl
 sed -i "s@__GRACE_TIME__@${VARNISH_GRACE_TIME}@" /etc/varnish/default.vcl
 
+sed -i "s@__PAGESPEED_REBEACON_KEY__@${PAGESPEED_REBEACON_KEY}@" /etc/varnish/default.vcl
+
 exec varnishd -F -f ${VARNISH_VCL_FILE} -s malloc,${VARNISH_MEMORY} -a 0.0.0.0:${VARNISH_LISTEN_PORT}
