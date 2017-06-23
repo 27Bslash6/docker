@@ -13,6 +13,5 @@ services:
     environment:
       - VIRTUAL_HOST=example.com
       - VARNISH_BACKEND_HOSTNAME=example.com
-      - VARNISH_BACKEND_PORT=80
       - VARNISH_BACKEND_ADDRESS=wordpress
 ```
