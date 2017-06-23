@@ -97,7 +97,7 @@ ENV SSL_ENABLED true
 
 COPY . /app
 
-RUN chmod 750 /app/bin/*.sh && \
+RUN chmod 750 /app/bin/*.sh && sync && \
     /app/bin/init_nginx.sh
 
 CMD ["/sbin/my_init"]
