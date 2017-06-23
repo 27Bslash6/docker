@@ -11,6 +11,7 @@ APP_HOSTNAME=${APP_HOSTNAME:-$(hostname)}
 
 _good "nginx:  server_name ${APP_HOSTNAME}"
 sed -i -r "s/example.com/${APP_HOSTNAME}/g" /etc/nginx/sites-enabled/default.conf
+sed -i -r "s/example.com/${APP_HOSTNAME}/g" /etc/nginx/server.d/10_pagespeed.conf
 
 if [ "${SSL_ENABLED}" = "false" ] ; then
 	# SSL disabled
@@ -61,6 +62,16 @@ sed -i -r "s/worker_processes\s+[0-9]+/worker_processes $procs/" /etc/nginx/ngin
 
 _good "nginx:  client_max_body_size = ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}"
 sed -i -r "s/client_max_body_size.+M;/client_max_body_size ${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE};/" /etc/nginx/nginx.conf
+
+# Configure pagespeed to support downstream caching
+# See: https://modpagespeed.com/doc/downstream-caching
+if [ "${PAGESPEED_REBEACON_KEY}" = "$DEFAULT_PAGESPEED_REBEACON_KEY" ]; then
+    _warning "nginx:  Pagespeed rebeacon key is default, please change \$PAGESPEED_REBEACON_KEY"
+else
+    _good "nginx:  PAGESPEED_REBEACON_KEY $PAGESPEED_REBEACON_KEY"
+fi
+sed -i -r "s/DownstreamCacheRebeaconingKey \"__PAGESPEED_REBEACON_KEY__\";/DownstreamCacheRebeaconingKey \"${PAGESPEED_REBEACON_KEY:-$DEFAULT_PAGESPEED_REBEACON_KEY}\";/g" /etc/nginx/server.d/10_pagespeed.conf
+
 
 # Update cloudflare IP ranges
 _good "nginx:  update cloudflare IP ranges"
