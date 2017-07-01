@@ -12,6 +12,10 @@ _title "funkygibbon/wordpress"
 
 ([ "$(ls -A /app/www)" ] && [ "${OVERWRITE_FILES,,}" != "true" ]) && _good "Destination not empty: Not installing Wordpress" && exit 0;
 
+if [ "${OVERWRITE_FILES,,}" == "true" ]; then
+    WP_FORCE=" --force "
+fi
+
 if [ "$WP_ADMIN_NAME" == "" ]; then
     _warning "WP_ADMIN_NAME is blank"
 else
@@ -73,25 +77,28 @@ wp_install() {
     mkdir -p /app/www
     chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www
 
+    _good "wp core download ..."
+
     wp core download --path=/app/www --locale=${WP_LOCALE} --version=${WP_VERSION}
 
-    wp core config --skip-check --dbname=${WP_DB_NAME:-$MYSQL_DATABASE} --dbhost=$WP_DB_HOST --dbuser=${WP_DB_USER:-$MYSQL_USER} --dbpass=${WP_DB_PASS:-$MYSQL_PASSWORD} \
-        --locale=${WP_LOCALE}
+    _good "wp core config ..."
 
-    echo "
-#define( 'WP_DEBUG', true );
-#define( 'WP_DEBUG_LOG', true );
+    wp core config --skip-check --dbname=${WP_DB_NAME:-$MYSQL_DATABASE} --dbhost=$WP_DB_HOST --dbuser=${WP_DB_USER:-$MYSQL_USER} --dbpass=${WP_DB_PASS:-$MYSQL_PASSWORD} --dbprefix=${WP_DB_PREFIX} --dbcharset=${WP_DB_CHARSET} --locale=${WP_LOCALE} ${WP_FORCE} --extra-php <<PHP
+define( 'WP_DEBUG', false );
+define( 'WP_DEBUG_LOG', false );
 
 define('FS_METHOD','direct');
 define('FS_CHMOD_FILE', 0664);
 define('FS_CHMOD_DIR', 0775);
 define('WP_TEMP_DIR', sys_get_temp_dir());
-" >> /app/www/wp-config.php
+PHP
 
     if [ "${WP_HOSTNAME:-$APP_HOSTNAME}" == "" ]; then
         _warning "WP_HOSTNAME and APP_HOSTNAME are undefined, falling back to $(hostname)"
         export WP_HOSTNAME=$(hostname)
     fi
+
+    _good "wp core install ..."
 
     wp core install --url=http://${WP_HOSTNAME:-$APP_HOSTNAME}/ --title=${WP_TITLE} --admin_user=${WP_ADMIN_USER} --admin_password=${WP_ADMIN_PASS} --admin_email=${WP_ADMIN_EMAIL:-$ADMIN_EMAIL}
 
