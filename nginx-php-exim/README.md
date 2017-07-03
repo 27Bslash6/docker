@@ -41,6 +41,7 @@ UPLOAD_MAX_SIZE | 30M | Maximum upload size, applied to nginx and php5-fpm
 NGINX_MAX_WORKER_PROCESSES | 8 | nginx worker_processes is determined from number of processor cores on service start, up to the maximum permitted by NGINX_MAX_WORKER_PROCESSES
 PHP_MEMORY_LIMIT | 128M | Maximum memory PHP can use per worker
 PHP_PROCESS_MANAGER | dynamic | dynamic, static, ondemand :: PHP process manager scheme
+PHP_CLEAR_ENV | yes | yes, no :: if set to 'no', enables access to all environment variables via php `getenv()`
 PHP_MAX_CHILDREN | 6 | process manager maximum spawned children 
 PHP_START_SERVERS | 3 | if PHP_PROCESS_MANAGER is dynamic, this is the number of children spawned on boot
 PHP_MIN_SPARE_SERVERS | 2 | if PHP_PROCESS_MANAGER is dynamic, this is the minimum number of idle children 

@@ -1,4 +1,8 @@
 .idea
 wordpress/wp-cli.phar
 *.sublime-*
+<<<<<<< HEAD
+
+=======
+>>>>>>> develop
 docker-ubuntu-base

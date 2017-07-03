@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-source /app/.colours
+source /app/bin/colours.sh
 
 # =============================================================================
 # Application is launched as $APP_USER:$APP_GROUP with specified UID and GID,

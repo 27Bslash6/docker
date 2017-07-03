@@ -13,7 +13,7 @@ NGINX_VERSION="1.13.1"
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
 NGINX_PAGESPEED_VERSION="latest"
-NGINX_PAGESPEED_RELEASE_STATUS="beta"
+NGINX_PAGESPEED_RELEASE_STATUS="stable"
 
 # https://www.openssl.org/source
 OPENSSL_VERSION="1.1.0f"
@@ -23,11 +23,9 @@ HEADERS_MORE_VERSION="0.32"
 
 PHP_VERSION="7.0"
 
-PROJECT_DIR=`pwd`
+source externals/ubuntu/bin/colours.sh
 
-SED_COMMAND="docker run --rm -v ${PROJECT_DIR}:/app busybox sed"
-SED_TARGET_LOCATION="/app"
-
+# Toggle building images
 BUILD=1
 
 while getopts "b:n:t:" opt; do
@@ -56,10 +54,18 @@ for PROJECT in "${PROJECTS[@]}"
 do
   echo -e "->> ${NAMESPACE}/${PROJECT}"
 
-  if [ ! -d ${PROJECT_DIR}/${PROJECT} ]; then
-    _warning "ERROR :: Directory not found : ${PROJECT_DIR}/${PROJECT}"
+  ROOT_DIR=$(pwd)
+  if [ -d ${ROOT_DIR}/${PROJECT} ]; then
+    PROJECT_DIR=$ROOT_DIR
+  elif [ -d ${ROOT_DIR}/externals/${PROJECT} ]; then
+    PROJECT_DIR=${ROOT_DIR}/externals
+  else
+    _warning "ERROR :: Directory not found for: ${NAMESPACE}/${PROJECT}"
     continue
   fi
+
+  SED_COMMAND="docker run --rm -v ${PROJECT_DIR}:/app busybox sed"
+  SED_TARGET_LOCATION="/app"
 
   $SED_COMMAND -i -r \
     -e "s/ENV NGINX_VERSION .*/ENV NGINX_VERSION ${NGINX_VERSION}/g" \

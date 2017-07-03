@@ -26,12 +26,16 @@ ENV WP_TITLE "funkygibbon/wordpress"
 
 ENV WP_HOSTNAME ""
 
-
 ENV WP_DB_HOST "mysql"
 ENV WP_DB_NAME ""
 ENV WP_DB_USER ""
 ENV WP_DB_PASS ""
-ENV WP_DB_PREFIX "wordpress_"
+ENV WP_DB_PREFIX "wp_"
+
+ENV WP_DB_CHARSET "utf8"
+ENV WP_DB_COLLATION ""
+
+ENV WP_FORCE_SSL_ADMIN "false"
 
 ENV WP_PLUGINS "wordfence;debug-bar"
 
