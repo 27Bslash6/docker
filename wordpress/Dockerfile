@@ -1,11 +1,12 @@
-FROM funkygibbon/nginx-php-exim:latest
+FROM funkygibbon/nginx-php-exim
 
 RUN ssh-keyscan -H bitbucket.org >> ~/.ssh/known_hosts && \
     ssh-keyscan -H github.com >> ~/.ssh/known_hosts && \
     apt-get update && \
     apt-get install -y --no-install-recommends git mysql-client && \
     apt-get clean && \
-    rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
+    rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/* && \
+    curl -o /app/wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 
 COPY . /app/
 
@@ -16,8 +17,6 @@ RUN rm -fr /app/www && mkdir /app/www && \
     chmod +x /etc/my_init.d/20_boot_wordpress.sh && \
     cp bin/wp.sh /usr/local/bin/wp && \
     chmod +x /usr/local/bin/wp
-
-RUN [ -f /app/wp-cli.phar ] || curl -o /app/wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 
 # If set to true then will install Wordpress in /app/www overwriting any contents
 ENV OVERWRITE_FILES "false"

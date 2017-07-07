@@ -13,6 +13,7 @@ _title "funkygibbon/wordpress"
 ([ "$(ls -A /app/www)" ] && [ "${OVERWRITE_FILES,,}" != "true" ]) && _good "Destination not empty: Not installing Wordpress" && exit 0;
 
 if [ "${OVERWRITE_FILES,,}" == "true" ]; then
+    rm -fr /app/www && sync && mkdir -p /app/www
     WP_FORCE=" --force "
 fi
 
@@ -92,6 +93,13 @@ define('FS_CHMOD_FILE', 0664);
 define('FS_CHMOD_DIR', 0775);
 define('WP_TEMP_DIR', sys_get_temp_dir());
 PHP
+
+    if ! wp db check; then
+        _good "wp db create"
+        wp db create
+    else
+        _good "db exists"
+    fi
 
     if [ "${WP_HOSTNAME:-$APP_HOSTNAME}" == "" ]; then
         _warning "WP_HOSTNAME and APP_HOSTNAME are undefined, falling back to $(hostname)"
