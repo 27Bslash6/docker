@@ -94,6 +94,13 @@ define('FS_CHMOD_DIR', 0775);
 define('WP_TEMP_DIR', sys_get_temp_dir());
 PHP
 
+    if ! wp db check; then
+        _good "wp db create"
+        wp db create
+    else
+        _good "db exists"
+    fi
+
     if [ "${WP_HOSTNAME:-$APP_HOSTNAME}" == "" ]; then
         _warning "WP_HOSTNAME and APP_HOSTNAME are undefined, falling back to $(hostname)"
         export WP_HOSTNAME=$(hostname)
