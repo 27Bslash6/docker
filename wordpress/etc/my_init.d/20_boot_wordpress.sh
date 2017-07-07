@@ -13,6 +13,7 @@ _title "funkygibbon/wordpress"
 ([ "$(ls -A /app/www)" ] && [ "${OVERWRITE_FILES,,}" != "true" ]) && _good "Destination not empty: Not installing Wordpress" && exit 0;
 
 if [ "${OVERWRITE_FILES,,}" == "true" ]; then
+    rm -fr /app/www && sync && mkdir -p /app/www
     WP_FORCE=" --force "
 fi
 
