@@ -2,31 +2,35 @@
 
 set -e
 
-NAMESPACE=funkygibbon
+NAMESPACE=${BUILD_NAMESPACE:-"funkygibbon"}
+SOURCE_NAMESPACE=${BUILD_SOURCE_NAMESPACE:-"funkygibbon"}
 
-TAG=latest
-
-PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "magento2" "wordpress" "nginx-proxy")
+TAG=${BUILD_TAG:-"latest"}
 
 # http://nginx.org/en/download.html
-NGINX_VERSION="1.13.1"
+NGINX_VERSION=${BUILD_NGINX_VERSION:-"1.13.1"}
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
-NGINX_PAGESPEED_VERSION="latest"
-NGINX_PAGESPEED_RELEASE_STATUS="stable"
+NGINX_PAGESPEED_VERSION=${BUILD_PAGESPEED_VERSION:-"latest"}
+NGINX_PAGESPEED_RELEASE_STATUS=${BUILD_PAGESPEED_RELEASE_STATUS:-"stable"}
 
 # https://www.openssl.org/source
-OPENSSL_VERSION="1.1.0f"
+OPENSSL_VERSION=${BUILD_OPENSSL_VERSION:-"1.1.0f"}
 
 # https://github.com/openresty/headers-more-nginx-module/tags
-HEADERS_MORE_VERSION="0.32"
+HEADERS_MORE_VERSION=${BUILD_OPENSSL_VERSION:-"0.32"}
 
-PHP_VERSION="7.0"
+PHP_VERSION=${BUILD_OPENSSL_VERSION:-"7.0"}
+
+PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "magento2" "wordpress" "wordpress-stateless" "nginx-proxy")
+
+#git submodule update --init
 
 source externals/ubuntu/bin/colours.sh
 
-# Toggle building images
-BUILD=1
+# Toggle building images,
+# If set to 0 only updates variables in version numbers
+BUILD=${BUILD_DO_BUILD:-"1"}
 
 while getopts "b:n:t:" opt; do
   case $opt in
@@ -60,14 +64,26 @@ do
   elif [ -d ${ROOT_DIR}/externals/${PROJECT} ]; then
     PROJECT_DIR=${ROOT_DIR}/externals
   else
-    _warning "ERROR :: Directory not found for: ${NAMESPACE}/${PROJECT}"
+#    _warning "ERROR :: Directory not found for: ${NAMESPACE}/${PROJECT}"
+    echo -e "ERROR :: Directory not found for: ${NAMESPACE}/${PROJECT}"
     continue
   fi
 
-  SED_COMMAND="docker run --rm -v ${PROJECT_DIR}:/app busybox sed"
-  SED_TARGET_LOCATION="/app"
+  if type docker >/dev/null 2>&1; then
+      SED_COMMAND="docker run --rm -v ${PROJECT_DIR}:/app busybox sed"
+      SED_TARGET_LOCATION="/app"
+  else
+      SED_COMMAND="sed"
+      SED_TARGET_LOCATION="."
+  fi
+
+  if [ ! -e ${PROJECT_DIR}/${PROJECT}/Dockerfile ]; then
+    echo -e "File does not exist: ${SED_TARGET_LOCATION}/${PROJECT}/Dockerfile"
+    continue
+  fi
 
   $SED_COMMAND -i -r \
+    -e "s:FROM .*/(.*):FROM ${SOURCE_NAMESPACE}/\1:g" \
     -e "s/ENV NGINX_VERSION .*/ENV NGINX_VERSION ${NGINX_VERSION}/g" \
     -e "s/ENV NGINX_PAGESPEED_VERSION .*/ENV NGINX_PAGESPEED_VERSION ${NGINX_PAGESPEED_VERSION}/g" \
     -e "s/ENV NGINX_PAGESPEED_RELEASE_STATUS .*/ENV NGINX_PAGESPEED_RELEASE_STATUS ${NGINX_PAGESPEED_RELEASE_STATUS}/g" \
