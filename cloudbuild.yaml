@@ -1,0 +1,32 @@
+# In this directory, run the following command to build this builder.
+# $ gcloud container builds submit . --config=cloudbuild.yaml
+steps:
+- name: 'ubuntu'
+  id: 'configure'
+  args: ['bash', './build_nginx_suite.sh']
+  env:
+  - 'BUILD_NAMESPACE=gcr.io/$PROJECT_ID'
+  - 'BUILD_SOURCE_NAMESPACE=gcr.io/$PROJECT_ID'
+  - 'BUILD_DO_BUILD=0'
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'nginx'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/nginx', './nginx']
+  waitFor: ['configure']
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'nginx-pagespeed'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/nginx-pagespeed', './nginx-pagespeed']
+  waitFor: ['configure']
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'nginx-php-exim'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/nginx-php-exim', './nginx-php-exim']
+  waitFor: ['nginx-pagespeed']
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'wordpress'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/wordpress', './wordpress']
+  waitFor: ['nginx-php-exim']
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'wordpress-stateless'
+  args: ['build', '--tag=gcr.io/$PROJECT_ID/wordpress-stateless', './wordpress-stateless']
+  waitFor: ['wordpress']
+
+images: ['gcr.io/$PROJECT_ID/nginx', 'gcr.io/$PROJECT_ID/nginx-pagespeed', 'gcr.io/$PROJECT_ID/nginx-php-exim', 'gcr.io/$PROJECT_ID/wordpress', 'gcr.io/$PROJECT_ID/wordpress-stateless']
