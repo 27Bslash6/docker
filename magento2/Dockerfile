@@ -1,4 +1,4 @@
-FROM funkygibbon/nginx-php-exim:latest
+FROM funkygibbon/nginx-php-exim
 
 COPY . /app/
 
