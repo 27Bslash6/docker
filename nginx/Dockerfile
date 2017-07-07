@@ -1,4 +1,4 @@
-FROM funkygibbon/ubuntu:xenial
+FROM funkygibbon/ubuntu
 
 EXPOSE 80
 EXPOSE 443
