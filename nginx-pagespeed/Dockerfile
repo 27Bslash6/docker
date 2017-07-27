@@ -4,7 +4,7 @@ EXPOSE 80
 EXPOSE 443
 
 # http://nginx.org/en/download.html
-ENV NGINX_VERSION 1.12.1
+ENV NGINX_VERSION 1.13.3
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
 ENV PAGESPEED_VERSION 1.12.34.2
@@ -76,7 +76,7 @@ RUN echo "Downloading nginx v${NGINX_VERSION} from http://nginx.org/download/ngi
 		--with-pcre-jit \
 		--with-openssl=/tmp/openssl-${OPENSSL_VERSION} \
         --add-module=/tmp/ngx_brotli \
-		--add-module=/tmp/ngx_pagespeed-${PAGESPEED_VERSION}-stable \
+		--add-dynamic-module=/tmp/ngx_pagespeed-${PAGESPEED_VERSION}-stable \
 		--add-module=/tmp/headers-more-nginx-module-${HEADERS_MORE_VERSION} && \
 	make && \
 	make install && \
