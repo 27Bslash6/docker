@@ -8,7 +8,7 @@ SOURCE_NAMESPACE=${BUILD_SOURCE_NAMESPACE:-"funkygibbon"}
 TAG=${BUILD_TAG:-"latest"}
 
 # http://nginx.org/en/download.html
-NGINX_VERSION=${BUILD_NGINX_VERSION:-"1.13.1"}
+NGINX_VERSION=${BUILD_NGINX_VERSION:-"1.13.3"}
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
 NGINX_PAGESPEED_VERSION=${BUILD_PAGESPEED_VERSION:-"latest"}

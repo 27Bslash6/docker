@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+echo "Building suite for $PROJECT_ID ..."
+
 TMPDIR=$(mktemp -d "${TMPDIR:-/tmp/}$(basename 0).XXXXXXXXXXXX")
 
 tar --exclude='.git/' -zcvf $TMPDIR/docker-source.tar.gz .
