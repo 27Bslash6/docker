@@ -18,38 +18,28 @@ RUN rm -fr /app/www && mkdir /app/www && \
     cp bin/wp.sh /usr/local/bin/wp && \
     chmod +x /usr/local/bin/wp
 
-# If set to true then will install Wordpress in /app/www overwriting any contents
-ENV OVERWRITE_FILES "false"
-
-ENV WP_TITLE "funkygibbon/wordpress"
-
-ENV WP_HOSTNAME ""
-
-ENV WP_DB_HOST "mysql"
-ENV WP_DB_NAME ""
-ENV WP_DB_USER ""
-ENV WP_DB_PASS ""
-ENV WP_DB_PREFIX "wp_"
-
-ENV WP_DB_CHARSET "utf8"
-ENV WP_DB_COLLATION ""
-
-ENV WP_FORCE_SSL_ADMIN "false"
-
-ENV WP_PLUGINS "wordfence;debug-bar"
-
-ENV WP_ADMIN_NAME ""
-ENV WP_ADMIN_USER ""
-ENV WP_ADMIN_PASS ""
-ENV WP_ADMIN_EMAIL ""
-
-ENV WP_VERSION "latest"
-ENV WP_LOCALE "en_AU"
-
-ENV WP_THEME_HTTP ""
-ENV WP_THEME_GIT ""
-ENV WP_THEME_USERNAME ""
-ENV WP_THEME_PASSWORD ""
-
-ENV SSH_DOMAIN_HOSTKEYS ""
+ENV WP_TITLE "funkygibbon/wordpress" \
+    WP_HOSTNAME "" \
+    WP_DB_HOST "mysql" \
+    WP_DB_PORT "3306" \ # unused
+    WP_DB_NAME "" \
+    WP_DB_USER ""  \
+    WP_DB_PASS "" \
+    WP_DB_PREFIX "wp_" \
+    WP_DB_CHARSET "utf8" \
+    WP_DB_COLLATION "" \
+    OVERWRITE_FILES "false" \
+    WP_FORCE_SSL_ADMIN "false" \
+    WP_PLUGINS "wordfence;debug-bar" \
+    WP_ADMIN_NAME "" \
+    WP_ADMIN_USER "" \
+    WP_ADMIN_PASS "" \
+    WP_ADMIN_EMAIL "" \
+    WP_VERSION "latest" \
+    WP_LOCALE "en_AU" \
+    WP_THEME_HTTP "" \
+    WP_THEME_GIT "" \
+    WP_THEME_USERNAME "" \
+    WP_THEME_PASSWORD "" \
+    SSH_DOMAIN_HOSTKEYS ""
 
