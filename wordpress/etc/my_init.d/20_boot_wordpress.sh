@@ -103,7 +103,8 @@ PHP
 
     if [ "${WP_HOSTNAME:-$APP_HOSTNAME}" == "" ]; then
         _warning "WP_HOSTNAME and APP_HOSTNAME are undefined, falling back to $(hostname)"
-        export WP_HOSTNAME=$(hostname)
+        export WP_HOSTNAME
+        WP_HOSTNAME=$(hostname)
     fi
 
     _good "wp core install ..."
@@ -150,4 +151,3 @@ wp_install
 plugin_install
 
 theme_install
-
