@@ -76,9 +76,9 @@ ENV DEFAULT_ADMIN_EMAIL nobody@example.com \
 
 COPY . /app
 
-RUN chmod 750 /app/bin/*
-
-RUN /app/bin/init_php.sh
+RUN chmod 750 /app/bin/* \
+    sync \
+    /app/bin/init_php.sh
 
 ENTRYPOINT ["/app/bin/boot.sh"]
 
