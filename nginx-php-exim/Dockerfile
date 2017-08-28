@@ -78,7 +78,8 @@ COPY . /app
 
 RUN chmod 750 /app/bin/* \
     sync \
-    /app/bin/init_php.sh
+    /app/bin/init_php.sh \
+    /app/bin/install_composer.sh
 
 ENTRYPOINT ["/app/bin/boot.sh"]
 
