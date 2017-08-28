@@ -10,19 +10,19 @@ RUN wget -O - https://download.newrelic.com/548C16BF.gpg | apt-key add - && \
 		php \
 		php-cli \
 		php-curl \
-        php-fpm \
+    php-fpm \
 		php-gd \
 		php-imagick \
 		php-imap \
-        php-intl \
-        php-mbstring \
+    php-intl \
+    php-mbstring \
 		php-mcrypt \
-        php-mysql \
-        php-memcached \
-        php-memcache \
-        php-recode \
-        php-redis \
-        php-soap \
+    php-mysql \
+    php-memcached \
+    php-memcache \
+    php-recode \
+    php-redis \
+    php-soap \
 		php-xdebug \
 		php-xml \
 		php-xsl \
