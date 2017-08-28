@@ -21,7 +21,7 @@ RUN rm -fr /app/www && mkdir /app/www && \
 ENV WP_TITLE "funkygibbon/wordpress" \
     WP_HOSTNAME "" \
     WP_DB_HOST "mysql" \
-    WP_DB_PORT "3306" \ # unused
+    WP_DB_PORT "3306" \
     WP_DB_NAME "" \
     WP_DB_USER ""  \
     WP_DB_PASS "" \
@@ -42,4 +42,3 @@ ENV WP_TITLE "funkygibbon/wordpress" \
     WP_THEME_USERNAME "" \
     WP_THEME_PASSWORD "" \
     SSH_DOMAIN_HOSTKEYS ""
-
