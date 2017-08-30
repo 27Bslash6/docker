@@ -76,9 +76,11 @@ ENV DEFAULT_ADMIN_EMAIL nobody@example.com \
 
 COPY . /app
 
-RUN chmod 750 /app/bin/* \
-    sync \
-    /app/bin/init_php.sh
+RUN chmod 750 /app/bin/* && \
+    sync && \
+    /app/bin/init_php.sh && \
+    /app/bin/install_composer.sh && \
+    cp /app/bin/composer.sh /usr/local/bin/composer
 
 ENTRYPOINT ["/app/bin/boot.sh"]
 
