@@ -6,31 +6,31 @@ RUN wget -O - https://download.newrelic.com/548C16BF.gpg | apt-key add - && \
     sh -c 'echo "deb http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list' && \
     apt-get update && \
     apt-get -y --no-install-recommends install \
-		exim4 \
-		php \
-		php-cli \
-		php-curl \
-    php-fpm \
-		php-gd \
-		php-imagick \
-		php-imap \
-    php-intl \
-    php-mbstring \
-		php-mcrypt \
-    php-mysql \
-    php-memcached \
-    php-memcache \
-    php-recode \
-    php-redis \
-    php-soap \
-		php-xdebug \
-		php-xml \
-		php-xsl \
-		php-zip \
-		newrelic-php5 && \
+		  exim4 \
+  		php \
+  		php-cli \
+  		php-curl \
+      php-fpm \
+  		php-gd \
+  		php-imagick \
+  		php-imap \
+      php-intl \
+      php-mbstring \
+  		php-mcrypt \
+      php-mysql \
+      php-memcached \
+      php-memcache \
+      php-recode \
+      php-redis \
+      php-soap \
+  		php-xdebug \
+  		php-xml \
+  		php-xsl \
+  		php-zip \
+	    newrelic-php5 && \
     newrelic-install install && \
-	apt-get clean && \
-    rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
+  	apt-get clean && \
+      rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
 RUN mkdir /root/bin/ && \
 	echo "export PATH=/root/bin:$PATH" > /root/.bashrc
