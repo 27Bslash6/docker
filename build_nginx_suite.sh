@@ -59,9 +59,9 @@ do
   echo -e "->> ${NAMESPACE}/${PROJECT}"
 
   ROOT_DIR=$(pwd)
-  if [ -d ${ROOT_DIR}/${PROJECT} ]; then
+  if [ -d "${ROOT_DIR}/${PROJECT}" ]; then
     PROJECT_DIR=$ROOT_DIR
-  elif [ -d ${ROOT_DIR}/externals/${PROJECT} ]; then
+  elif [ -d "${ROOT_DIR}/externals/${PROJECT}" ]; then
     PROJECT_DIR=${ROOT_DIR}/externals
   else
 #    _warning "ERROR :: Directory not found for: ${NAMESPACE}/${PROJECT}"
@@ -77,7 +77,7 @@ do
       SED_TARGET_LOCATION="."
   fi
 
-  if [ ! -e ${PROJECT_DIR}/${PROJECT}/Dockerfile ]; then
+  if [ ! -e "${PROJECT_DIR}/${PROJECT}/Dockerfile" ]; then
     echo -e "File does not exist: ${SED_TARGET_LOCATION}/${PROJECT}/Dockerfile"
     continue
   fi
