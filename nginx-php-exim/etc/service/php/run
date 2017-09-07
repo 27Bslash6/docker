@@ -10,6 +10,10 @@ source /app/bin/colours.sh
 # Ubuntu xenial php doesn't create /run/php, where it expects socket files to live
 chown -R ${APP_USER:-$DEFAULT_APP_USER} /run/php
 
+# replace PHP upstream
+_good "nginx:    upstream  ${NGINX_FASTCGI_BACKEND:-$DEFAULT_NGINX_FASTCGI_BACKEND}"
+sed -i -r "s/server:.*;/server: ${NGINX_FASTCGI_BACKEND:-$DEFAULT_NGINX_FASTCGI_BACKEND};/g" /etc/nginx/sites-enabled/upstream.conf
+
 # replace PHP Pool name
 POOL_NAME=`echo ${APP_HOSTNAME} | sed -e 's/[^a-zA-Z]/_/g'`
 _good "php:    pool name   ${POOL_NAME}"
