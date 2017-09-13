@@ -6,8 +6,11 @@ source /app/bin/colours.sh
 # Update nginx user
 sed -i -r "s/user\s+.+;/user ${APP_USER:-$DEFAULT_APP_USER};/g" /etc/nginx/nginx.conf
 
-# If APP_HOSTNAME is not set, use default `hostname`
-APP_HOSTNAME=${APP_HOSTNAME:-$(hostname)}
+IFS=',' read -r -a VIRTUAL_HOSTNAMES <<< "${VIRTUAL_HOST}"
+
+# If APP_HOSTNAME is not set, try first in list of VIRTUAL_HOST, then simply hostname
+# VIRTUAL_HOST is for use behind jwilder/nginx-proxy
+APP_HOSTNAME=${APP_HOSTNAME:-${VIRTUAL_HOSTNAMES[0]:-$(hostname)}}
 
 _good "nginx:  server_name ${APP_HOSTNAME}"
 sed -i -r "s/example.com/${APP_HOSTNAME}/g" /etc/nginx/sites-enabled/default.conf
@@ -78,4 +81,6 @@ _good "nginx:  updating cloudflare IP ranges"
 /app/bin/cloudflare-ip-updater.sh
 
 wait # for openssl dhparam generation to finish
+
+_good "Starting nginx service ..."
 exec nginx
