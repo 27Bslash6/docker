@@ -79,7 +79,7 @@ else
 	useradd -r -s /usr/sbin/nologin -G nginx -u ${APP_UID:-$DEFAULT_APP_UID} -g ${APP_GROUP:-$DEFAULT_APP_GROUP} ${APP_USER:-$DEFAULT_APP_USER}
 fi
 
-if [ "${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}" = "true" ] ; then
+if [[ "${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}" == "true" ]] && [ -d "/app/www" ] ; then
 	_good "chown ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www"
 	chown -Rf ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www
-fi 
+fi
