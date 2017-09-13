@@ -81,4 +81,6 @@ _good "nginx:  updating cloudflare IP ranges"
 /app/bin/cloudflare-ip-updater.sh
 
 wait # for openssl dhparam generation to finish
+
+_good "Starting nginx service ..."
 exec nginx
