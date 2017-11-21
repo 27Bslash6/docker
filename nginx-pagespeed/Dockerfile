@@ -17,7 +17,7 @@ ENV NGINX_PAGESPEED_RELEASE_STATUS stable
 ENV HEADERS_MORE_VERSION 0.32
 
 # https://www.openssl.org/source
-ENV OPENSSL_VERSION 1.1.0f
+ENV OPENSSL_VERSION 1.1.0g
 
 COPY ./bin/download_pagespeed.sh /app/bin/download_pagespeed.sh
 
