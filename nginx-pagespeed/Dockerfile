@@ -6,7 +6,7 @@ EXPOSE 443
 # http://nginx.org/en/download.html
 ENV NGINX_VERSION 1.13.9
 
-# https://github.com/pagespeed/ngx_pagespeed/releases
+# https://github.com/apache/incubator-pagespeed-ngx/releases
 ENV NGINX_PAGESPEED_VERSION latest
 ENV NGINX_PAGESPEED_RELEASE_STATUS stable
 
@@ -22,9 +22,9 @@ ENV OPENSSL_VERSION 1.1.0g
 COPY ./bin/download_pagespeed.sh /app/bin/download_pagespeed.sh
 
 RUN chmod 750 /app/bin/*.sh && \
-    useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/nginx && \
+	useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/nginx && \
 	apt-get update && \
-	apt-get -y --no-install-recommends install wget git-core autoconf automake libtool build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
+	apt-get -y --no-install-recommends install wget git-core autoconf automake libtool build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev uuid-dev && \
 	echo "Downloading nginx ${NGINX_VERSION} from http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz ..." && \
 	wget -O - http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz --progress=bar --tries=3 | tar zxf - -C /tmp && \
 	echo "Downloading headers-more ${HEADERS_MORE_VERSION} from https://github.com/openresty/headers-more-nginx-module/archive/v${HEADERS_MORE_VERSION}.tar.gz ..." && \
@@ -75,7 +75,7 @@ RUN chmod 750 /app/bin/*.sh && \
 		--with-pcre-jit \
 		--with-openssl=/tmp/openssl-${OPENSSL_VERSION} \
         --add-module=/tmp/headers-more-nginx-module-${HEADERS_MORE_VERSION} \
-		--add-module=/tmp/ngx_pagespeed-${NGINX_PAGESPEED_VERSION}-${NGINX_PAGESPEED_RELEASE_STATUS}  && \
+		--add-module=/tmp/incubator-pagespeed-ngx-${NGINX_PAGESPEED_VERSION}-${NGINX_PAGESPEED_RELEASE_STATUS} && \
 	make && \
 	make install && \
 	apt-get purge -yqq automake autoconf libtool git-core build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
@@ -87,9 +87,9 @@ ENV DEFAULT_APP_USER app
 ENV DEFAULT_APP_GROUP app
 ENV DEFAULT_APP_UID 1000
 ENV DEFAULT_APP_GID 1000
+ENV DEFAULT_CHOWN_APP_DIR true
 ENV DEFAULT_UPLOAD_MAX_SIZE 30M
 ENV DEFAULT_NGINX_MAX_WORKER_PROCESSES 8
-ENV DEFAULT_CHOWN_APP_DIR true
 
 ENV DEFAULT_PAGESPEED_REBEACON_KEY uwuudeL7iedoo7Meengi
 
@@ -98,6 +98,6 @@ ENV SSL_ENABLED true
 COPY . /app
 
 RUN chmod 750 /app/bin/*.sh && sync && \
-    /app/bin/init_nginx.sh
+	/app/bin/init_nginx.sh
 
 CMD ["/sbin/my_init"]
