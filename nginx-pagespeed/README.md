@@ -51,7 +51,7 @@ CHOWN_APP_DIR | false | If true `chown` `/app/www` as `APP_USER:APP_GROUP`
 
 Nginx is compiled from mainline source according to Ubuntu compile flags, with the following modifications:
 - OpenSSL 1.1.0g sources - https://www.openssl.org/source/
-- Google Pagespeed nginx module - https://github.com/pagespeed/ngx_pagespeed/releases
+- Google Pagespeed nginx module - https://github.com/apache/incubator-pagespeed-ngx/releases
 - headers-more nginx module - https://github.com/openresty/headers-more-nginx-module/tags
 - `http_ssi_module` and `http_autoindex_module` disabled
 
