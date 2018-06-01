@@ -4,7 +4,7 @@ EXPOSE 80
 EXPOSE 443
 
 # http://nginx.org/en/download.html
-ENV NGINX_VERSION 1.13.9
+ENV NGINX_VERSION 1.13.12
 
 # https://github.com/apache/incubator-pagespeed-ngx/releases
 ENV NGINX_PAGESPEED_VERSION latest
