@@ -22,11 +22,11 @@ HEADERS_MORE_VERSION=${BUILD_HEADERS_MORE_VERSION:-"0.33"}
 
 PHP_VERSION=${BUILD_PHP_VERSION:-"7.3"}
 
-PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "magento2" "wordpress" "wordpress-stateless" "nginx-proxy")
+PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "wordpress")
 
 #git submodule update --init
 
-source externals/ubuntu/bin/colours.sh
+# source externals/ubuntu/bin/colours.sh
 
 # Toggle building images,
 # If set to 0 only updates variables in version numbers
