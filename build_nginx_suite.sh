@@ -8,19 +8,19 @@ SOURCE_NAMESPACE=${BUILD_SOURCE_NAMESPACE:-"funkygibbon"}
 TAG=${BUILD_TAG:-"latest"}
 
 # http://nginx.org/en/download.html
-NGINX_VERSION=${BUILD_NGINX_VERSION:-"1.13.3"}
+NGINX_VERSION=${BUILD_NGINX_VERSION:-"1.17.4"}
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
 NGINX_PAGESPEED_VERSION=${BUILD_PAGESPEED_VERSION:-"latest"}
 NGINX_PAGESPEED_RELEASE_STATUS=${BUILD_PAGESPEED_RELEASE_STATUS:-"stable"}
 
 # https://www.openssl.org/source
-OPENSSL_VERSION=${BUILD_OPENSSL_VERSION:-"1.1.0f"}
+OPENSSL_VERSION=${BUILD_OPENSSL_VERSION:-"1.1.0l"}
 
 # https://github.com/openresty/headers-more-nginx-module/tags
-HEADERS_MORE_VERSION=${BUILD_OPENSSL_VERSION:-"0.32"}
+HEADERS_MORE_VERSION=${BUILD_HEADERS_MORE_VERSION:-"0.33"}
 
-PHP_VERSION=${BUILD_OPENSSL_VERSION:-"7.0"}
+PHP_VERSION=${BUILD_PHP_VERSION:-"7.3"}
 
 PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "magento2" "wordpress" "wordpress-stateless" "nginx-proxy")
 
