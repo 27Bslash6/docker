@@ -2,33 +2,30 @@ FROM funkygibbon/nginx-pagespeed
 
 MAINTAINER Ray Walker <hello@raywalker.it>
 
-RUN wget -O - https://download.newrelic.com/548C16BF.gpg | apt-key add - && \
-    sh -c 'echo "deb http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list' && \
+ENV PHP_VERSION 7.3
+
+RUN wget --retry-connrefused --waitretry=1 -t 5 -O - https://download.newrelic.com/548C16BF.gpg | apt-key add - && \
+    echo "deb http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list && \
+    add-apt-repository ppa:ondrej/php && \
     apt-get update && \
     apt-get -y --no-install-recommends install \
-		exim4 \
-		php \
-		php-cli \
-		php-curl \
-        php-fpm \
-		php-gd \
-		php-imagick \
-		php-imap \
-        php-intl \
-        php-mbstring \
-		php-mcrypt \
-        php-mysql \
-        php-memcached \
-        php-memcache \
-        php-recode \
-        php-redis \
-        php-soap \
-		php-xdebug \
-		php-xml \
-		php-xsl \
-		php-zip \
-		newrelic-php5 && \
-    newrelic-install install && \
+      newrelic-php5 \
+      php${PHP_VERSION} \
+      php${PHP_VERSION}-cli \
+      php${PHP_VERSION}-curl \
+      php${PHP_VERSION}-fpm \
+      php${PHP_VERSION}-gd \
+      php${PHP_VERSION}-imagick \
+      php${PHP_VERSION}-mbstring \
+      php${PHP_VERSION}-mysql \
+      php${PHP_VERSION}-recode \
+      php${PHP_VERSION}-redis \
+      php${PHP_VERSION}-xml \
+      php${PHP_VERSION}-zip \
+      exim4 \
+  		newrelic-php5 \
+      && \
+  newrelic-install install && \
 	apt-get clean && \
     rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
@@ -38,7 +35,6 @@ RUN mkdir /root/bin/ && \
 EXPOSE 443
 EXPOSE 80
 
-ENV PHP_VERSION 7.0
 
 ENV DEFAULT_ADMIN_EMAIL nobody@example.com
 ENV DEFAULT_APP_ENV production
@@ -51,7 +47,7 @@ ENV DEFAULT_APP_UID 1000
 ENV DEFAULT_APP_GID 1000
 ENV DEFAULT_UPLOAD_MAX_SIZE 30M
 ENV DEFAULT_NGINX_MAX_WORKER_PROCESSES 8
-ENV DEFAULT_NGINX_KEEPALIVE_TIMEOUT 30 
+ENV DEFAULT_NGINX_KEEPALIVE_TIMEOUT 30
 ENV DEFAULT_PHP_MEMORY_LIMIT 128M
 ENV DEFAULT_PHP_MAX_EXECUTION_TIME 300
 ENV DEFAULT_PHP_MAX_INPUT_VARS 2000

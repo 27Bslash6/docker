@@ -4,7 +4,7 @@ EXPOSE 80
 EXPOSE 443
 
 # http://nginx.org/en/download.html
-ENV NGINX_VERSION 1.13.12
+ENV NGINX_VERSION 1.17.4
 
 # https://github.com/apache/incubator-pagespeed-ngx/releases
 ENV NGINX_PAGESPEED_VERSION latest
@@ -14,10 +14,10 @@ ENV NGINX_PAGESPEED_RELEASE_STATUS stable
 #ENV PAGESPEED_PSOL_VERSION 1.11.33.4
 
 # https://github.com/openresty/headers-more-nginx-module/tags
-ENV HEADERS_MORE_VERSION 0.32
+ENV HEADERS_MORE_VERSION 0.33
 
 # https://www.openssl.org/source
-ENV OPENSSL_VERSION 1.1.0g
+ENV OPENSSL_VERSION 1.1.0l
 
 COPY ./bin/download_pagespeed.sh /app/bin/download_pagespeed.sh
 
