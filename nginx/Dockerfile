@@ -79,10 +79,8 @@ ENV DEFAULT_CHOWN_APP_DIR true
 
 ENV SSL_ENABLED true
 
-COPY . /app
+COPY . /app/
 
 RUN chmod 750 /app/bin/*.sh
 
 RUN /app/bin/init_nginx.sh
-
-CMD ["/sbin/my_init"]

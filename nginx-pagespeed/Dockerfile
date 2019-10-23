@@ -95,9 +95,7 @@ ENV DEFAULT_PAGESPEED_REBEACON_KEY uwuudeL7iedoo7Meengi
 
 ENV SSL_ENABLED true
 
-COPY . /app
+COPY . /app/
 
 RUN chmod 750 /app/bin/*.sh && sync && \
 	/app/bin/init_nginx.sh
-
-CMD ["/sbin/my_init"]

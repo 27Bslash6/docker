@@ -71,12 +71,8 @@ ENV DEFAULT_EXIM_SMARTHOST_AUTH_PASSWORD password_123
 ENV DEFAULT_NEWRELIC_ENABLED true
 ENV DEFAULT_NEWRELIC_LICENSE DISABLED
 
-COPY . /app
+COPY . /app/
 
 RUN chmod 750 /app/bin/*
 
 RUN /app/bin/init_php.sh
-
-ENTRYPOINT ["/app/bin/boot.sh"]
-
-CMD ["/sbin/my_init"]

@@ -13,8 +13,6 @@ COPY . /app/
 WORKDIR /app
 
 RUN rm -fr /app/www && mkdir /app/www && \
-    cp -R etc/* /etc/ && \
-    chmod +x /etc/my_init.d/20_boot_wordpress.sh && \
     cp bin/wp.sh /usr/local/bin/wp && \
     chmod +x /usr/local/bin/wp
 
@@ -52,4 +50,3 @@ ENV WP_THEME_USERNAME ""
 ENV WP_THEME_PASSWORD ""
 
 ENV SSH_DOMAIN_HOSTKEYS ""
-
