@@ -3,7 +3,6 @@
 set -e
 
 NAMESPACE=${BUILD_NAMESPACE:-"funkygibbon"}
-SOURCE_NAMESPACE=${BUILD_SOURCE_NAMESPACE:-"funkygibbon"}
 
 TAG=${BUILD_TAG:-"latest"}
 
