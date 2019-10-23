@@ -1,41 +1,10 @@
 #!/bin/bash
 set -e
 
-cp -R /app/etc/* /etc
-
-chmod 750 /etc/service/*/run
-
 mkdir -p /run/php
 
 # make terminal programs happy, eg. vim, less
 echo "export TERM=xterm-256color" >> /root/.bashrc
-
-# PHP-FPM
-sed -i -r "s/fastcgi_pass unix:.*;/fastcgi_pass unix:\/run\/php\/php${PHP_VERSION}-fpm\.sock;/g" /etc/nginx/sites-enabled/default.conf
-sed -i -r "s/fastcgi_pass unix:.*;/fastcgi_pass unix:\/run\/php\/php${PHP_VERSION}-fpm\.sock;/g" /etc/nginx/sites-enabled/default-ssl.conf
-
-# Backup original information
-cp /etc/php/${PHP_VERSION}/fpm/php.ini /etc/php/${PHP_VERSION}/fpm/php.ini.dist
-cp /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf.dist
-
-mkdir -p /app/xdebug
-
-echo "display_errors=On" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
-echo "html_errors=On" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
-echo "xdebug.default_enable=0"  >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
-echo "xdebug.remote_enable=0"  >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
-echo "xdebug.remote_autostart=0"  >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
-echo "xdebug.remote_handler=dbgp"  >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
-echo "xdebug.ide_key=default_ide_key"  >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
-echo "xdebug.remote_host=172.17.42.1" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
-echo "xdebug.remote_port=9000" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
-echo "xdebug.profiler_enable=0" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
-echo "xdebug.profiler_enable_trigger=0" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
-echo "xdebug.profiler_output_dir=/app/xdebug" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
-echo "xdebug.var_display_max_children=256" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
-
-# Newrelic
-sed -i -r "s/;newrelic.enabled =/newrelic.enabled =/g" /etc/php/${PHP_VERSION}/mods-available/newrelic.ini
 
 # Remove duplicate newrelic.ini files. Solves "Module 'newrelic' already loaded" warning message
 # See: https://discuss.newrelic.com/t/php-warning-module-newrelic-already-loaded-in-unknown-on-line-0/2903/21

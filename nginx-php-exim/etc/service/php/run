@@ -3,9 +3,121 @@ set -euf
 
 source /app/bin/colours.sh
 
+
+_title "Starting config in ${APP_ENV:-$DEFAULT_APP_ENV} mode ..."
+
+export APP_HOSTNAME=${APP_HOSTNAME:-`hostname -f`}
+
+_good "host:   ${APP_HOSTNAME}"
+
+# =============================================================================
+# 	EXIM4
+# =============================================================================
+
+if [[ "${EXIM_DELIVERY_MODE:-$DEFAULT_EXIM_DELIVERY_MODE}" = "smarthost" ]] ; then
+
+	# -------------------------------------------------------------------------
+	# 	SMARTHOST
+	# -------------------------------------------------------------------------
+
+	_good "exim4:  smarthost"
+
+	if [[ "${EXIM_SMARTHOST_AUTH_USERNAME:-$DEFAULT_EXIM_SMARTHOST_AUTH_USERNAME}" = "postmaster@example.com" ]] ; then
+
+		_warning "exim4:  Your username is 'postmaster@example.com'"
+		_warning "        Please rebuild using EXIM_SMARTHOST_AUTH_USERNAME and EXIM_SMARTHOST_AUTH_PASSWORD"
+		_warning "        $ docker run -e \"EXIM_SMARTHOST_AUTH_USERNAME=foo\" etc"
+		_error "Quitting"
+
+	else
+
+		_good "exim4:  *:${EXIM_SMARTHOST_AUTH_USERNAME:-$DEFAULT_EXIM_SMARTHOST_AUTH_USERNAME}:********"
+
+		echo "*:${EXIM_SMARTHOST_AUTH_USERNAME:-$DEFAULT_EXIM_SMARTHOST_AUTH_USERNAME}:${EXIM_SMARTHOST_AUTH_PASSWORD:-$DEFAULT_EXIM_SMARTHOST_AUTH_PASSWORD}" > /etc/exim4/passwd.client
+		# Configure exim4 mta smarthost to use sendgrid or mailgun
+		sed -i -r "s/dc_eximconfig_configtype='[a-z]*'/dc_eximconfig_configtype='smarthost'/" /etc/exim4/update-exim4.conf.conf
+
+		_good "exim4:  relay: ${EXIM_SMARTHOST:-$DEFAULT_EXIM_SMARTHOST}"
+		sed -i -r "s/dc_smarthost=.*/dc_smarthost='${EXIM_SMARTHOST:-$DEFAULT_EXIM_SMARTHOST}'/" /etc/exim4/update-exim4.conf.conf
+
+		_good "exim4:  from:  ${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}"
+		sed -i -r "s/dc_readhost='.*'/dc_readhost='${EXIM_MAIL_FROM:-$DEFAULT_EXIM_MAIL_FROM}'/" /etc/exim4/update-exim4.conf.conf
+
+		sed -i -r "s/dc_hide_mailname=''/dc_hide_mailname='true'/" /etc/exim4/update-exim4.conf.conf
+
+	fi
+
+else
+
+	# -------------------------------------------------------------------------
+	# 	LOCAL
+	# -------------------------------------------------------------------------
+
+	_good "exim4:  local"
+
+	sed -i -r "s/dc_eximconfig_configtype=.*/dc_eximconfig_configtype='local'/g" /etc/exim4/update-exim4.conf.conf
+	sed -i -r "s/dc_smarthost=.*/dc_smarthost=''/g" /etc/exim4/update-exim4.conf.conf
+	sed -i -r "s/dc_hide_mailname=.*/dc_hide_mailname='true'/g" /etc/exim4/update-exim4.conf.conf
+
+	_good "exim4:  rm /etc/exim4/passwd.client"
+	rm -f /etc/exim4/passwd.client
+
+fi
+
+# -----------------------------------------------------------------------------
+#   EXIM email redirect
+# -----------------------------------------------------------------------------
+
+if [[ "${APP_ENV:-$DEFAULT_APP_ENV}" = "development" ]]; then
+
+	if [[ ${ADMIN_EMAIL:-$DEFAULT_ADMIN_EMAIL} = "nobody@example.com" ]]; then
+		echo " ** WARNING ** admin email is default - nobody@example.com - emails will disappear into the void"
+	fi
+
+	_good "exim4:  re-routing all outgoing email to ${ADMIN_EMAIL:-$DEFAULT_ADMIN_EMAIL}"
+	echo -e "catch_all_outgoing:\n  debug_print = \"R: redirecting email for \$local_part@\$domain\"\n  driver = redirect\n  domains = ! +local_domains\n  allow_fail\n  data = ${ADMIN_EMAIL:-$DEFAULT_ADMIN_EMAIL}\n  no_more\n" > /etc/exim4/conf.d/router/190_exim4-config_intercept
+
+	update-exim4.conf.template -r
+
+else
+	rm -fr /etc/exim4/conf.d/router/190_exim4-config_intercept
+fi
+
+_good "exim4:  restarting service ..."
+rm -f /etc/exim4/exim4.conf.template.bak*
+service exim4 restart >> /dev/null &
+
+
 # =============================================================================
 # 	PHP-FPM
 # =============================================================================
+
+# PHP-FPM
+sed -i -r "s/fastcgi_pass unix:.*;/fastcgi_pass unix:\/run\/php\/php${PHP_VERSION}-fpm\.sock;/g" /etc/nginx/sites-enabled/default.conf
+sed -i -r "s/fastcgi_pass unix:.*;/fastcgi_pass unix:\/run\/php\/php${PHP_VERSION}-fpm\.sock;/g" /etc/nginx/sites-enabled/default-ssl.conf
+
+# Backup original information
+cp /etc/php/${PHP_VERSION}/fpm/php.ini /etc/php/${PHP_VERSION}/fpm/php.ini.dist
+cp /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf.dist
+
+mkdir -p /app/xdebug
+
+echo "display_errors=On" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "html_errors=On" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.default_enable=0"  >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.remote_enable=0"  >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.remote_autostart=0"  >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.remote_handler=dbgp"  >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.ide_key=default_ide_key"  >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.remote_host=172.17.42.1" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.remote_port=9000" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.profiler_enable=0" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.profiler_enable_trigger=0" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.profiler_output_dir=/app/xdebug" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+echo "xdebug.var_display_max_children=256" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini
+
+# Newrelic
+sed -i -r "s/;newrelic.enabled =/newrelic.enabled =/g" /etc/php/${PHP_VERSION}/mods-available/newrelic.ini
 
 # Ubuntu xenial php doesn't create /run/php, where it expects socket files to live
 chown -R ${APP_USER:-$DEFAULT_APP_USER} /run/php
