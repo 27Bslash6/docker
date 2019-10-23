@@ -14,7 +14,7 @@ ENV OPENSSL_VERSION 1.1.0l
 
 RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/nginx
 RUN	apt-get update && \
-	apt-get -y install wget git-core perl libc6-dev autoconf automake libtool build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
+	apt-get -y install wget git-core perl libc6-dev autoconf automake libtool build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
 	echo "Downloading nginx v${NGINX_VERSION} from http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz ..." && wget -O - http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz --progress=bar --tries=3 | tar zxf - -C /tmp && \
     echo "Downloading headers-more v${HEADERS_MORE_VERSION} from https://github.com/openresty/headers-more-nginx-module/archive/v${HEADERS_MORE_VERSION}.tar.gz ..." && wget -O - https://github.com/openresty/headers-more-nginx-module/archive/v${HEADERS_MORE_VERSION}.tar.gz --progress=bar --tries=3 | tar zxf - -C /tmp && \
     echo "Downloading openssl v${OPENSSL_VERSION} from https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz ..." && wget -O - https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz --progress=bar --tries=3 | tar xzf  - -C /tmp && \
@@ -64,7 +64,7 @@ RUN	apt-get update && \
 		--add-module=/tmp/headers-more-nginx-module-${HEADERS_MORE_VERSION} && \
 	make && \
 	make install && \
-	apt-get purge -yqq build-essential autoconf automake libtool git-core zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgd2-xpm-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
+	apt-get purge -yqq build-essential autoconf automake libtool git-core zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
 	apt-get autoremove -yqq && \
 	apt-get clean && \
 	rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
