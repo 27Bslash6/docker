@@ -24,9 +24,5 @@ steps:
   id: 'wordpress'
   args: ['build', '--tag=gcr.io/$PROJECT_ID/wordpress', './wordpress']
   waitFor: ['nginx-php-exim']
-- name: 'gcr.io/cloud-builders/docker'
-  id: 'wordpress-stateless'
-  args: ['build', '--tag=gcr.io/$PROJECT_ID/wordpress-stateless', './wordpress-stateless']
-  waitFor: ['wordpress']
 
 images: ['gcr.io/$PROJECT_ID/nginx', 'gcr.io/$PROJECT_ID/nginx-pagespeed', 'gcr.io/$PROJECT_ID/nginx-php-exim', 'gcr.io/$PROJECT_ID/wordpress', 'gcr.io/$PROJECT_ID/wordpress-stateless']
