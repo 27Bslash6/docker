@@ -1,4 +1,4 @@
-FROM funkygibbon/nginx-pagespeed
+FROM funkygibbon/nginx-pagespeed:latest
 
 MAINTAINER Ray Walker <hello@raywalker.it>
 

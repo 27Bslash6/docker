@@ -10,21 +10,18 @@ ENV NGINX_VERSION 1.17.4
 ENV NGINX_PAGESPEED_VERSION latest
 ENV NGINX_PAGESPEED_RELEASE_STATUS stable
 
-# Releases after 1.11.33.4 there will be a PSOL_BINARY_URL file that tells us where to look, until then this is hardcoded
-#ENV PAGESPEED_PSOL_VERSION 1.11.33.4
-
 # https://github.com/openresty/headers-more-nginx-module/tags
 ENV HEADERS_MORE_VERSION 0.33
 
 # https://www.openssl.org/source
-ENV OPENSSL_VERSION 1.1.0l
+ENV OPENSSL_VERSION 1.1.1d
 
 COPY ./bin/download_pagespeed.sh /app/bin/download_pagespeed.sh
 
 RUN chmod 750 /app/bin/*.sh && \
 	useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/nginx && \
-	apt-get update && \
-	apt-get -y --no-install-recommends install wget git-core autoconf automake libtool build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgeoip-dev libgoogle-perftools-dev libperl-dev uuid-dev && \
+	apt-fast update && \
+	apt-fast -y --no-install-recommends install wget git-core autoconf automake libtool build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgeoip-dev libgoogle-perftools-dev libperl-dev uuid-dev && \
 	echo "Downloading nginx ${NGINX_VERSION} from http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz ..." && \
 	wget -O - http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz --progress=bar --tries=3 | tar zxf - -C /tmp && \
 	echo "Downloading headers-more ${HEADERS_MORE_VERSION} from https://github.com/openresty/headers-more-nginx-module/archive/v${HEADERS_MORE_VERSION}.tar.gz ..." && \
@@ -78,9 +75,9 @@ RUN chmod 750 /app/bin/*.sh && \
 		--add-module=/tmp/incubator-pagespeed-ngx-${NGINX_PAGESPEED_VERSION}-${NGINX_PAGESPEED_RELEASE_STATUS} && \
 	make && \
 	make install && \
-	apt-get purge -yqq automake autoconf libtool git-core build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
-	apt-get autoremove -yqq && \
-	apt-get clean && \
+	apt-fast purge -yqq automake autoconf libtool git-core build-essential zlib1g-dev libpcre3-dev libxslt1-dev libxml2-dev libgeoip-dev libgoogle-perftools-dev libperl-dev && \
+	apt-fast autoremove -yqq && \
+	apt-fast clean && \
 	rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
 ENV DEFAULT_APP_USER app
@@ -93,7 +90,7 @@ ENV DEFAULT_NGINX_MAX_WORKER_PROCESSES 8
 
 ENV DEFAULT_PAGESPEED_REBEACON_KEY uwuudeL7iedoo7Meengi
 
-ENV SSL_ENABLED true
+ENV SSL_ENABLED false
 
 COPY . /app/
 

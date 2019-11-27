@@ -1,6 +1,6 @@
 # Nginx + OpenSSL
 
-![nginx 1.17.4](https://img.shields.io/badge/nginx-1.17.4-brightgreen.svg) ![OpenSSL 1.1.0l](https://img.shields.io/badge/OpenSSL-1.1.0l-brightgreen.svg)
+![nginx 1.17.4](https://img.shields.io/badge/nginx-1.17.4-brightgreen.svg) ![OpenSSL 1.1.1d](https://img.shields.io/badge/OpenSSL-1.1.1d-brightgreen.svg)
 
 
 Built on [funkygibbon/ubuntu](https://registry.hub.docker.com/u/funkygibbon/ubuntu/), a lightly modified Ubuntu Xenial [Phusion Base Image](https://phusion.github.io/baseimage-docker/).
@@ -50,7 +50,7 @@ CHOWN_APP_DIR | false | If true `chown` `/app/www` as `APP_USER:APP_GROUP`
 ### Security
 
 Nginx is compiled from mainline source according to Ubuntu compile flags, with the following modifications:
-- OpenSSL 1.1.0l sources - https://www.openssl.org/source/
+- OpenSSL 1.1.1d sources - https://www.openssl.org/source/
 - headers-more nginx module - https://github.com/openresty/headers-more-nginx-module/tags
 - `http_ssi_module` and `http_autoindex_module` disabled
 
@@ -65,6 +65,5 @@ HTTPS is configured using modern sane defaults, including
 
 - nginx user is set to `${APP_USER:-$DEFAULT_APP_USER}` (default is nginx)
 - creates user and group from `{APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP}`, some sanity checks for matching UID / GID in the event that user/group already exists
-- if `${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}` is true, `chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www`  (default false)
 - `worker_processes` is set to the number of available processor cores and adjusts `/etc/nginx/nginx.conf` to match, up to a maximum number of cores `${NGINX_MAX_WORKER_PROCESSES:-$DEFAULT_MAX_WORKER_PROCESSES}`
 - `client_max_body_size` is set to `${UPLOAD_MAX_SIZE:-$DEFAULT_UPLOAD_MAX_SIZE}`
