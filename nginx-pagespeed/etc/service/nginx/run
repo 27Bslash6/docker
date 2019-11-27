@@ -18,6 +18,7 @@ if [ "${SSL_ENABLED}" = "false" ] ; then
 
 	_good "nginx:  SSL disabled"
 	rm -f /etc/nginx/sites-enabled/default-ssl.conf
+	touch /etc/nginx/sites-enabled/default-ssl.conf
 else
 	# SSL enabled
 
