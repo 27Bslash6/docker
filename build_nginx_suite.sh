@@ -21,7 +21,7 @@ HEADERS_MORE_VERSION=${BUILD_HEADERS_MORE_VERSION:-"0.33"}
 
 PHP_VERSION=${BUILD_PHP_VERSION:-"7.3"}
 
-PROJECTS=("nginx" "nginx-pagespeed" "nginx-php-exim" "wordpress")
+PROJECTS=("nginx-pagespeed" "nginx-php-exim" "php-fpm" "wordpress" "nginx")
 
 #git submodule update --init
 
