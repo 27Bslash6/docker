@@ -1,6 +1,6 @@
 # Nginx + OpenSSL
 
-![nginx 1.17.4](https://img.shields.io/badge/nginx-1.17.4-brightgreen.svg) ![OpenSSL 1.1.1d](https://img.shields.io/badge/OpenSSL-1.1.1d-brightgreen.svg)
+![nginx 1.21.4](https://img.shields.io/badge/nginx-1.21.4-brightgreen.svg) ![OpenSSL 1.1.1l](https://img.shields.io/badge/OpenSSL-1.1.1l-brightgreen.svg)
 
 
 Built on [funkygibbon/ubuntu](https://registry.hub.docker.com/u/funkygibbon/ubuntu/), a lightly modified Ubuntu Xenial [Phusion Base Image](https://phusion.github.io/baseimage-docker/).
@@ -50,7 +50,7 @@ CHOWN_APP_DIR | false | If true `chown` `/app/www` as `APP_USER:APP_GROUP`
 ### Security
 
 Nginx is compiled from mainline source according to Ubuntu compile flags, with the following modifications:
-- OpenSSL 1.1.1d sources - https://www.openssl.org/source/
+- OpenSSL 1.1.1l sources - https://www.openssl.org/source/
 - headers-more nginx module - https://github.com/openresty/headers-more-nginx-module/tags
 - `http_ssi_module` and `http_autoindex_module` disabled
 

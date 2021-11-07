@@ -1,36 +1,35 @@
 FROM funkygibbon/nginx-pagespeed:latest
 
-MAINTAINER Ray Walker <hello@raywalker.it>
+LABEL maintainer="Ray Walker <hello@raywalker.it>" 
 
-ENV PHP_VERSION 7.3
+ENV PHP_VERSION 7.4
 
 RUN wget --retry-connrefused --waitretry=1 -t 5 -O - https://download.newrelic.com/548C16BF.gpg | apt-key add - && \
-    echo "deb http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list && \
-    add-apt-repository ppa:ondrej/php && \
-    apt-get update && \
-    apt-get -y --no-install-recommends install \
-      newrelic-php5 \
-      php${PHP_VERSION} \
-      php${PHP_VERSION}-cli \
-      php${PHP_VERSION}-curl \
-      php${PHP_VERSION}-fpm \
-      php${PHP_VERSION}-gd \
-      php${PHP_VERSION}-imagick \
-      php${PHP_VERSION}-mbstring \
-      php${PHP_VERSION}-mysql \
-      php${PHP_VERSION}-recode \
-      php${PHP_VERSION}-redis \
-      php${PHP_VERSION}-xml \
-      php${PHP_VERSION}-zip \
-      exim4 \
-  		newrelic-php5 \
-      && \
+  echo "deb http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list && \
+  add-apt-repository ppa:ondrej/php && \
+  apt-get update && \
+  apt-get -y --no-install-recommends install \
+  newrelic-php5 \
+  php${PHP_VERSION} \
+  php${PHP_VERSION}-cli \
+  php${PHP_VERSION}-curl \
+  php${PHP_VERSION}-fpm \
+  php${PHP_VERSION}-gd \
+  php${PHP_VERSION}-imagick \
+  php${PHP_VERSION}-mbstring \
+  php${PHP_VERSION}-mysql \
+  php${PHP_VERSION}-redis \
+  php${PHP_VERSION}-xml \
+  php${PHP_VERSION}-zip \
+  exim4 \
+  newrelic-php5 \
+  && \
   newrelic-install install && \
-	apt-get clean && \
-    rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
+  apt-get clean && \
+  rm -Rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
 RUN mkdir /root/bin/ && \
-	echo "export PATH=/root/bin:$PATH" > /root/.bashrc
+  echo "export PATH=/root/bin:$PATH" > /root/.bashrc
 
 EXPOSE 443
 EXPOSE 80

@@ -7,19 +7,19 @@ NAMESPACE=${BUILD_NAMESPACE:-"funkygibbon"}
 TAG=${BUILD_TAG:-"latest"}
 
 # http://nginx.org/en/download.html
-NGINX_VERSION=${BUILD_NGINX_VERSION:-"1.17.4"}
+NGINX_VERSION=${BUILD_NGINX_VERSION:-"1.21.4"}
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
 NGINX_PAGESPEED_VERSION=${BUILD_PAGESPEED_VERSION:-"latest"}
 NGINX_PAGESPEED_RELEASE_STATUS=${BUILD_PAGESPEED_RELEASE_STATUS:-"stable"}
 
 # https://www.openssl.org/source
-OPENSSL_VERSION=${BUILD_OPENSSL_VERSION:-"1.1.1d"}
+OPENSSL_VERSION=${BUILD_OPENSSL_VERSION:-"1.1.1l"}
 
 # https://github.com/openresty/headers-more-nginx-module/tags
 HEADERS_MORE_VERSION=${BUILD_HEADERS_MORE_VERSION:-"0.33"}
 
-PHP_VERSION=${BUILD_PHP_VERSION:-"7.3"}
+PHP_VERSION=${BUILD_PHP_VERSION:-"7.4"}
 
 PROJECTS=("nginx-pagespeed" "nginx-php-exim" "php-fpm" "wordpress" "nginx")
 
@@ -34,27 +34,25 @@ BUILD=${BUILD_DO_BUILD:-"1"}
 while getopts "b:n:t:" opt; do
   case $opt in
   b)
-      if [ "$OPTARG" == "true" ]
-      then
-        BUILD=1
-      else
-        BUILD=0
-      fi
-      ;;
+    if [ "$OPTARG" == "true" ]; then
+      BUILD=1
+    else
+      BUILD=0
+    fi
+    ;;
   n)
-      NAMESPACE=$OPTARG
-      ;;
+    NAMESPACE=$OPTARG
+    ;;
   t)
-      TAG=$OPTARG
-      ;;
+    TAG=$OPTARG
+    ;;
 
   esac
 done
 
 shift $((OPTIND - 1))
 
-for PROJECT in "${PROJECTS[@]}"
-do
+for PROJECT in "${PROJECTS[@]}"; do
   echo -e "->> ${NAMESPACE}/${PROJECT}"
 
   ROOT_DIR=$(pwd)
@@ -63,17 +61,17 @@ do
   elif [ -d ${ROOT_DIR}/externals/${PROJECT} ]; then
     PROJECT_DIR=${ROOT_DIR}/externals
   else
-#    _warning "ERROR :: Directory not found for: ${NAMESPACE}/${PROJECT}"
+    #    _warning "ERROR :: Directory not found for: ${NAMESPACE}/${PROJECT}"
     echo -e "ERROR :: Directory not found for: ${NAMESPACE}/${PROJECT}"
     continue
   fi
 
   if type docker >/dev/null 2>&1; then
-      SED_COMMAND="docker run --rm -v ${PROJECT_DIR}:/app busybox sed"
-      SED_TARGET_LOCATION="/app"
+    SED_COMMAND="docker run --rm -v ${PROJECT_DIR}:/app busybox sed"
+    SED_TARGET_LOCATION="/app"
   else
-      SED_COMMAND="sed"
-      SED_TARGET_LOCATION="."
+    SED_COMMAND="sed"
+    SED_TARGET_LOCATION="."
   fi
 
   if [ ! -e ${PROJECT_DIR}/${PROJECT}/Dockerfile ]; then
@@ -99,8 +97,8 @@ do
     ${SED_TARGET_LOCATION}/${PROJECT}/README.md
 
   if [ "$BUILD" -eq 1 ]; then
-      echo -e "\nBuilding ${NAMESPACE}/${PROJECT}:${TAG} ...\n"
-      docker build -t ${NAMESPACE}/${PROJECT}:${TAG} ${PROJECT_DIR}/${PROJECT}
+    echo -e "\nBuilding ${NAMESPACE}/${PROJECT}:${TAG} ...\n"
+    docker build -t ${NAMESPACE}/${PROJECT}:${TAG} ${PROJECT_DIR}/${PROJECT}
   fi
 
 done
