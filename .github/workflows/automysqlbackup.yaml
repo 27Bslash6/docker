@@ -13,6 +13,7 @@ on:
       - synchronize
 
 env:
+  APPLICATION_NAME: automysqlbackup
   IMAGE: funkygibbon/automysqlbackup
   PR_NUMBER: ${{ github.event.number }}
 
@@ -31,9 +32,8 @@ jobs:
         with:
           dockerfile: automysqlbackup/Dockerfile
           ignore: DL3008
-
   build:
-    name: Snyk
+    name: Build and Scan
     if: github.event.pull_request.merged == false
     permissions:
       contents: read # for actions/checkout to fetch code
@@ -70,35 +70,38 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: snyk.sarif
-  # bump-version:
-  #   name: Bump version
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     new_tag: ${{ steps.bump-version.outputs.new_tag }}
-  #     new_version: ${{ steps.bump-version.outputs.new_version }}
-  #   steps:
-  #     - name: Check out code
-  #       uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: "0"
-  #     - name: Bump version
-  #       id: bump-version
-  #       uses: MaxKelsen/github-tag-action@v5.8
-  #       with:
-  #         custom_release_rules: build:patch,refactor:minor
-  #         default_bump: false
-  #         dry_run: true
-  #         fetch_all_tags: true
-  #         github_token: ${{ github.token }}
-  #         release_branches: main
-  #         tag_prefix: v
-  tag:
-    name: Tag new version
-    # needs:
-    #   - bump-version
+  bump:
+    name: Bump version
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    outputs:
+      new_tag: ${{ steps.bump.outputs.new_tag }}
+      new_version: ${{ steps.bump.outputs.new_version }}
     steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+      - name: Bump version
+        id: bump
+        uses: MaxKelsen/github-tag-action@v5.8
+        with:
+          custom_release_rules: build:patch,refactor:minor
+          default_bump: false
+          dry_run: true
+          fetch_all_tags: true
+          github_token: ${{ github.token }}
+          release_branches: main
+          tag_prefix: v
+  release:
+    name: Tag new release
+    needs:
+      - bump
+    if: github.event.pull_request.merged == true && needs.bump.outputs.new_tag != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -113,6 +116,30 @@ jobs:
           docker pull ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }}
           docker tag ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }} ${{ env.IMAGE }}:${{ github.sha }}
           docker push ${{ env.IMAGE }}:${{ github.sha }}
+          docker tag ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }} ${{ env.IMAGE }}:${{ needs.bump.outputs.new_tag }}
+          docker push ${{ env.IMAGE }}:${{ needs.bump.outputs.new_tag }}
           docker tag ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }} ${{ env.IMAGE }}:latest
           docker push ${{ env.IMAGE }}:latest
-        working-directory: automysqlbackup
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install Node things
+        shell: bash
+        run: |
+          npm install conventional-changelog-cli
+      - name: Generate release notes
+        shell: bash
+        run: |
+          echo '{"version": "${{ needs.bump.outputs.new_version }}", "title": "${{ env.APPLICATION_NAME }}"}' > context.json
+          npx conventional-changelog \
+            -p conventionalcommits \
+            -t v \
+            --config changelog.config.js \
+            --context context.json \
+            -o RELEASELOG.md
+      - name: Create release with tag
+        uses: ncipollo/release-action@v1
+        with:
+          bodyFile: ./RELEASELOG.md
+          commit: ${{ github.sha }}
+          tag: ${{ needs.bump.outputs.new_tag }}

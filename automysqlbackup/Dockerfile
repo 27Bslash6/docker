@@ -9,14 +9,14 @@ ENV DBHOST "mysql"
 ENV USERNAME "root"
 ENV PASSWORD "root"
 
+ENV CRON_SCHEDULE "10 0 * * *"
+
+# Email currently not implemented
 ENV EMAIL_TO ""
 ENV EMAIL_FROM "no-reply@example.com"
-ENV HOSTNAME "docker"
 
 ENV MAILGUN_API_KEY ""
 ENV MAILGUN_DOMAIN ""
-
-ENV CRON_SCHEDULE "10 0 * * *"
 
 COPY config.sh /etc/my_init.d/10_config.sh
 
