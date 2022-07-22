@@ -1,0 +1,13 @@
+name: Gitleaks
+on: [pull_request]
+
+jobs:
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+      - name: Run secret scan
+        uses: gitleaks/gitleaks-action@v1
