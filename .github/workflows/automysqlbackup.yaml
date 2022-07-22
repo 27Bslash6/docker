@@ -1,0 +1,118 @@
+name: AutoMySQLBackup Lint, Scan, Build and Push
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "automysqlbackup/**"
+    types:
+      - opened
+      - closed
+      - reopened
+      - synchronize
+
+env:
+  IMAGE: funkygibbon/automysqlbackup
+  PR_NUMBER: ${{ github.event.number }}
+
+jobs:
+  hadolint:
+    name: Hadolint
+    if: github.event.pull_request.merged == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+      - name: Lint Dockerfile
+        id: lint
+        uses: hadolint/hadolint-action@v2.0.0
+        with:
+          dockerfile: automysqlbackup/Dockerfile
+          ignore: DL3008
+
+  build:
+    name: Snyk
+    if: github.event.pull_request.merged == false
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          install: true
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: automysqlbackup
+          push: true
+          tags: ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }},${{ env.IMAGE }}:${{ github.sha }}
+      - name: Run Snyk to check Docker image for vulnerabilities
+        uses: snyk/actions/docker@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }}
+          args: --file=automysqlbackup/Dockerfile --severity-threshold=high
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: snyk.sarif
+  # bump-version:
+  #   name: Bump version
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     new_tag: ${{ steps.bump-version.outputs.new_tag }}
+  #     new_version: ${{ steps.bump-version.outputs.new_version }}
+  #   steps:
+  #     - name: Check out code
+  #       uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: "0"
+  #     - name: Bump version
+  #       id: bump-version
+  #       uses: MaxKelsen/github-tag-action@v5.8
+  #       with:
+  #         custom_release_rules: build:patch,refactor:minor
+  #         default_bump: false
+  #         dry_run: true
+  #         fetch_all_tags: true
+  #         github_token: ${{ github.token }}
+  #         release_branches: main
+  #         tag_prefix: v
+  tag:
+    name: Tag new version
+    # needs:
+    #   - bump-version
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build a Docker image
+        run: |
+          docker pull ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }}
+          docker tag ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }} ${{ env.IMAGE }}:${{ github.sha }}
+          docker push ${{ env.IMAGE }}:${{ github.sha }}
+          docker tag ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }} ${{ env.IMAGE }}:latest
+          docker push ${{ env.IMAGE }}:latest
+        working-directory: automysqlbackup
