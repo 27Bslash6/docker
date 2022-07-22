@@ -1,0 +1,144 @@
+name: Ubuntu Base Image
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "ubuntu/**"
+      - "!ubuntu/*.md"
+    types:
+      - opened
+      - closed
+      - reopened
+      - synchronize
+
+env:
+  APPLICATION_NAME: ubuntu
+  IMAGE: funkygibbon/ubuntu
+  PR_NUMBER: ${{ github.event.number }}
+
+jobs:
+  lint:
+    name: Hadolint
+    if: github.event.pull_request.merged == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+      - name: Lint Dockerfile
+        id: lint
+        uses: hadolint/hadolint-action@v2.0.0
+        with:
+          dockerfile: ubuntu/Dockerfile
+          ignore: DL3008
+  build:
+    name: Build and Scan
+    if: github.event.pull_request.merged == false
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          install: true
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: ubuntu
+          push: true
+          tags: ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }},${{ env.IMAGE }}:${{ github.sha }}
+      - name: Run Snyk to check Docker image for vulnerabilities
+        uses: snyk/actions/docker@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }}
+          args: --file=ubuntu/Dockerfile --severity-threshold=high
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: snyk.sarif
+  bump:
+    name: Bump version
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    outputs:
+      new_tag: ${{ steps.bump.outputs.new_tag }}
+      new_version: ${{ steps.bump.outputs.new_version }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+      - name: Bump version
+        id: bump
+        uses: MaxKelsen/github-tag-action@v5.8
+        with:
+          custom_release_rules: build:patch,refactor:minor
+          default_bump: false
+          dry_run: true
+          fetch_all_tags: true
+          github_token: ${{ github.token }}
+          release_branches: main
+          tag_prefix: ${{ env.APPLICATION_NAME }}-v
+  release:
+    name: Tag new release
+    needs:
+      - bump
+    if: github.event.pull_request.merged == true && needs.bump.outputs.new_tag != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build a Docker image
+        run: |
+          docker pull ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }}
+          docker tag ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }} ${{ env.IMAGE }}:${{ needs.bump.outputs.new_version }}
+          docker push ${{ env.IMAGE }}:${{ needs.bump.outputs.new_version }}
+          docker tag ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }} ${{ env.IMAGE }}:latest
+          docker push ${{ env.IMAGE }}:latest
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install Node things
+        shell: bash
+        run: |
+          npm install conventional-changelog-cli
+      - name: Generate release notes
+        shell: bash
+        run: |
+          echo '{"version": "${{ needs.bump.outputs.new_version }}", "title": "${{ env.APPLICATION_NAME }}"}' > context.json
+          npx conventional-changelog \
+            -p conventionalcommits \
+            -t ${{ env.APPLICATION_NAME }}-v \
+            --config changelog.config.js \
+            --context context.json \
+            -o RELEASELOG.md
+      - name: Create release with tag
+        uses: ncipollo/release-action@v1
+        with:
+          bodyFile: ./RELEASELOG.md
+          commit: ${{ github.sha }}
+          tag: ${{ needs.bump.outputs.new_tag }}
