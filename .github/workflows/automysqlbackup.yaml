@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "automysqlbackup/**"
+      - "!automysqlbackup/*.md"
     types:
       - opened
       - closed
@@ -91,7 +92,7 @@ jobs:
           fetch_all_tags: true
           github_token: ${{ github.token }}
           release_branches: main
-          tag_prefix: v
+          tag_prefix: ${{ env.APPLICATION_NAME }}-v
   release:
     name: Tag new release
     needs:
@@ -116,8 +117,8 @@ jobs:
           docker pull ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }}
           docker tag ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }} ${{ env.IMAGE }}:${{ github.sha }}
           docker push ${{ env.IMAGE }}:${{ github.sha }}
-          docker tag ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }} ${{ env.IMAGE }}:${{ needs.bump.outputs.new_tag }}
-          docker push ${{ env.IMAGE }}:${{ needs.bump.outputs.new_tag }}
+          docker tag ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }} ${{ env.IMAGE }}:${{ needs.bump.outputs.new_version }}
+          docker push ${{ env.IMAGE }}:${{ needs.bump.outputs.new_version }}
           docker tag ${{ env.IMAGE }}:pr-${{ env.PR_NUMBER }} ${{ env.IMAGE }}:latest
           docker push ${{ env.IMAGE }}:latest
       - uses: actions/setup-node@v3
@@ -133,7 +134,7 @@ jobs:
           echo '{"version": "${{ needs.bump.outputs.new_version }}", "title": "${{ env.APPLICATION_NAME }}"}' > context.json
           npx conventional-changelog \
             -p conventionalcommits \
-            -t v \
+            -t ${{ env.APPLICATION_NAME }}-v \
             --config changelog.config.js \
             --context context.json \
             -o RELEASELOG.md
