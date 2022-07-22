@@ -1,20 +1,26 @@
-FROM funkygibbon/python
+FROM funkygibbon/ubuntu:focal-0.0.1
 
 VOLUME ["/backup"]
 
-RUN apt-get update \
- && apt-get install -y automysqlbackup
+RUN install_clean automysqlbackup
 
-ENV BACKUP_DATABASES all
-ENV BACKUP_HOST mysql
-ENV BACKUP_USERNAME root
-ENV BACKUP_PASSWORD root
+ENV DATABASES "all"
+ENV DBHOST "mysql"
+ENV USERNAME "root"
+ENV PASSWORD "root"
 
-ENV BACKUP_EMAIL root
+ENV EMAIL_TO ""
+ENV EMAIL_FROM "no-reply@example.com"
+ENV HOSTNAME "docker"
 
-ENV BACKUP_CRONTIME "12 5 * * *"
+ENV MAILGUN_API_KEY ""
+ENV MAILGUN_DOMAIN ""
+
+ENV CRON_SCHEDULE "10 0 * * *"
 
 COPY config.sh /etc/my_init.d/10_config.sh
 
+RUN echo "EXTRA_OPTS='-L /proc/1/fd/1'" >> /etc/default/cron
+
 RUN cp /etc/default/automysqlbackup /etc/default/automysqlbackup.dist \
- && chmod +x /etc/my_init.d/*.sh
+    && chmod +x /etc/my_init.d/*.sh
