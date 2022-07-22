@@ -24,5 +24,3 @@ RUN echo "EXTRA_OPTS='-L /proc/1/fd/1'" >> /etc/default/cron
 
 RUN cp /etc/default/automysqlbackup /etc/default/automysqlbackup.dist \
     && chmod +x /etc/my_init.d/*.sh
-
-# bump
