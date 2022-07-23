@@ -30,3 +30,5 @@ if [[ -n "${EMAIL_TO:-}" ]]; then
 else
   _warning "EMAIL_TO not set, will not send emails"
 fi
+
+service postfix start
