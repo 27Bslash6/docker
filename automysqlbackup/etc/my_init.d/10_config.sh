@@ -22,7 +22,7 @@ else
 fi
 
 _good "schedule:  ${CRON_SCHEDULE}"
-(crontab -u root -l 2>/dev/null || true; echo "${CRON_SCHEDULE} nice automysqlbackup" ) | crontab -u root -
+(crontab -u root -l 2>/dev/null || true; echo "${CRON_SCHEDULE} nice /usr/sbin/automysqlbackup" ) | crontab -u root -
 
 if [[ -n "${EMAIL_TO:-}" ]]; then
   _good "email:     ${EMAIL_TO}"
