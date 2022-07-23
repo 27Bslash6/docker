@@ -16,7 +16,7 @@ echo -e "[client]\nuser = ${USERNAME}\npassword = ${PASSWORD}\nhost = ${DBHOST}\
 
 _good "databases: ${DATABASES//,/ }"
 if [[ ${DATABASES} = "all" ]]; then
-    sed -i -r "s#^DBNAMES=.*#DBNAMES=$(mysql --defaults-file=/etc/mysql/debian.cnf --execute="SHOW DATABASES" | awk '{print $1}' | grep -v ^Database$ | grep -v ^mysql$ | grep -v ^performance_schema$ | grep -v ^information_schema$ | tr \\r\\n ,\ )#g" $AUTOMYSQLBACKUP_CONFIG_FILE
+    sed -i -r "s#^DBNAMES=.*#DBNAMES=\"$(mysql --defaults-file=/etc/mysql/debian.cnf --execute="SHOW DATABASES" | awk '{print $1}' | grep -v ^Database$ | grep -v ^mysql$ | grep -v ^performance_schema$ | grep -v ^information_schema$ | tr \\r\\n ,\ )\"#g" $AUTOMYSQLBACKUP_CONFIG_FILE
 else
     sed -i -r "s#^DBNAMES=.*#DBNAMES=\"${DATABASES//,/ }\"#g" $AUTOMYSQLBACKUP_CONFIG_FILE
 fi
