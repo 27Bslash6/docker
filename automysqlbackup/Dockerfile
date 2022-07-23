@@ -1,4 +1,4 @@
-FROM funkygibbon/ubuntu:0.1.0
+FROM funkygibbon/ubuntu:0.1.1
 
 VOLUME ["/backup"]
 
