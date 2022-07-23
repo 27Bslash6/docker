@@ -1,0 +1,2 @@
+# Send cron output to container stdout
+EXTRA_OPTS='-L /proc/1/fd/1'
