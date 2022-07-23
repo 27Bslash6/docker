@@ -24,8 +24,6 @@ done
 # 	BOOT
 # =============================================================================
 
-# _good "$(date) -" "exec $*"
-
 # Default Docker CMD will be /sbin/my_init
 if [[ $1 = /sbin/my_init ]]; then
   exec /sbin/my_init

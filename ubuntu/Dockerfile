@@ -11,6 +11,7 @@ RUN mv /etc/apt/sources.list /etc/apt/sources.list.original \
     && apt-fast install --no-install-recommends -y \
       time \
       tzdata \
+      rsync \
       wget \
     && rm -fr /tmp/* /var/tmp/* /var/lib/apt/lists/* /var/cache/apt/apt-fast/* \
     && chmod 755 /app/bin/* \
