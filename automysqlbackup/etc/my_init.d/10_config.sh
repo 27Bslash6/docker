@@ -8,27 +8,31 @@ sed -i -r "s#BACKUPDIR=.*#BACKUPDIR=\"/backup\"#g" $AUTOMYSQLBACKUP_CONFIG_FILE
 
 _title "Configuring AutoMySQLBackup ..."
 
-_good "host:      ${DBHOST}"
+_good "host:        ${DBHOST}"
 sed -i -r "s#DBHOST=localhost#DBHOST=${DBHOST}#g" $AUTOMYSQLBACKUP_CONFIG_FILE
 
-_good "username:  ${USERNAME}"
+_good "username:    ${USERNAME}"
 echo -e "[client]\nuser = ${USERNAME}\npassword = ${PASSWORD}\nhost = ${DBHOST}\nport = 3306" > $MYSQL_CONFIG_FILE
 
-_good "databases: ${DATABASES//,/ }"
+_good "databases:   ${DATABASES//,/ }"
 if [[ ${DATABASES} = "all" ]]; then
     sed -i -r "s#^DBNAMES=.*#DBNAMES=\"$(mysql --defaults-file=/etc/mysql/debian.cnf --execute="SHOW DATABASES" | awk '{print $1}' | grep -v ^Database$ | grep -v ^mysql$ | grep -v ^performance_schema$ | grep -v ^information_schema$ | tr \\r\\n ,\ )\"#g" $AUTOMYSQLBACKUP_CONFIG_FILE
 else
     sed -i -r "s#^DBNAMES=.*#DBNAMES=\"${DATABASES//,/ }\"#g" $AUTOMYSQLBACKUP_CONFIG_FILE
 fi
 
-_good "schedule:  ${CRON_SCHEDULE}"
-(crontab -u root -l 2>/dev/null || true; echo "${CRON_SCHEDULE} nice /usr/sbin/automysqlbackup" ) | crontab -u root -
+_good "compress:    ${COMPRESSION}"
+sed -i -r "s#COMP=.*#COMP=\"${COMPRESSION}\"#g" $AUTOMYSQLBACKUP_CONFIG_FILE
+
+_good "schedule:    ${CRON_SCHEDULE}"
+(crontab -u root -l 2>/dev/null || true; echo "${CRON_SCHEDULE} nice /app/bin/automysqlbackup" ) | crontab -u root -
 
 if [[ -n "${EMAIL_TO:-}" ]]; then
-  _good "email:     ${EMAIL_TO}"
-  sed -i -r "s#MAILADDR=.*#MAILADDR=${EMAIL_TO}#g" $AUTOMYSQLBACKUP_CONFIG_FILE
+  _good "email:       ${EMAIL_TO}"
+  sed -i -r "s#MAILADDR=.*#MAILADDR=\"${EMAIL_TO}\"#g" $AUTOMYSQLBACKUP_CONFIG_FILE
+  _good "mailcontent: ${EMAIL_CONTENT}"
+  sed -i -r "s#MAILCONTENT=.*#MAILCONTENT=\"${EMAIL_CONTENT}\"#g" $AUTOMYSQLBACKUP_CONFIG_FILE
+  service postfix start
 else
   _warning "EMAIL_TO not set, will not send emails"
 fi
-
-service postfix start
