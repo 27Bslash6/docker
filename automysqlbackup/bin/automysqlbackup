@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-set -eu
 #
 # MySQL Backup Script
-# VER. 2.5 - http://sourceforge.net/projects/automysqlbackup/
+# VER. 2.6 - https://github.com/27Bslash6/docker/tree/main/automysqlbackup/bin
+# Copyright (c) 2022, 27Bslash6 hello@raywalker.it
 # Copyright (c) 2002-2003 wipe_out@lycos.co.uk
 #
 # This program is free software; you can redistribute it and/or modify
@@ -25,83 +25,12 @@ set -eu
 # (Detailed instructions below variables)
 #=====================================================================
 
-if [ -f /etc/default/automysqlbackup ]; then
-  . /etc/default/automysqlbackup
-else
-
-  # Username to access the MySQL server e.g. dbuser
-  USERNAME=dbuser
-
-  # Username to access the MySQL server e.g. password
-  PASSWORD=password
-
-  # Host name (or IP address) of MySQL server e.g localhost
-  DBHOST=localhost
-
-  # List of DBNAMES for Daily/Weekly Backup e.g. "DB1 DB2 DB3"
-  DBNAMES="DB1 DB2 DB3"
-
-  # Backup directory location e.g /backups
-  BACKUPDIR="/backups"
-
-  # Mail setup
-  # What would you like to be mailed to you?
-  # - log   : send only log file
-  # - files : send log file and sql files as attachments (see docs)
-  # - stdout : will simply output the log to the screen if run manually.
-  # - quiet : Only send logs if an error occurs to the MAILADDR.
-  MAILCONTENT="stdout"
-
-  # Set the maximum allowed email size in k. (4000 = approx 5MB email [see docs])
-  MAXATTSIZE="4000"
-
-  # Email Address to send mail to? (user@domain.com)
-  MAILADDR="user@domain.com"
-
-  # ============================================================
-  # === ADVANCED OPTIONS ( Read the doc's below for details )===
-  #=============================================================
-
-  # List of DBBNAMES for Monthly Backups.
-  MDBNAMES="mysql $DBNAMES"
-
-  # List of DBNAMES to EXLUCDE if DBNAMES are set to all (must be in " quotes)
-  DBEXCLUDE=""
-
-  # Include CREATE DATABASE in backup?
-  CREATE_DATABASE=yes
-
-  # Separate backup directory and file for each DB? (yes or no)
-  SEPDIR=yes
-
-  # Which day do you want weekly backups? (1 to 7 where 1 is Monday)
-  DOWEEKLY=6
-
-  # Choose Compression type. (gzip or bzip2)
-  COMP=gzip
-
-  # Compress communications between backup server and MySQL server?
-  COMMCOMP=no
-
-  # Additionally keep a copy of the most recent backup in a seperate directory.
-  LATEST=no
-
-  #  The maximum size of the buffer for client/server communication. e.g. 16MB (maximum is 1GB)
-  MAX_ALLOWED_PACKET=
-
-  #  For connections to localhost. Sometimes the Unix socket file must be specified.
-  SOCKET=
-
-  # Command to run before backups (uncomment to use)
-  #PREBACKUP="/etc/mysql-backup-pre"
-
-  # Command run after backups (uncomment to use)
-  #POSTBACKUP="/etc/mysql-backup-post"
-
-  # Backup of stored procedures and routines
-  ROUTINES=yes
-
+if [ ! -f /etc/default/automysqlbackup ]; then
+    echo "ERROR: /etc/default/automysqlbackup not found"
+    exit 1
 fi
+
+. /etc/default/automysqlbackup
 
 #=====================================================================
 # Options documantation
@@ -254,7 +183,7 @@ fi
 # VER 2.6 - (2022-07-24)
 #  - hello@raywalker.it Started hacking on it
 # VER 2.5 - (2006-01-15)
-#               Added support for setting MAXIMUM_PACKET_SIZE and SOCKET parameters (suggested by Yvo van Doorn)
+#    Added support for setting MAXIMUM_PACKET_SIZE and SOCKET parameters (suggested by Yvo van Doorn)
 # VER 2.4 - (2006-01-23)
 #    Fixed bug where weekly backups were not being rotated. (Fix by wolf02)
 #    Added hour an min to backup filename for the case where backups are taken multiple
@@ -365,7 +294,7 @@ if [ "$COMMCOMP" = "yes" ]; then
 fi
 
 # Add --routines mysqldum option to ${OPT}
-if [ "${ROUTINES}" = "yes" ]; then
+if [ "$ROUTINES" = "yes" ]; then
   OPT="${OPT} --routines"
 fi
 
@@ -379,8 +308,8 @@ if [ ! -e "$BACKUPDIR" ]; then # Check Backup Directory exists.
   mkdir -p "$BACKUPDIR"
 fi
 
-chmod o-x ${BACKUPDIR}
-chmod o-r ${BACKUPDIR}
+chmod o-x "$BACKUPDIR"
+chmod o-r "$BACKUPDIR"
 
 if [ ! -e "$BACKUPDIR/daily" ]; then # Check Daily Directory exists.
   mkdir -p "$BACKUPDIR/daily"
@@ -402,31 +331,31 @@ if [ "$LATEST" = "yes" ]; then
 fi
 
 # IO redirection for logging.
-touch $LOGFILE
+touch "$LOGFILE"
 exec 6>&1 # Link file descriptor #6 with stdout.
 # Saves stdout.
-exec >$LOGFILE # stdout replaced with file $LOGFILE.
-touch $LOGERR
+exec >"$LOGFILE" # stdout replaced with file $LOGFILE.
+touch "$LOGERR"
 exec 7>&2 # Link file descriptor #7 with stderr.
 # Saves stderr.
-exec 2>$LOGERR # stderr replaced with file $LOGERR.
+exec 2>"$LOGERR" # stderr replaced with file $LOGERR.
 
 # Functions
 
 # Database dump function
 dbdump() {
-  touch $2
-  chmod 600 $2
+  touch "$2"
+  chmod 600 "$2"
   if [ "$1" = "information_schema" ]; then
     NEWOPT="--skip-opt ${OPT}"
   else
     NEWOPT="--opt $OPT"
   fi
 
-  if [ -z "${USERNAME}" -o -z "${PASSWORD}" ]; then
-    mysqldump --column-statistics=0 --defaults-file=/etc/mysql/debian.cnf $NEWOPT $1 >$2
+  if [ "$USERNAME" = "" -o -z "$PASSWORD" ]; then
+    mysqldump --defaults-file=/etc/mysql/debian.cnf --column-statistics=0 "$NEWOPT" "$1" >"$2"
   else
-    mysqldump --column-statistics=0 --user=$USERNAME --password=$PASSWORD --host=$DBHOST $NEWOPT $1 >$2
+    mysqldump --column-statistics=0 --user="$USERNAME" --password="$PASSWORD" --host="$DBHOST" "$NEWOPT" "$1" >"$2"
   fi
   return 0
 }
@@ -442,13 +371,13 @@ compression() {
     SUFFIX=".gz"
   elif [ "$COMP" = "bzip2" ]; then
     echo Compression information for "$1.bz2"
-    bzip2 -f -v $1 2>&1
+    bzip2 -f -v "$1" 2>&1
     SUFFIX=".bz2"
   else
     echo "No compression option set, check advanced settings"
   fi
   if [ "$LATEST" = "yes" ]; then
-    cp $1$SUFFIX "$BACKUPDIR/latest/"
+    cp "$1$SUFFIX" "$BACKUPDIR/latest/"
   fi
   return 0
 }
@@ -458,7 +387,7 @@ if [ "$PREBACKUP" ]; then
   echo ======================================================================
   echo "Prebackup command output."
   echo
-  $PREBACKUP
+  "$PREBACKUP"
   echo
   echo ======================================================================
   echo
@@ -486,42 +415,42 @@ fi
 
 # If backing up all DBs on the server
 if [ "$DBNAMES" = "all" ]; then
-  if [ -z "${USERNAME}" -o -z "${PASSWORD}" ]; then
+  if [ "$USERNAME" = "" -o -z "$PASSWORD" ]; then
     DBNAMES="$(mysql --defaults-file=/etc/mysql/debian.cnf --batch --skip-column-names -e "show databases" | sed 's/ /%/g')"
   else
-    DBNAMES="$(mysql --user=$USERNAME --password=$PASSWORD --host=$DBHOST --batch --skip-column-names -e "show databases" | sed 's/ /%/g')"
+    DBNAMES="$(mysql --user="$USERNAME" --password="$PASSWORD" --host="$DBHOST" --batch --skip-column-names -e "show databases" | sed 's/ /%/g')"
   fi
 
   # If DBs are excluded
-  for exclude in $DBEXCLUDE; do
-    DBNAMES=$(echo $DBNAMES | sed "s/\b$exclude\b//g")
+  for exclude in "${DBEXCLUDE[@]}"; do
+    DBNAMES=$(echo "$DBNAMES" | sed "s/\b$exclude\b//g")
   done
 
   MDBNAMES=$DBNAMES
 fi
 
 echo ======================================================================
-echo AutoMySQLBackup VER $VER
+echo AutoMySQLBackup VER "$VER"
 echo http://sourceforge.net/projects/automysqlbackup/
 echo
-echo Backup of Database Server - $HOST
+echo Backup of Database Server - "$HOST"
 echo ======================================================================
 
 # Test is seperate DB backups are required
 if [ "$SEPDIR" = "yes" ]; then
-  echo Backup Start Time $(date)
+  echo Backup Start Time "$(date)"
   echo ======================================================================
   # Monthly Full Backup of all Databases
   if [ "$DOM" = "01" ]; then
-    for MDB in $MDBNAMES; do
+    for MDB in "${MDBNAMES[@]}"; do
 
       # Prepare $DB for using
-      MDB="$(echo $MDB | sed 's/%/ /g')"
+      MDB="$(echo "$MDB" | sed 's/%/ /g')"
 
       if [ ! -e "$BACKUPDIR/monthly/$MDB" ]; then # Check Monthly DB Directory exists.
         mkdir -p "$BACKUPDIR/monthly/$MDB"
       fi
-      echo Monthly Backup of $MDB...
+      echo Monthly Backup of "$MDB"...
       dbdump "$MDB" "$BACKUPDIR/monthly/$MDB/${MDB}_$DATE.$M.$MDB.sql"
       compression "$BACKUPDIR/monthly/$MDB/${MDB}_$DATE.$M.$MDB.sql"
       BACKUPFILES="$BACKUPFILES $BACKUPDIR/monthly/$MDB/${MDB}_$DATE.$M.$MDB.sql$SUFFIX"
@@ -529,9 +458,9 @@ if [ "$SEPDIR" = "yes" ]; then
     done
   fi
 
-  for DB in $DBNAMES; do
+  for DB in "${DBNAMES[@]}"; do
     # Prepare $DB for using
-    DB="$(echo $DB | sed 's/%/ /g')"
+    DB="$(echo "$DB" | sed 's/%/ /g')"
 
     # Create Seperate directory for each DB
     if [ ! -e "$BACKUPDIR/daily/$DB" ]; then # Check Daily DB Directory exists.
@@ -544,14 +473,14 @@ if [ "$SEPDIR" = "yes" ]; then
 
     # Weekly Backup
     if [ "$DNOW" = "$DOWEEKLY" ]; then
-      echo Weekly Backup of Database \( $DB \)
+      echo Weekly Backup of Database \( "$DB" \)
       echo Rotating 5 weeks Backups...
       if [ "$W" -le 05 ]; then
-        REMW=$(expr 48 + $W)
+        REMW=$(expr 48 + "$W")
       elif [ "$W" -lt 15 ]; then
-        REMW=0$(expr $W - 5)
+        REMW=0$(expr "$W" - 5)
       else
-        REMW=$(expr $W - 5)
+        REMW=$(expr "$W" - 5)
       fi
       rm -fv "$BACKUPDIR/weekly/$DB/${DB}_week.$REMW".*
       echo
@@ -562,7 +491,7 @@ if [ "$SEPDIR" = "yes" ]; then
 
     # Daily Backup
     else
-      echo Daily Backup of Database \( $DB \)
+      echo Daily Backup of Database \( "$DB" \)
       echo Rotating last weeks Backup...
       rm -fv "$BACKUPDIR/daily/$DB"/*."$DOW".sql.*
       echo
@@ -572,16 +501,16 @@ if [ "$SEPDIR" = "yes" ]; then
       echo ----------------------------------------------------------------------
     fi
   done
-  echo Backup End $(date)
+  echo Backup End "$(date)"
   echo ======================================================================
 
 else
   # One backup file for all DBs
-  echo Backup Start $(date)
+  echo Backup Start "$(date)"
   echo ======================================================================
   # Monthly Full Backup of all Databases
   if [ "$DOM" = "01" ]; then
-    echo Monthly full Backup of \( $MDBNAMES \)...
+    echo Monthly full Backup of \( "$MDBNAMES" \)...
     dbdump "$MDBNAMES" "$BACKUPDIR/monthly/$DATE.$M.all-databases.sql"
     compression "$BACKUPDIR/monthly/$DATE.$M.all-databases.sql"
     BACKUPFILES="$BACKUPFILES $BACKUPDIR/monthly/$DATE.$M.all-databases.sql$SUFFIX"
@@ -590,15 +519,15 @@ else
 
   # Weekly Backup
   if [ "$DNOW" = "$DOWEEKLY" ]; then
-    echo Weekly Backup of Databases \( $DBNAMES \)
+    echo Weekly Backup of Databases \( "$DBNAMES" \)
     echo
     echo Rotating 5 weeks Backups...
     if [ "$W" -le 05 ]; then
-      REMW=$(expr 48 + $W)
+      REMW=$(expr 48 + "$W")
     elif [ "$W" -lt 15 ]; then
-      REMW=0$(expr $W - 5)
+      REMW=0$(expr "$W" - 5)
     else
-      REMW=$(expr $W - 5)
+      REMW=$(expr "$W" - 5)
     fi
     rm -fv "$BACKUPDIR/weekly/week.$REMW".*
     echo
@@ -609,7 +538,7 @@ else
 
   # Daily Backup
   else
-    echo Daily Backup of Databases \( $DBNAMES \)
+    echo Daily Backup of Databases \( "$DBNAMES" \)
     echo
     echo Rotating last weeks Backup...
     rm -fv "$BACKUPDIR"/daily/*."$DOW.sql".*
@@ -619,12 +548,12 @@ else
     BACKUPFILES="$BACKUPFILES $BACKUPDIR/daily/$DATE.$DOW.sql$SUFFIX"
     echo ----------------------------------------------------------------------
   fi
-  echo Backup End Time $(date)
+  echo Backup End Time "$(date)"
   echo ======================================================================
 fi
 echo Total disk space used for backup storage..
 echo Size - Location
-echo $(du -hs "$BACKUPDIR")
+echo "$(du -hs "$BACKUPDIR")"
 echo
 echo ======================================================================
 echo If you find AutoMySQLBackup valuable please make a donation at
@@ -636,7 +565,7 @@ if [ "$POSTBACKUP" ]; then
   echo ======================================================================
   echo "Postbackup command output."
   echo
-  $POSTBACKUP
+  "$POSTBACKUP"
   echo
   echo ======================================================================
 fi
@@ -652,22 +581,22 @@ if [ "$MAILCONTENT" = "files" ]; then
     ERRORNOTE="WARNING: Error Reported - "
   fi
   #Get backup size
-  ATTSIZE=$(du -c $BACKUPFILES | grep "[[:digit:][:space:]]total$" | sed s/\s*total//)
-  if [ $MAXATTSIZE -ge $ATTSIZE ]; then
+  ATTSIZE=$(du -c "$BACKUPFILES" | grep "[[:digit:][:space:]]total$" | sed s/\s*total//)
+  if [ "$MAXATTSIZE" -ge "$ATTSIZE" ]; then
     BACKUPFILES=$(echo "$BACKUPFILES" | sed -e "s# # -a #g")                                                  #enable multiple attachments
-    mutt -s "$ERRORNOTE MySQL Backup Log and SQL Files for $HOST - $DATE" $BACKUPFILES -- $MAILADDR <$LOGFILE #send via mutt
+    mutt -s "$ERRORNOTE MySQL Backup Log and SQL Files for $HOST - $DATE" "$BACKUPFILES" -- "$MAILADDR" <"$LOGFILE" #send via mutt
   else
-    cat "$LOGFILE" | mail -s "WARNING! - MySQL Backup exceeds set maximum attachment size on $HOST - $DATE" $MAILADDR
+    cat "$LOGFILE" | mail -s "WARNING! - MySQL Backup exceeds set maximum attachment size on $HOST - $DATE" "$MAILADDR"
   fi
 elif [ "$MAILCONTENT" = "log" ]; then
-  cat "$LOGFILE" | mail -s "MySQL Backup Log for $HOST - $DATE" $MAILADDR
+  cat "$LOGFILE" | mail -s "MySQL Backup Log for $HOST - $DATE" "$MAILADDR"
   if [ -s "$LOGERR" ]; then
-    cat "$LOGERR" | mail -s "ERRORS REPORTED: MySQL Backup error Log for $HOST - $DATE" $MAILADDR
+    cat "$LOGERR" | mail -s "ERRORS REPORTED: MySQL Backup error Log for $HOST - $DATE" "$MAILADDR"
   fi
 elif [ "$MAILCONTENT" = "quiet" ]; then
   if [ -s "$LOGERR" ]; then
-    cat "$LOGERR" | mail -s "ERRORS REPORTED: MySQL Backup error Log for $HOST - $DATE" $MAILADDR
-    cat "$LOGFILE" | mail -s "MySQL Backup Log for $HOST - $DATE" $MAILADDR
+    cat "$LOGERR" | mail -s "ERRORS REPORTED: MySQL Backup error Log for $HOST - $DATE" "$MAILADDR"
+    cat "$LOGFILE" | mail -s "MySQL Backup Log for $HOST - $DATE" "$MAILADDR"
   fi
 else
   if [ -s "$LOGERR" ]; then
@@ -692,4 +621,4 @@ fi
 rm -f "$LOGFILE"
 rm -f "$LOGERR"
 
-exit $STATUS
+exit "$STATUS"

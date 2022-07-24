@@ -9,7 +9,7 @@ ENV \
     CRON_SCHEDULE="10 0 * * *" \
     DATABASES="all" \
     DBHOST="mysql" \
-    EMAIL_CONTENT="quiet" \
+    EMAIL_CONTENT="log" \
     EMAIL_FROM="no-reply@example.com" \
     EMAIL_TO="" \
     PASSWORD="root" \
