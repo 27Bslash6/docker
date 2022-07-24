@@ -353,7 +353,7 @@ dbdump() {
   fi
 
   if [ "$USERNAME" = "" -o -z "$PASSWORD" ]; then
-    mysqldump --column-statistics=0 --defaults-file=/etc/mysql/debian.cnf "$NEWOPT" "$1" >"$2"
+    mysqldump --defaults-file=/etc/mysql/debian.cnf --column-statistics=0 "$NEWOPT" "$1" >"$2"
   else
     mysqldump --column-statistics=0 --user="$USERNAME" --password="$PASSWORD" --host="$DBHOST" "$NEWOPT" "$1" >"$2"
   fi
