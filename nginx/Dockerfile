@@ -4,13 +4,13 @@ EXPOSE 80
 EXPOSE 443
 
 # http://nginx.org/en/download.html
-ENV NGINX_VERSION 1.21.4
+ENV NGINX_VERSION 1.22.1
 
 # https://github.com/openresty/headers-more-nginx-module/tags
-ENV HEADERS_MORE_VERSION 0.33
+ENV HEADERS_MORE_VERSION 0.34
 
 # https://www.openssl.org/source
-ENV OPENSSL_VERSION 1.1.1l
+ENV OPENSSL_VERSION 1.1.1s
 
 RUN useradd -r -s /usr/sbin/nologin nginx && mkdir -p /var/log/nginx /var/cache/nginx
 RUN	apt-get update && \

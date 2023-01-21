@@ -33,3 +33,9 @@ help:
 		'^.PHONY: .*?## .*$$' $(MAKEFILE_LIST) | \
 		sort | \
 		awk 'BEGIN {FS = ".PHONY: |## "}; {printf "\033[36m%-16s\033[0m %s\n", $$2, $$3}'
+
+build:
+	./build_ngx_suite.sh
+
+push:
+	./push_ngx_suite.sh

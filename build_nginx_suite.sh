@@ -7,21 +7,21 @@ NAMESPACE=${BUILD_NAMESPACE:-"funkygibbon"}
 TAG=${BUILD_TAG:-"latest"}
 
 # http://nginx.org/en/download.html
-NGINX_VERSION=${BUILD_NGINX_VERSION:-"1.21.4"}
+NGINX_VERSION=${BUILD_NGINX_VERSION:-"1.22.1"}
 
 # https://github.com/pagespeed/ngx_pagespeed/releases
 NGINX_PAGESPEED_VERSION=${BUILD_PAGESPEED_VERSION:-"latest"}
 NGINX_PAGESPEED_RELEASE_STATUS=${BUILD_PAGESPEED_RELEASE_STATUS:-"stable"}
 
 # https://www.openssl.org/source
-OPENSSL_VERSION=${BUILD_OPENSSL_VERSION:-"1.1.1l"}
+OPENSSL_VERSION=${BUILD_OPENSSL_VERSION:-"1.1.1s"}
 
 # https://github.com/openresty/headers-more-nginx-module/tags
-HEADERS_MORE_VERSION=${BUILD_HEADERS_MORE_VERSION:-"0.33"}
+HEADERS_MORE_VERSION=${BUILD_HEADERS_MORE_VERSION:-"0.34"}
 
-PHP_VERSION=${BUILD_PHP_VERSION:-"7.4"}
+PHP_VERSION=${BUILD_PHP_VERSION:-"8.2"}
 
-PROJECTS=("nginx-pagespeed" "nginx-php-exim" "php-fpm" "wordpress" "nginx")
+PROJECTS=("nginx-pagespeed" "nginx-php-exim" "wordpress" "nginx")
 
 #git submodule update --init
 
@@ -48,9 +48,8 @@ while getopts "b:n:t:" opt; do
     ;;
 
   esac
+  shift $((OPTIND - 1))
 done
-
-shift $((OPTIND - 1))
 
 for PROJECT in "${PROJECTS[@]}"; do
   echo -e "->> ${NAMESPACE}/${PROJECT}"

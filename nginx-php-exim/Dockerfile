@@ -2,7 +2,8 @@ FROM funkygibbon/nginx-pagespeed:latest
 
 LABEL maintainer="Ray Walker <hello@raywalker.it>" 
 
-ENV PHP_VERSION 7.4
+ENV PHP_VERSION 8.2
+ENV NR_INSTALL_SILENT true
 
 RUN wget --retry-connrefused --waitretry=1 -t 5 -O - https://download.newrelic.com/548C16BF.gpg | apt-key add - && \
   echo "deb http://apt.newrelic.com/debian/ newrelic non-free" > /etc/apt/sources.list.d/newrelic.list && \
