@@ -74,7 +74,7 @@ else
   useradd -r -s /usr/sbin/nologin -u "${APP_UID}" -g "${APP_GROUP}" "${APP_USER}"
 fi
 
-if [[ "${CHOWN_APP_DIR}" == "true" ]] && [ -d "${PUBLIC_PATH}" ]; then
-  _good "chown ${APP_USER} ${PUBLIC_PATH}"
-  chown -Rf "${APP_USER}" "${PUBLIC_PATH}"
+if [[ "${CHOWN_APP_DIR}" == "true" ]] && [ -d "/app/source/public" ]; then
+  _good "chown ${APP_USER} /app/source/public"
+  chown -Rf "${APP_USER}" "/app/source/public"
 fi

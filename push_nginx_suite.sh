@@ -7,7 +7,7 @@ NAMESPACE=${BUILD_NAMESPACE:-"funkygibbon"}
 TAG=${BUILD_TAG:-$(date +'%Y%m%d')}
 
 
-PROJECTS=("nginx-pagespeed" "nginx-php-exim" "wordpress" "nginx")
+PROJECTS=("nginx-pagespeed" "nginx-php-exim")
 
 #git submodule update --init
 

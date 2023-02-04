@@ -10,10 +10,10 @@ _title "funkygibbon/wordpress"
 
 # PRE-INSTALLATION CHECKS
 
-([ "$(ls -A /app/www)" ] && [ "${OVERWRITE_FILES,,}" != "true" ]) && _good "Destination not empty: Not installing Wordpress" && exit 0;
+([ "$(ls -A /app/source/public)" ] && [ "${OVERWRITE_FILES,,}" != "true" ]) && _good "Destination not empty: Not installing Wordpress" && exit 0;
 
 if [ "${OVERWRITE_FILES,,}" == "true" ]; then
-    rm -fr /app/www && sync && mkdir -p /app/www
+    rm -fr /app/source/public && sync && mkdir -p /app/source/public
     WP_FORCE=" --force "
 fi
 
@@ -75,12 +75,12 @@ _good "Installing Wordpress for site ${WP_HOSTNAME:-${APP_HOSTNAME:-$DEFAULT_APP
 
 wp_install() {
 
-    mkdir -p /app/www
-    chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www
+    mkdir -p /app/source/public
+    chown -R ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/source/public
 
     _good "wp core download ..."
 
-    wp core download --path=/app/www --locale=${WP_LOCALE} --version=${WP_VERSION}
+    wp core download --path=/app/source/public --locale=${WP_LOCALE} --version=${WP_VERSION}
 
     _good "wp core config ..."
 
@@ -137,8 +137,8 @@ theme_install() {
     if [ "$WP_THEME_GIT" != "" ]; then
         ssh-keyscan -H bitbucket.org >> ~/.ssh/known_hosts
         ssh-keyscan -H github.com >> ~/.ssh/known_hosts
-        _good "Cloning $WP_THEME_GIT into /app/www/wp-content/themes/theme"
-        git clone $WP_THEME_GIT /app/www/wp-content/themes/theme
+        _good "Cloning $WP_THEME_GIT into /app/source/public/wp-content/themes/theme"
+        git clone $WP_THEME_GIT /app/source/public/wp-content/themes/theme
         wp theme activate theme
         return 0;
     fi

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 #  (The MIT License)
 #
@@ -23,33 +23,40 @@
 #  THE SOFTWARE.
 
 # CHANGE AS PER YOUR SERVER
+set -euo pipefail
+
+_good "$(printf "%-10s " "openresty:")" "CLOUDFLARE ${CLOUDFLARE_ENABLED}"
+
+[[ ${CLOUDFLARE_ENABLED} = "true" ]] || {
+  exit 0
+}
+
+# Create cloudflare config file
 CLOUDFLARE_IP_RANGES_FILE_PATH="/etc/nginx/conf.d/cloudflare-ips.conf"
-WWW_GROUP=${APP_GROUP:-$DEFAULT_APP_GROUP}
-WWW_USER=${APP_USER:-$DEFAULT_APP_USER}
 
 CLOUDFLARE_IPSV4_REMOTE_FILE="https://www.cloudflare.com/ips-v4/"
 CLOUDFLARE_IPSV6_REMOTE_FILE="https://www.cloudflare.com/ips-v6/"
 CLOUDFLARE_IPSV4_LOCAL_FILE="/tmp/cloudflare-ips-v4"
 CLOUDFLARE_IPSV6_LOCAL_FILE="/tmp/cloudflare-ips-v6"
 
-if [ -f /usr/bin/fetch ];
-then
-    fetch $CLOUDFLARE_IPSV4_REMOTE_FILE --no-verify-hostname --no-verify-peer -o $CLOUDFLARE_IPSV4_LOCAL_FILE --quiet
-    fetch $CLOUDFLARE_IPSV6_REMOTE_FILE --no-verify-hostname --no-verify-peer -o $CLOUDFLARE_IPSV6_LOCAL_FILE --quiet
-else
-    wget -q $CLOUDFLARE_IPSV4_REMOTE_FILE -O $CLOUDFLARE_IPSV4_LOCAL_FILE --no-check-certificate
-    wget -q $CLOUDFLARE_IPSV6_REMOTE_FILE -O $CLOUDFLARE_IPSV6_LOCAL_FILE --no-check-certificate
-fi
+wget --retry-connrefused --waitretry=1 -t 5 -q $CLOUDFLARE_IPSV4_REMOTE_FILE -O $CLOUDFLARE_IPSV4_LOCAL_FILE --no-check-certificate
+wget --retry-connrefused --waitretry=1 -t 5 -q $CLOUDFLARE_IPSV6_REMOTE_FILE -O $CLOUDFLARE_IPSV6_LOCAL_FILE --no-check-certificate
 
-echo "# CloudFlare IP Ranges" > $CLOUDFLARE_IP_RANGES_FILE_PATH
-echo "# Generated at $(date) by $0" >> $CLOUDFLARE_IP_RANGES_FILE_PATH
-echo "" >> $CLOUDFLARE_IP_RANGES_FILE_PATH
-awk '{ print "set_real_ip_from " $0 ";" }' $CLOUDFLARE_IPSV4_LOCAL_FILE >> $CLOUDFLARE_IP_RANGES_FILE_PATH
-awk '{ print "set_real_ip_from " $0 ";" }' $CLOUDFLARE_IPSV6_LOCAL_FILE >> $CLOUDFLARE_IP_RANGES_FILE_PATH
-echo "real_ip_header CF-Connecting-IP;" >> $CLOUDFLARE_IP_RANGES_FILE_PATH
-echo "" >> $CLOUDFLARE_IP_RANGES_FILE_PATH
+echo "# CloudFlare IP Ranges" >$CLOUDFLARE_IP_RANGES_FILE_PATH
+echo "# Generated at $(date) by $0" >>$CLOUDFLARE_IP_RANGES_FILE_PATH
+echo "" >>$CLOUDFLARE_IP_RANGES_FILE_PATH
+awk '{ print "set_real_ip_from " $0 ";" }' $CLOUDFLARE_IPSV4_LOCAL_FILE >>$CLOUDFLARE_IP_RANGES_FILE_PATH
+awk '{ print "set_real_ip_from " $0 ";" }' $CLOUDFLARE_IPSV6_LOCAL_FILE >>$CLOUDFLARE_IP_RANGES_FILE_PATH
+echo "" >>$CLOUDFLARE_IP_RANGES_FILE_PATH
 
-chown $WWW_USER:$WWW_GROUP $CLOUDFLARE_IP_RANGES_FILE_PATH
+chown $APP_USER:$APP_GROUP $CLOUDFLARE_IP_RANGES_FILE_PATH
 
 rm -rf $CLOUDFLARE_IPSV4_LOCAL_FILE
 rm -rf $CLOUDFLARE_IPSV6_LOCAL_FILE
+
+#Setup cron job to update Cloudflare ips
+CRON_SCHEDULE="cron.daily"
+CLOUDFLARE_DAILY_CRON_FILE_PATH="/etc/$CRON_SCHEDULE/nginx_update_cloudflare_ips"
+CLOUDFLARE_CRON_FILE="/app/bin/nginx_update_cloudflare_ips.sh"
+
+ln -s $CLOUDFLARE_CRON_FILE $CLOUDFLARE_DAILY_CRON_FILE_PATH

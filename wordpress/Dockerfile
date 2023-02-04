@@ -12,11 +12,11 @@ COPY . /app/
 
 WORKDIR /app
 
-RUN rm -fr /app/www && mkdir /app/www && \
+RUN rm -fr /app/source/public && mkdir /app/source/public && \
     cp bin/wp.sh /usr/local/bin/wp && \
     chmod +x /usr/local/bin/wp
 
-# If set to true then will install Wordpress in /app/www overwriting any contents
+# If set to true then will install Wordpress in /app/source/public overwriting any contents
 ENV OVERWRITE_FILES "false"
 
 ENV WP_TITLE "funkygibbon/wordpress"

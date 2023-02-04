@@ -2,14 +2,14 @@
 
 PHP_BINARY=`which php`
 
-APP_PATH=/app/www
+APP_PATH=/app/source/public
 
 LOGROTATE_FILENAME=/app/magento-logrotate
 
 if [ ! -f ${LOGROTATE_FILENAME} ]
 then
   cat > ${LOGROTATE_FILENAME} <<EOF
-/app/www/var/log/*.log {
+/app/source/public/var/log/*.log {
     rotate 52
     weekly
     compress

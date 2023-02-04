@@ -1,19 +1,29 @@
+{{ if eq .Env.SSL_ENABLED "true" }}
+
 server {
     listen  443 deferred http2 ssl;
     listen  [::]:443 deferred http2 ssl default ipv6only=on;
 
-    server_name example.com www.example.com -;
+    server_name {{ .Env.APP_HOSTNAME }} -;
 
-    root /app/source/public;
+    root {{ .Env.PUBLIC_PATH }};
 
+    {{ if eq .Env.PHP_ENABLED "true" }}
+    index index.php;
+    {{ else }}
     index index.html;
+    {{ end }}
+    
+    {{ if .Env.CUSTOM_404 }}
+    error_page 404 {{ .Env.CUSTOM_404 }};
+    {{ end }}
 
     ssl on;
 
-    ssl_certificate /etc/nginx/ssl/example.com.crt;
-    ssl_certificate_key /etc/nginx/ssl/example.com.key;
+    ssl_certificate /etc/nginx/ssl/{{ .Env.APP_HOSTNAME }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ .Env.APP_HOSTNAME }}.key;
 
-    ssl_dhparam /etc/nginx/ssl/example.com.dhparam.pem;
+    ssl_dhparam /etc/nginx/ssl/{{ .Env.APP_HOSTNAME }}.dhparam.pem;
 
     # OSCP
     # http://blog.mozilla.org/security/2013/07/29/ocsp-stapling-in-firefox/
@@ -43,3 +53,5 @@ server {
     include server.d/*.conf;
 
 }
+
+{{ end }}

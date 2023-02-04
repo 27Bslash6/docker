@@ -1,0 +1,113 @@
+
+{{ if eq .Env.PHP_ENABLED "true" }}
+
+# Common front handler for Magento / Wordpress etc
+location @handler {
+  rewrite / /index.php?$args;
+}
+
+location / {
+  index index.php index.html;
+  # First attempt to serve request as file, then
+  # as directory, then fall back to handler
+  try_files $uri $uri/ @handler;
+}
+
+# Allow PHP-FPM status from localhost only
+location = /_php_status {
+  access_log off;
+  allow 127.0.0.1;
+  deny all;
+  include fastcgi.conf;
+  fastcgi_pass fastcgi_backend;
+}
+
+{{ if eq .Env.REDIS_FASTCGI_CACHE_ENABLED "true" }}
+
+# Cache everything by default
+set $skip_cache 0;
+
+# POST requests and urls with a query string should always go to PHP
+if ($request_method = POST) {
+  set $skip_cache 1;
+}
+if ($query_string != "") {
+  set $skip_cache 1;
+}
+
+# Don't cache uris containing the following segments
+if ($request_uri ~* "/wp-admin/|/get-en-session-token|/xmlrpc.php|wp-.*.php|/feed/|index.php|sitemap(_index)?.xml|health_*.php") {
+  set $skip_cache 1;
+}
+
+# Don't use the cache for logged in users or recent commenters
+if ($http_cookie ~* "comment_author|wordpress_[a-f0-9]+|wp-postpass|wordpress_no_cache|wordpress_logged_in") {
+  set $skip_cache 1;
+}
+
+location /redis-fetch {
+  internal;
+  set $redis_key $args;
+  redis_pass redis_backend;
+}
+
+location /redis-store {
+  internal;
+  set_unescape_uri $key $arg_key ;
+  redis2_query set $key $echo_request_body;
+  redis2_query expire $key {{ .Env.REDIS_FASTCGI_CACHE_TTL }};
+  redis2_pass redis_backend;
+}
+
+{{ end }}
+
+# pass the PHP scripts to FastCGI
+location ~ \.php$ {
+  {{ if eq .Env.REDIS_FASTCGI_CACHE_ENABLED "true" }}
+
+  set $key "nginx-cache:$real_scheme$request_method$host$request_uri";
+
+  srcache_fetch_skip $skip_cache;
+  srcache_store_skip $skip_cache;
+
+  srcache_response_cache_control off;
+
+  set_escape_uri $escaped_key $key;
+
+  srcache_fetch GET /redis-fetch $key;
+  srcache_store PUT /redis-store key=$escaped_key;
+
+  more_set_headers 'X-Cache $srcache_fetch_status';
+  more_set_headers 'X-Cache-2 $srcache_store_status';
+  {{ end }}
+
+  # Remove PHP version from response
+  more_clear_headers x-powered-by;
+
+  try_files $uri =404;
+
+  # NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+  fastcgi_split_path_info ^(.+\.php)(/.+)$;
+  fastcgi_index index.php;
+  fastcgi_intercept_errors on;
+
+  include fastcgi.conf;
+  fastcgi_pass fastcgi_backend;
+
+}
+
+location php.ini {
+  deny all;
+}
+
+# Deny access to any files with a .php extension in the uploads directory
+# Works in sub-directory installs and also in multisite network
+location ~* /(?:wflogs|uploads|files)/.*\.php$ {
+  deny all;
+}
+
+location ~ .php/ { ## Forward paths like /js/index.php/x.js to relevant handler
+  rewrite ^(.*.php)/ $1 last;
+}
+
+{{ end }}

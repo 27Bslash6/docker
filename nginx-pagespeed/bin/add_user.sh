@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-source /app/bin/colours.sh
+source /app/.colours
 
 # =============================================================================
 # Application is launched as $APP_USER:$APP_GROUP with specified UID and GID, 
@@ -80,6 +80,6 @@ else
 fi
 
 if [ "${CHOWN_APP_DIR:-$DEFAULT_CHOWN_APP_DIR}" = "true" ] ; then
-	_good "chown ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www"
-	chown -Rf ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/www
+	_good "chown ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/source/public"
+	chown -Rf ${APP_USER:-$DEFAULT_APP_USER}:${APP_GROUP:-$DEFAULT_APP_GROUP} /app/source/public
 fi 

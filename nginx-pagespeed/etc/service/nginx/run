@@ -74,9 +74,9 @@ fi
 sed -i -r "s/DownstreamCacheRebeaconingKey \"__PAGESPEED_REBEACON_KEY__\";/DownstreamCacheRebeaconingKey \"${PAGESPEED_REBEACON_KEY:-$DEFAULT_PAGESPEED_REBEACON_KEY}\";/g" /etc/nginx/server.d/10_pagespeed.conf
 
 
-# Update cloudflare IP ranges
-_good "nginx:  updating cloudflare IP ranges"
-/app/bin/cloudflare-ip-updater.sh
+nginx_configure_pagespeed.sh
 
 wait # for openssl dhparam generation to finish
+
+_title "Starting service: nginx $(nginx -v 2>&1 | awk -F/ '{print $2}')..."
 exec nginx

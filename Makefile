@@ -34,8 +34,14 @@ help:
 		sort | \
 		awk 'BEGIN {FS = ".PHONY: |## "}; {printf "\033[36m%-16s\033[0m %s\n", $$2, $$3}'
 
-build:
-	./build_ngx_suite.sh
+.PHONY: ubuntu
+ubuntu: ## Builds the ubuntu Dockerfile
+	docker build -t funkygibbon/ubuntu:local ubuntu
 
-push:
-	./push_ngx_suite.sh
+.PHONY: build
+build: ## Builds the nginx suite of Dockerfiles
+	./build_nginx_suite.sh
+
+.PHONY: push
+push:  ## Pushes the nginx suite of Dockerfiles
+	./push_nginx_suite.sh

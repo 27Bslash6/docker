@@ -1,0 +1,45 @@
+#!/bin/bash
+set -e
+
+source /app/.colours
+
+# Update nginx user
+sed -i -r "s/user\s+.+;/user ${APP_USER:-$DEFAULT_APP_USER};/g" /etc/nginx/nginx.conf
+
+# If APP_HOSTNAME is not set, use default `hostname`
+APP_HOSTNAME=${APP_HOSTNAME:-$(hostname)}
+
+_good "nginx:  server_name ${APP_HOSTNAME}"
+
+nginx_configure_ssl.sh
+
+nginx_configure_pagespeed.sh
+
+nginx_configure_hostpath.sh
+
+nginx_configure_real_ip.sh
+
+nginx_configure_cloudflare.sh
+
+nginx_configure_health_checks.sh
+
+# Set worker_processes = num cpu cores
+WORKER_PROCESSES=$(grep -c processor /proc/cpuinfo)
+if [[ $WORKER_PROCESSES -gt ${OPENRESTY_MAX_WORKER_PROCESSES} ]]; then
+  # number of available processor cores exceeds the maximum permitted, limit to maximum
+  _good "$(printf "%-10s " "nginx:")" "Using max ${OPENRESTY_MAX_WORKER_PROCESSES} of $WORKER_PROCESSES available cores"
+  WORKER_PROCESSES=${OPENRESTY_MAX_WORKER_PROCESSES}
+fi
+_good "$(printf "%-10s " "nginx:")" "worker_processes=$WORKER_PROCESSES"
+export WORKER_PROCESSES
+
+dockerize \
+  -template /app/templates/etc/nginx/sites-enabled/default.conf.tmpl:/etc/nginx/sites-enabled/default.conf \
+  -template /app/templates/etc/nginx/sites-enabled/default-ssl.conf.tmpl:/etc/nginx/sites-enabled/default-ssl.conf \
+  -template /app/templates/etc/nginx/sites-enabled/upstream.conf.tmpl:/etc/nginx/sites-enabled/upstream.conf \
+  -template /app/templates/etc/nginx/nginx.conf.tmpl:/etc/nginx/nginx.conf
+
+_good "nginx:  ready for PHP ${PHP_VERSION}"
+
+_title "Starting service: nginx $(nginx -v 2>&1 | awk -F/ '{print $2}')..."
+exec nginx

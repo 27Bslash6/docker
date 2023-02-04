@@ -37,8 +37,8 @@ echo "html_errors = 1" >> /etc/hhvm/php.ini
 # # Enable sendmail additional parameters
 # sed -i -r "s/;sendmail_path =/sendmail_path =/g" /etc/php5/fpm/php.ini
 
-rm /app/www/index.html
-echo "<?php phpinfo(); " > /app/www/index.php
+rm /app/source/public/index.html
+echo "<?php phpinfo(); " > /app/source/public/index.php
 
 # EXIM
 
